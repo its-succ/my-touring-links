@@ -1,22 +1,18 @@
-# create-svelte
+# My Touring Links Client App
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## Environmet
 
-## Creating a project
+`.env.local` ファイルを作成して Google Maps Platform APIs の API キーを設定します
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
 ```
+PUBLIC_GMAP_API_KEY=0987654321
+```
+
+設定したあとで `npm run build` しておくこと。
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Once you've created a project and installed dependencies with `npm install`, start a development server:
 
 ```bash
 npm run dev
@@ -34,5 +30,3 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
