@@ -7,8 +7,8 @@
   import Tabs from './Tabs.svelte';
 
   let map: google.maps.MapElement;
+  let marker: google.maps.marker.AdvancedMarkerElement;
   let placePicker: { value: google.maps.places.Place; };
-  let center: string | google.maps.LatLng;
   let place: google.maps.places.Place | undefined;
   let placeId = 'ChIJp2YSkviJGGARyhnZ3I29Gzo';
   let tabs = [new Date('2023-11-02T08:00+09:00')];
@@ -17,12 +17,11 @@
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
     map.innerMap.addListener('click', onCLickMap);
-    center = new google.maps.LatLng({ lat: 35.684022, lng: 139.774474});
   });
 
   function placechange() {
     place = placePicker.value;
-    center = place.location!;
+    marker.position = map.center = place.location!;
     placeId = place.id;
   }
 
@@ -30,7 +29,7 @@
     if ((<google.maps.IconMouseEvent>event).placeId) {
       const iconMouseEvent = <google.maps.IconMouseEvent>event;
       placeId = iconMouseEvent.placeId!;
-      center = iconMouseEvent.latLng!;
+      marker.position = map.center = iconMouseEvent.latLng!;
     }
   }
 
@@ -75,8 +74,8 @@
 <gmpx-split-layout column-reverse row-reverse row-layout-min-width="640">
   <div slot="main">
     <gmpx-place-picker placeholder="Enter a place" id="place-picker" style="width: 100%" on:gmpx-placechange={placechange} bind:this={placePicker}></gmpx-place-picker>
-    <gmp-map center="{center}" zoom="13" map-id="DEMO_MAP_ID" bind:this={map} >
-      <gmp-advanced-marker position="{center}"></gmp-advanced-marker>
+    <gmp-map center="35.684022,139.774474" zoom="13" map-id="DEMO_MAP_ID" bind:this={map} >
+      <gmp-advanced-marker position="35.684022,139.774474" bind:this={marker}></gmp-advanced-marker>
     </gmp-map>
   </div>
   <div slot="fixed">
