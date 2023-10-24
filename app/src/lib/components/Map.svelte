@@ -1,18 +1,23 @@
 <script lang="ts">
   import { PUBLIC_GMAP_API_KEY } from '$env/static/public';
   import { onMount } from "svelte";
+  import { DateTime } from 'luxon';
   import pWaitFor from 'p-wait-for';
   import Place from './Place.svelte';
+  import Tabs from './Tabs.svelte';
 
   let map: google.maps.MapElement;
   let placePicker: { value: google.maps.places.Place; };
-  let center: string | google.maps.LatLng = '35.684022,139.774474';
+  let center: string | google.maps.LatLng;
   let place: google.maps.places.Place | undefined;
   let placeId = 'ChIJp2YSkviJGGARyhnZ3I29Gzo';
+  let tabs = [new Date('2023-11-02T08:00+09:00')];
+  let active = tabs[0];
 
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
     map.innerMap.addListener('click', onCLickMap);
+    center = new google.maps.LatLng({ lat: 35.684022, lng: 139.774474});
   });
 
   function placechange() {
@@ -27,6 +32,20 @@
       placeId = iconMouseEvent.placeId!;
       center = iconMouseEvent.latLng!;
     }
+  }
+
+  function changeDepartureDateTime() {
+    console.log('change datetime');
+  }
+
+  function addTab() {
+    tabs = [...tabs, DateTime.fromJSDate(tabs[tabs.length - 1]).plus({ days: 1 }).toJSDate()];
+  }
+
+  function closeTab() {
+    const activeIndex = tabs.indexOf(active);
+    tabs = tabs.filter((p) => p !== active);
+    setTimeout(() => active = tabs[activeIndex] ?? tabs[activeIndex - 1]);
   }
 </script>
 
@@ -61,7 +80,9 @@
     </gmp-map>
   </div>
   <div slot="fixed">
-    <h3>More information</h3>
-    <Place placeId="{placeId}"></Place>
+    <Tabs planDates={tabs} bind:active={active} on:add={addTab} on:close={closeTab} on:changeDepartureDateTime={changeDepartureDateTime}></Tabs>
+    <div class="places">
+      <Place placeId="{placeId}"></Place>
+    </div>
   </div>
 </gmpx-split-layout>
