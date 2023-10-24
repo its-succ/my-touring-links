@@ -32,11 +32,6 @@
 </script>
 
 <style>
-  :global(.tabicon) {
-    font-size:12px;
-    line-height:24px;
-    margin-right: -24px;
-  }
   nav {
     display: block;
     text-align: right;
