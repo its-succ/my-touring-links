@@ -5,6 +5,7 @@
   import pWaitFor from 'p-wait-for';
   import Place from './Place.svelte';
   import Tabs from './Tabs.svelte';
+  import DateTimePicker from "./DateTimePicker.svelte";
 
   /** gmp-map タグ */
   let map: google.maps.MapElement;
@@ -12,12 +13,16 @@
   let marker: google.maps.marker.AdvancedMarkerElement;
   /** gmpx-place-picker タグ */
   let placePicker: { value: google.maps.places.Place; };
+  /** DateTimePicker タグ */
+  let dateTimePicker: DateTimePicker;
   /** Place を表示する場所。これはリスト化すると不要になる */
   let placeId = 'ChIJp2YSkviJGGARyhnZ3I29Gzo';
   /** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
-  let tabs = [new Date('2023-11-02T08:00+09:00')];
+  let tabs = [new Date()];
   /** アクティブなタブ */
   let active = tabs[0];
+  /** 新規タブ追加中の場合はコールバックが設定される */
+  let addTabCallback: Function | undefined;
 
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
@@ -39,11 +44,26 @@
   }
 
   function changeDepartureDateTime() {
-    console.log('change datetime');
+    dateTimePicker.open(active);
+  }
+
+  function changedDepartureDateTime(e: CustomEvent) {
+    if (addTabCallback) {
+      addTabCallback(e.detail);
+    } else {
+      const activeIndex = tabs.indexOf(active);
+      tabs[activeIndex] = e.detail;
+      setTimeout(() => active = tabs[activeIndex]);
+    }
   }
 
   function addTab() {
-    tabs = [...tabs, DateTime.fromJSDate(tabs[tabs.length - 1]).plus({ days: 1 }).toJSDate()];
+    dateTimePicker.open(new Date());
+    addTabCallback = (date: Date) => {
+      tabs = [...tabs, date].sort((a:Date, b:Date) => a.getTime() - b.getTime());
+      setTimeout(() => active = date);
+      addTabCallback = undefined;
+    };
   }
 
   function closeTab() {
@@ -88,5 +108,6 @@
     <div class="places">
       <Place placeId="{placeId}"></Place>
     </div>
+    <DateTimePicker bind:this={dateTimePicker} on:selected={changedDepartureDateTime}></DateTimePicker>
   </div>
 </gmpx-split-layout>
