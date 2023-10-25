@@ -6,12 +6,17 @@
   import Place from './Place.svelte';
   import Tabs from './Tabs.svelte';
 
+  /** gmp-map タグ */
   let map: google.maps.MapElement;
+  /** gmp-advanced-marker タグ */
   let marker: google.maps.marker.AdvancedMarkerElement;
+  /** gmpx-place-picker タグ */
   let placePicker: { value: google.maps.places.Place; };
-  let place: google.maps.places.Place | undefined;
+  /** Place を表示する場所。これはリスト化すると不要になる */
   let placeId = 'ChIJp2YSkviJGGARyhnZ3I29Gzo';
+  /** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
   let tabs = [new Date('2023-11-02T08:00+09:00')];
+  /** アクティブなタブ */
   let active = tabs[0];
 
   onMount(async () => {
@@ -20,7 +25,7 @@
   });
 
   function placechange() {
-    place = placePicker.value;
+    const place = placePicker.value;
     marker.position = map.center = place.location!;
     placeId = place.id;
   }
