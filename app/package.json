@@ -12,20 +12,31 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"prepare": "npm run smui-theme-light && npm run smui-theme-dark",
+		"smui-theme-light": "smui-theme compile static/smui.css -i src/theme",
+		"smui-theme-dark": "smui-theme compile static/smui-dark.css -i src/theme/dark"
 	},
 	"devDependencies": {
+		"@googlemaps/extended-component-library": "^0.4.3",
 		"@playwright/test": "^1.28.1",
+		"@smui/button": "^7.0.0-beta.15",
+		"@smui/tab": "^7.0.0-beta.15",
+		"@smui/tab-bar": "^7.0.0-beta.15",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.20.4",
 		"@types/google.maps": "^3.54.3",
+		"@types/luxon": "^3.3.3",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-svelte": "^2.30.0",
+		"luxon": "^3.4.3",
+		"p-wait-for": "^5.0.2",
 		"prettier": "^3.0.3",
 		"prettier-plugin-svelte": "^3.0.3",
+		"smui-theme": "^7.0.0-beta.15",
 		"svelte": "^4.0.5",
 		"svelte-check": "^3.4.3",
 		"tslib": "^2.4.1",
@@ -33,9 +44,5 @@
 		"vite": "^4.4.2",
 		"vitest": "^0.34.6"
 	},
-	"type": "module",
-	"dependencies": {
-		"@googlemaps/extended-component-library": "^0.4.3",
-		"p-wait-for": "^5.0.2"
-	}
+	"type": "module"
 }
