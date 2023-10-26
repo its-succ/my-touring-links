@@ -15,7 +15,7 @@ const config = {
     alias: {
       'components': 'src/lib/components'
     }
-	}
+  }
 };
 
 export default config;
