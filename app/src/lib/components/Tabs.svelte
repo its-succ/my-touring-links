@@ -32,6 +32,11 @@
 </script>
 
 <style>
+  header {
+    position: sticky;
+    background-color: #fff;
+    top: 0;
+  }
   nav {
     display: block;
     text-align: right;
@@ -39,23 +44,25 @@
   }
 </style>
 
-<TabBar tabs={planDates} let:tab bind:active>
-  <Tab {tab} minWidth>
-    <Label>{DateTime.fromJSDate(tab).setZone('Asia/Tokyo').toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label>
-  </Tab>
-  {#if tab === planDates[planDates.length - 1]}
-    <Tab tab={'+'} minWidth on:click={add}>
-      <Icon class="material-icons">add</Icon>
+<header>
+  <TabBar tabs={planDates} let:tab bind:active>
+    <Tab {tab} minWidth>
+      <Label>{DateTime.fromJSDate(tab).setZone('Asia/Tokyo').toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label>
     </Tab>
-  {/if}
-</TabBar>
-<nav>
-  <Button color="secondary" on:click={changeDepartureDateTime}>
-    <Label>出発日時を変更する</Label>
-    <Icon class="material-icons navicon">settings</Icon>
-  </Button>
-  <Button color="secondary" disabled={planDates.length === 1} on:click={close}>
-    <Label>タブを閉じる</Label>
-    <Icon class="material-icons navicon">close</Icon>
-  </Button>
-</nav>
+    {#if tab === planDates[planDates.length - 1]}
+      <Tab tab={'+'} minWidth on:click={add}>
+        <Icon class="material-icons">add</Icon>
+      </Tab>
+    {/if}
+  </TabBar>
+  <nav>
+    <Button color="secondary" on:click={changeDepartureDateTime}>
+      <Label>出発日時を変更する</Label>
+      <Icon class="material-icons navicon">settings</Icon>
+    </Button>
+    <Button color="secondary" disabled={planDates.length === 1} on:click={close}>
+      <Label>タブを閉じる</Label>
+      <Icon class="material-icons navicon">close</Icon>
+    </Button>
+  </nav>
+</header>

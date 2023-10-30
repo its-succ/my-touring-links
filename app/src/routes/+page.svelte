@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Map from 'components/Map.svelte';
+  import Edit from "components/Edit.svelte";
 </script>
 
 <style>
@@ -29,7 +29,7 @@
     <h1>Welcome to My Touring Links</h1>
   </header>
   <main>
-    <Map />
+    <Edit />
   </main>
   <footer>
     @copy-right: ESM
