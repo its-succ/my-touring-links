@@ -17,6 +17,17 @@
 			rel="stylesheet"
 		/>
 		<script type="module" src="https://unpkg.com/@googlemaps/extended-component-library"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/mobile-drag-drop/default.css">
+    <script src="https://unpkg.com/mobile-drag-drop/index.min.js"></script>
+    <script src="https://unpkg.com/mobile-drag-drop/scroll-behaviour.min.js"></script>
+    <script>
+      const usePolyfill = MobileDragDrop.polyfill({ dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride });
+      if (usePolyfill) {
+        document.addEventListener('dragenter', (event) => event.preventDefault());
+        window.addEventListener('touchmove', () => {}, { passive: false });
+      }
+    </script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

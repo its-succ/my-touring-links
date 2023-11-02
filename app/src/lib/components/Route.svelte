@@ -36,8 +36,9 @@
    */
   function onDragStart(e: DragEvent) {
     if (!handlePressed) {
+      e.stopPropagation();
       e.preventDefault();
-      return;
+      return false;
     }
     const dragged = getDraggedParent(e.target);
     e.dataTransfer?.setData("source", dragged?.index.toString());
@@ -50,7 +51,9 @@
    */
   function onDrop(e: DragEvent) {
     const dragged = getDraggedParent(e.target);
-    const from = Number(e.dataTransfer?.getData("source"));
+    const source = e.dataTransfer?.getData("source");
+    if (source === undefined  || source === '') return false;
+    const from = Number(source);
     const to = dragged.index;
     const newList = [...places];
     newList[from] = [newList[to], (newList[to] = newList[from])][0];
