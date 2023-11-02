@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import pWaitFor from 'p-wait-for';
+  import { v4 as uuidv4 } from "uuid";
   import type { Place } from "$lib/models/place";
 
   /**
@@ -22,7 +23,7 @@
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
     map.innerMap.addListener('click', onCLickMap);
-    selected =  { placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo', latLng: new google.maps.LatLng({  lat: 35.684022, lng: 139.774474 }) };
+    selected =  { id: uuidv4(), placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo', latLng: new google.maps.LatLng({  lat: 35.684022, lng: 139.774474 }) };
   });
 
   /**
@@ -33,7 +34,7 @@
   function placechange() {
     const place = placePicker.value;
     marker.position = map.center = place.location!;
-    selected = { placeId: place.id, latLng: place.location! };
+    selected = { id: uuidv4(), placeId: place.id, latLng: place.location! };
   }
 
   /**
@@ -45,7 +46,7 @@
   function onCLickMap(event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
     if ((<google.maps.IconMouseEvent>event).placeId) {
       const iconMouseEvent = <google.maps.IconMouseEvent>event;
-      selected = <Place>iconMouseEvent;
+      selected = { ...iconMouseEvent,  id: uuidv4() };
       marker.position = map.center = iconMouseEvent.latLng!;
     }
   }
