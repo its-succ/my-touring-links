@@ -1,15 +1,19 @@
 <script lang="ts">
+  import IconButton from '@smui/icon-button';
+
   /** Place ID */
   export let placeId: string | undefined;
+  /** ソートハンドルアイコンが押されているかどうか */
+  export let pressed: boolean;
 </script>
 
 <style>
   gmpx-place-data-provider {
     display: grid;
     grid-template:
-      "img name" auto
-      "img address" auto
-      /70px 1fr
+      "img name meta" auto
+      "img address meta" auto
+      /50px 1fr
     ;
     gap: 0 10px;
     padding: 5px;
@@ -22,9 +26,9 @@
   }
 
   gmpx-place-photo-gallery::part(tile) {
-    max-width: 50px;
-    max-height: 50px;
-    margin: 10px;
+    max-width: 40px;
+    max-height: 40px;
+    margin: 5px;
     border-radius: 100%;
   }
 
@@ -42,6 +46,12 @@
     margin: 0;
     padding: 5px 0;
   }
+  div.meta {
+    grid-area: meta;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 </style>
 
 <gmpx-place-data-provider place="{placeId}">
@@ -50,4 +60,8 @@
     <gmpx-place-field-text field="displayName"></gmpx-place-field-text>
   </header>
   <p><gmpx-place-field-text field="formattedAddress"></gmpx-place-field-text></p>
+  <div class="meta">
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div on:pointerdown={() => pressed = true} on:pointerleave={() => pressed = false}><IconButton class="material-icons" ripple={false}>drag_handle</IconButton></div>
+  </div>
 </gmpx-place-data-provider>
