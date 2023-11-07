@@ -5,17 +5,10 @@
   import Tabs from './Tabs.svelte';
   import DateTimePicker from "./DateTimePicker.svelte";
 	import RouteElement from './Route.svelte';
+  import Progress from './Progress.svelte';
   import Button, { Icon, Label } from '@smui/button';
   import elementResizeDetectorMaker from '@andybeersdev/element-resize-detector';
-  import {
-    addDepartureDateTimeToRoutes,
-    addPlaceByDepartureDateTimeToRoutes,
-    changeDepartureDateTimeToRoutes,
-    findRoutesByDepartureDateTime,
-    getDepartureDateTimes,
-    initialRoutes,
-    removeDepartureDateTimeFromRoutes
-  } from '$lib/models/routes';
+  import { Routes } from '$lib/models/routes';
   import type { Route } from '$lib/models/route';
   import type { Place } from "$lib/models/place";
 
@@ -24,20 +17,26 @@
   /** 新規タブ追加中の場合はコールバックが設定される */
   let addTabCallback: ((date: Date) => void)  | undefined;
   /** Map コンポーネント */
+  let map: Map;
+  /** Map で選択されている場所 */
   let selectedPlace: Place;
   /** 追加ボタン のエレメント。スクロール用に利用 */
   let addButton: HTMLElement;
   /** gmpx-split-layout の固定情報エレメント。ルート一覧の内容が変わったときに高さの変更を検知する用 */
   let fixed: HTMLElement;
   /** 出発日時別ルート */
-  let routes = initialRoutes();
+  let routes = new Routes();
   /** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
-  let tabs = getDepartureDateTimes(routes);
+  let tabs = routes.getDepartureDateTimes();
   /** アクティブなタブ */
   let active = tabs[0];
   /** アクティブなタブのルート */
   let route: Route | undefined;
-  $: route = findRoutesByDepartureDateTime(routes, active);
+  $: route = routes.findRoutesByDepartureDateTime(active);
+  /** ルートエレメント */
+  let routeElement: RouteElement;
+  /** プログレスダイアログの表示状態 */
+  let progressOpen: boolean;
 
   /**
    * コンポーネントがロードされたら、ルート一覧の内容が変わった(高さに変化があった)ときに
@@ -75,8 +74,8 @@
     if (addTabCallback) {
       addTabCallback(e.detail);
     } else {
-      changeDepartureDateTimeToRoutes(routes, active, e.detail);
-      tabs = getDepartureDateTimes(routes);
+      routes.changeDepartureDateTimeToRoutes(active, e.detail);
+      tabs = routes.getDepartureDateTimes();
       setTimeout(() => active = e.detail);
     }
   }
@@ -95,8 +94,8 @@
   function addTab() {
     dateTimePicker.open(new Date());
     addTabCallback = (date: Date) => {
-      route = addDepartureDateTimeToRoutes(routes, date);
-      tabs = getDepartureDateTimes(routes);
+      route = routes.addDepartureDateTimeToRoutes(date);
+      tabs = routes.getDepartureDateTimes();
       setTimeout(() => active = date);
       addTabCallback = undefined;
     };
@@ -110,8 +109,8 @@
    */
   function closeTab() {
     const activeIndex = tabs.indexOf(active);
-    removeDepartureDateTimeFromRoutes(routes, active);
-    tabs = getDepartureDateTimes(routes);
+    routes.removeDepartureDateTimeFromRoutes(active);
+    tabs = routes.getDepartureDateTimes();
     setTimeout(() => active = tabs[activeIndex] ?? tabs[activeIndex - 1]);
   }
 
@@ -119,7 +118,35 @@
    * 場所をアクティブなルートに追加する
    */
   function addPlaceToRoute() {
-    route = addPlaceByDepartureDateTimeToRoutes(routes, active, selectedPlace);
+    route = routes.addPlaceByDepartureDateTimeToRoutes(active, selectedPlace);
+  }
+
+  /**
+   * ルートをプレビューする
+   * @param e - DirectionsResult を含むイベント
+   */
+  async function previewRoute(e: CustomEvent<google.maps.DirectionsResult>) {
+    await map.previewRoute(e.detail);
+  }
+
+  /**
+   * ルート計算できないかどうか
+   * @param route - ルート
+   * @returns ルート計算できないときは true
+   */
+  function routeDisable(route?: Route) {
+    if (route === undefined) return true;
+    if (route.get().length < 2) return true;
+    return false;
+  }
+
+  /**
+   * ルートを計算する
+   */
+  async function calcRoute() {
+    progressOpen = true;
+    await routeElement.calc(active);
+    progressOpen = false;
   }
 </script>
 
@@ -151,17 +178,22 @@
 <gmpx-api-loader key="{PUBLIC_GMAP_API_KEY}"></gmpx-api-loader>
 <gmpx-split-layout column-reverse row-reverse row-layout-min-width="640">
   <div slot="main">
-    <Map bind:selected={selectedPlace}></Map>
+    <Map bind:selected={selectedPlace} bind:this={map}></Map>
   </div>
   <div slot="fixed" bind:this={fixed}>
     <Tabs  planDates={tabs} bind:active={active} on:add={addTab} on:close={closeTab} on:changeDepartureDateTime={changeDepartureDateTime}></Tabs>
-    <RouteElement value={route}></RouteElement>
+    <RouteElement value={route} on:previewRoute={previewRoute} bind:this={routeElement}></RouteElement>
     <div id="add-route-wrapper" bind:this={addButton}>
-      <Button variant="outlined" color="secondary" class="button-shaped-round" on:click={addPlaceToRoute}>
+      <Button variant="outlined" color="primary" class="button-shaped-round" on:click={addPlaceToRoute}>
         <Icon class="material-icons">add</Icon>
-        <Label>選択されている場所を追加する</Label>
+        <Label>場所を追加する</Label>
+      </Button>
+      <Button variant="outlined" color="secondary" class="button-shaped-round" disabled={routeDisable(route)} on:click={calcRoute}>
+        <Icon class="material-icons">alt_route</Icon>
+        <Label>ルートを計算する</Label>
       </Button>
     </div>
     <DateTimePicker bind:this={dateTimePicker} on:selected={changedDepartureDateTime}></DateTimePicker>
   </div>
 </gmpx-split-layout>
+<Progress bind:open={progressOpen}></Progress>

@@ -16,6 +16,8 @@
   let marker: google.maps.marker.AdvancedMarkerElement;
   /** gmpx-place-picker タグ */
   let placePicker: { value: google.maps.places.Place; };
+  /** ルート描画 */
+  let directionsRenderer: google.maps.DirectionsRenderer | undefined;
 
   /**
    * コンポーネントがマウントされたら、google Map が利用可能になるまで待って、クリックイベントのハンドラをセットする
@@ -35,6 +37,7 @@
     const place = placePicker.value;
     marker.position = map.center = place.location!;
     selected = { id: uuidv4(), placeId: place.id, latLng: place.location! };
+    removeRoute();
   }
 
   /**
@@ -48,7 +51,36 @@
       const iconMouseEvent = <google.maps.IconMouseEvent>event;
       selected = { ...iconMouseEvent,  id: uuidv4() };
       marker.position = map.center = iconMouseEvent.latLng!;
+      removeRoute();
     }
+  }
+
+  /**
+   * ルートを地図から消す
+   */
+  function removeRoute() {
+    if (directionsRenderer && directionsRenderer.getMap() !== null) {
+      directionsRenderer.setMap(null);
+    }
+  }
+
+  /**
+   * マーカーを削除する
+   */
+  function removeMarker() {
+    marker.position = null;
+  }
+
+  /**
+   * ルートをプレビューする
+   * @param param - google.maps.DirectionsResult
+   * @returns ルート取得結果
+   */
+  export function previewRoute(param: google.maps.DirectionsResult) {
+    directionsRenderer = directionsRenderer ?? new google.maps.DirectionsRenderer();
+    directionsRenderer.setDirections(param);
+    directionsRenderer.setMap(map.innerMap);
+    removeMarker();
   }
 </script>
 

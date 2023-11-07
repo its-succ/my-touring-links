@@ -26,7 +26,7 @@
 
 <article>
   <header>
-    <h1>Welcome to My Touring Links</h1>
+    <h3>Welcome to My Touring Links</h3>
   </header>
   <main>
     <Edit />

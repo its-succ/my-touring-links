@@ -11,6 +11,8 @@
 	$error: color-palette.$red-900
 );
 
+@use './typography/Typography';
+
 html,
 body {
 	background-color: theme.$surface;
