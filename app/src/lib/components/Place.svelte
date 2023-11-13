@@ -136,6 +136,9 @@ import { DateTime } from 'luxon';
     <IconButton class="material-icons" on:click={() => menu.setOpen(true)}>more_vert</IconButton>
     <Menu bind:this={menu}>
       <List>
+        <Item on:SMUI:action={() => dispatch('deleteFromRoute', placeId)}>
+          <Text class="mdc-typography--caption">ルートから削除</Text>
+        </Item>
         <Item on:SMUI:action={() => dispatch('previewRouteTo', placeId)} disabled={directionsResult === undefined}>
           <Text class="mdc-typography--caption">1つ前の場所からのルートを確認</Text>
         </Item>
