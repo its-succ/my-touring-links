@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import pWaitFor from 'p-wait-for';
   import { v4 as uuidv4 } from "uuid";
-  import type { Place } from "$lib/models/place";
+  import { DEFAULT_STAYING_TIME, type Place } from "$lib/models/place";
 
   /**
    * 選択されている場所
@@ -25,7 +25,7 @@
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
     map.innerMap.addListener('click', onCLickMap);
-    selected =  { id: uuidv4(), placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo', latLng: new google.maps.LatLng({  lat: 35.684022, lng: 139.774474 }) };
+    selected =  { id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME,  placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo', latLng: new google.maps.LatLng({  lat: 35.684022, lng: 139.774474 }) };
   });
 
   /**
@@ -36,7 +36,7 @@
   function placechange() {
     const place = placePicker.value;
     marker.position = map.center = place.location!;
-    selected = { id: uuidv4(), placeId: place.id, latLng: place.location! };
+    selected = { id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME, placeId: place.id, latLng: place.location! };
     removeRoute();
   }
 
@@ -49,7 +49,7 @@
   function onCLickMap(event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
     if ((<google.maps.IconMouseEvent>event).placeId) {
       const iconMouseEvent = <google.maps.IconMouseEvent>event;
-      selected = { ...iconMouseEvent,  id: uuidv4() };
+      selected = { ...iconMouseEvent,  id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME };
       marker.position = map.center = iconMouseEvent.latLng!;
       removeRoute();
     }

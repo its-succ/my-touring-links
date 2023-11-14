@@ -76,6 +76,7 @@
     } else {
       routes.changeDepartureDateTimeToRoutes(active, e.detail);
       tabs = routes.getDepartureDateTimes();
+      routeElement.reset();
       setTimeout(() => active = e.detail);
     }
   }
@@ -159,13 +160,13 @@
   }
   gmpx-split-layout {
     --gmpx-fixed-panel-width-row-layout: 50%;
-    --gmpx-fixed-panel-height-column-layout: 40%;
+    --gmpx-fixed-panel-height-column-layout: 50%;
   }
   #add-route-wrapper {
     padding: 1.5em 0;
     text-align: center;
   }
- :global(.button-shaped-round) {
+ * :global(.button-shaped-round) {
     border-radius: 36px;
   }
   @media screen and (min-width: 640px) {
