@@ -92,6 +92,18 @@
   }
 
   /**
+   * ルートから場所を削除する
+   * @param e - 場所IDを含むカスタムイベント
+   */
+   function deleteFromRoute(e: CustomEvent<string>) {
+    const placeId = e.detail;
+    const to = places.findIndex((p) => placeId === (<Spot>p).placeId );
+    directionsResults = undefined;
+    places = places.toSpliced(to, 1);
+    value?.set(places);
+  }
+
+  /**
    * 指定番目のルート計算結果を取得する
    * @param index - 場所の繰り返しindex
    * @returns ルート計算結果の0番目は、場所[1]のルート計算結果なので、 index - 1 番目の計算結果が戻る
@@ -121,7 +133,7 @@
         on:dragover|preventDefault={() => {}}
         on:drop|preventDefault={onDrop}
       >
-        <PlaceElement placeId={getPlaceId(place)} directionsResult={getDirectionsResult(index)} isLatest={index === (places.length - 1)} bind:pressed={handlePressed} on:previewRouteTo={previewRoute}></PlaceElement>
+        <PlaceElement placeId={getPlaceId(place)} directionsResult={getDirectionsResult(index)} isLatest={index === (places.length - 1)} bind:pressed={handlePressed} on:previewRouteTo={previewRoute} on:deleteFromRoute={deleteFromRoute}></PlaceElement>
       </li>
     {/if}
   {/each}
