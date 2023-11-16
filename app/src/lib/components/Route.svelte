@@ -26,9 +26,17 @@
     places = places;
   }
 
-  /** スポットの placeId を取得する */
-  function getPlaceId(place: Place)  {
-    return (<Spot>place).placeId!;
+  /**
+   * ルートをリセットする
+   */
+   export function reset() {
+    directionsResults = undefined;
+    places = places;
+  }
+
+  /** スポットで返却する */
+  function toSpot(place: Place)  {
+    return <Spot>place;
   }
 
   /**
@@ -84,8 +92,8 @@
    * @param e - 場所IDを含むカスタムイベント
    */
   function previewRoute(e: CustomEvent<string>) {
-    const placeId = e.detail;
-    const to = places.findIndex((p) => placeId === (<Spot>p).placeId );
+    const id = e.detail;
+    const to = places.findIndex((p) => id === p.id );
     if (to === undefined || to === 0) return false;
     if (directionsResults === undefined) return false;
     dispatch('previewRoute', directionsResults[to - 1]);
@@ -96,10 +104,23 @@
    * @param e - 場所IDを含むカスタムイベント
    */
    function deleteFromRoute(e: CustomEvent<string>) {
-    const placeId = e.detail;
-    const to = places.findIndex((p) => placeId === (<Spot>p).placeId );
+    const id = e.detail;
+    const to = places.findIndex((p) => id === p.id );
     directionsResults = undefined;
     places = places.toSpliced(to, 1);
+    value?.set(places);
+  }
+
+  /**
+   * 滞在時間を更新する
+   * @param e - 場所IDと滞在時間を含むカスタムイベント
+   */
+   function changeStayingTime(e: CustomEvent<{ id: string, value: number }>) {
+    const { id, value: stayingTime  } = e.detail;
+    const target = places.findIndex((p) => id === p.id );
+    places[target].stayingTime = stayingTime;
+    directionsResults = undefined;
+    places = places;
     value?.set(places);
   }
 
@@ -115,7 +136,7 @@
 </script>
 
 <style>
-  :global(ul.routes, ul.routes > li) {
+  ul.routes, ul.routes > li {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -133,7 +154,15 @@
         on:dragover|preventDefault={() => {}}
         on:drop|preventDefault={onDrop}
       >
-        <PlaceElement placeId={getPlaceId(place)} directionsResult={getDirectionsResult(index)} isLatest={index === (places.length - 1)} bind:pressed={handlePressed} on:previewRouteTo={previewRoute} on:deleteFromRoute={deleteFromRoute}></PlaceElement>
+        <PlaceElement
+          place={toSpot(place)}
+          directionsResult={getDirectionsResult(index)}
+          isLatest={index === (places.length - 1)}
+          bind:pressed={handlePressed}
+          on:previewRouteTo={previewRoute}
+          on:deleteFromRoute={deleteFromRoute}
+          on:changeStayingTime={changeStayingTime}
+        ></PlaceElement>
       </li>
     {/if}
   {/each}

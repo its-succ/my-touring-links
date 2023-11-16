@@ -58,7 +58,7 @@ export class Route {
 			this.calculated.push(result);
 			departureTime = DateTime.fromJSDate(departureTime)
 				.plus({ second: result.routes[0].legs.at(-1)!.duration!.value })
-				.plus({ minutes: 10 }) // TODO: 滞在時間はデフォルトで10分とする。滞在時間の実装は後で
+				.plus({ minutes: this.places[i].stayingTime })
 				.toJSDate();
 		}
 		return this.calculated;
