@@ -22,7 +22,7 @@
   let dispatch = createEventDispatcher();
   /** 滞在時間編集ダイアログの表示状態 */
   let stayingTimeDialog = false;
-  /** 経由値 */
+  /** 経由地 */
   let waypoint = place.waypoint || false;
   $: fireChangeWaypoint(waypoint);
   function fireChangeWaypoint(value: boolean) {
@@ -40,7 +40,7 @@
       <Text class="mdc-typography--caption">滞在時間を変更する</Text>
     </Item>
     <Item nonInteractive disabled={origin === true || destination === true}>
-      <Label class="mdc-typography--caption">経由値</Label>
+      <Label class="mdc-typography--caption">経由地</Label>
       <Meta>
         <Checkbox bind:checked={waypoint} disabled={origin === true || destination === true} />
       </Meta>

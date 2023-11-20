@@ -120,8 +120,8 @@
   }
 
   /**
-   * 経由値の設定を更新する
-   * @param e - 場所IDと経由値フラグを含むカスタムイベント
+   * 経由地の設定を更新する
+   * @param e - 場所IDと経由地フラグを含むカスタムイベント
    */
    function changeWaypoint(e: CustomEvent<{ id: string, value: boolean }>) {
     const { id, value: waypoint  } = e.detail;

@@ -4,7 +4,7 @@ type PlaceBase = {
 	id: string;
 	/** 滞在時間(分) */
 	stayingTime: number;
-  /** 経由値 */
+  /** 経由地 */
   waypoint?: boolean;
 };
 
