@@ -35,6 +35,7 @@
    */
   function placechange() {
     const place = placePicker.value;
+    if (place === undefined) return;
     marker.position = map.center = place.location!;
     selected = { id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME, placeId: place.id, latLng: place.location! };
     removeRoute();

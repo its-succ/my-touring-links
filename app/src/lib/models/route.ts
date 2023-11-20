@@ -39,11 +39,24 @@ export class Route {
 	 * @return 計算結果
 	 */
 	async calc(departureTime: Date) {
+    let waypoints: google.maps.DirectionsWaypoint[] = [];
+    let origin: google.maps.LatLng | undefined = undefined;
 		this.calculated = [];
 		for (let i = 1; i < this.places.length; i++) {
-			const request: google.maps.DirectionsRequest = {
-				origin: this.places[i - 1].latLng!,
+      if (this.places[i].waypoint === true && i < (this.places.length - 1)) {
+        waypoints.push({ location: this.places[i].latLng! });
+        if (origin === undefined) {
+          origin = this.places[i - 1].latLng!;
+        }
+        continue;
+      }
+      if (origin === undefined) {
+        origin = this.places[i - 1].latLng!;
+      }
+      const request: google.maps.DirectionsRequest = {
+				origin,
 				destination: this.places[i].latLng!,
+        waypoints,
 				travelMode: google.maps.TravelMode.DRIVING,
 				drivingOptions: { departureTime }
 			};
@@ -57,10 +70,12 @@ export class Route {
 			})();
 			this.calculated.push(result);
 			departureTime = DateTime.fromJSDate(departureTime)
-				.plus({ second: result.routes[0].legs.at(-1)!.duration!.value })
+				.plus({ second: result.routes[0].legs.map((l) => l.duration!.value).reduce((sum, val) => sum + val, 0) })
 				.plus({ minutes: this.places[i].stayingTime })
 				.toJSDate();
-		}
+      waypoints = [];
+      origin = undefined;
+    }
 		return this.calculated;
 	}
 
@@ -101,7 +116,7 @@ export class DirectionsResultCache extends Map<string, google.maps.DirectionsRes
 	}
 
 	private generateKey(request: google.maps.DirectionsRequest): string {
-		return `${request.origin.toString()}-${request.destination.toString()}-${request.drivingOptions?.departureTime.getTime()}}`;
+		return `${request.origin.toString()}-${request.waypoints?.map((w) => w.location?.toString()).join('+')}-${request.destination.toString()}-${request.drivingOptions?.departureTime.getTime()}}`;
 	}
 }
 
