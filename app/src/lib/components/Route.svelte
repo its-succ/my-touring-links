@@ -1,7 +1,7 @@
 <script lang="ts">
-	import PlaceElement from "./Place.svelte";
-	import { isLatLng, isPlace, isSpot, type Place } from "$lib/models/place";
-	import type { Route } from "$lib/models/route";
+  import PlaceElement from './Place.svelte';
+  import { isLatLng, isPlace, isSpot, type Place } from '$lib/models/place';
+  import type { Route } from '$lib/models/route';
   import { createEventDispatcher } from 'svelte';
 
   /**  ルート */
@@ -29,7 +29,7 @@
   /**
    * ルートをリセットする
    */
-   export function reset() {
+  export function reset() {
     directionsResults = undefined;
     places = places;
   }
@@ -59,7 +59,7 @@
       return false;
     }
     const dragged = findListItemDataset(e.target!);
-    e.dataTransfer?.setData("source", dragged?.index!.toString());
+    e.dataTransfer?.setData('source', dragged?.index!.toString());
     e.dataTransfer?.setData('text/plain', 'handle');
   }
 
@@ -69,13 +69,13 @@
    */
   function onDrop(e: DragEvent) {
     const dragged = findListItemDataset(e.target!);
-    const source = e.dataTransfer?.getData("source");
-    if (source === undefined  || source === '') return false;
+    const source = e.dataTransfer?.getData('source');
+    if (source === undefined || source === '') return false;
     const from = Number(source);
     const to = Number(dragged.index);
     const newList = [...places];
     directionsResults = undefined;
-    places =  newList.toSpliced(from, 1).toSpliced(to, 0, places[from]);
+    places = newList.toSpliced(from, 1).toSpliced(to, 0, places[from]);
     value?.set(places);
   }
 
@@ -87,7 +87,7 @@
    */
   function previewRoute(e: CustomEvent<string>) {
     const id = e.detail;
-    const place = places.find((p) => id === p.id );
+    const place = places.find((p) => id === p.id);
     if (place === undefined) return false;
     const directionsResult = getDirectionsResult(place);
     if (directionsResult === undefined) return false;
@@ -98,9 +98,9 @@
    * ルートから場所を削除する
    * @param e - 場所IDを含むカスタムイベント
    */
-   function deleteFromRoute(e: CustomEvent<string>) {
+  function deleteFromRoute(e: CustomEvent<string>) {
     const id = e.detail;
-    const to = places.findIndex((p) => id === p.id );
+    const to = places.findIndex((p) => id === p.id);
     directionsResults = undefined;
     places = places.toSpliced(to, 1);
     value?.set(places);
@@ -110,9 +110,9 @@
    * 滞在時間を更新する
    * @param e - 場所IDと滞在時間を含むカスタムイベント
    */
-   function changeStayingTime(e: CustomEvent<{ id: string, value: number }>) {
-    const { id, value: stayingTime  } = e.detail;
-    const target = places.findIndex((p) => id === p.id );
+  function changeStayingTime(e: CustomEvent<{ id: string; value: number }>) {
+    const { id, value: stayingTime } = e.detail;
+    const target = places.findIndex((p) => id === p.id);
     places[target].stayingTime = stayingTime;
     directionsResults = undefined;
     places = places;
@@ -123,9 +123,9 @@
    * 経由地の設定を更新する
    * @param e - 場所IDと経由地フラグを含むカスタムイベント
    */
-   function changeWaypoint(e: CustomEvent<{ id: string, value: boolean }>) {
-    const { id, value: waypoint  } = e.detail;
-    const target = places.findIndex((p) => id === p.id );
+  function changeWaypoint(e: CustomEvent<{ id: string; value: boolean }>) {
+    const { id, value: waypoint } = e.detail;
+    const target = places.findIndex((p) => id === p.id);
     places[target].waypoint = waypoint;
     directionsResults = undefined;
     places = places;
@@ -138,23 +138,19 @@
    * @returns 指定した到着場所のルート計算結果がない場合は undefined
    */
   function getDirectionsResult(place: Place) {
-    const getLatLng = (destination: Parameters<typeof isPlace>[0] | string): google.maps.LatLng | null => {
+    const getLatLng = (
+      destination: Parameters<typeof isPlace>[0] | string
+    ): google.maps.LatLng | null => {
       if (typeof destination === 'string') return null;
-      if(isPlace(destination)) destination = (<google.maps.Place>destination).location!;
-      if(isLatLng(destination)) return <google.maps.LatLng>destination;
+      if (isPlace(destination)) destination = (<google.maps.Place>destination).location!;
+      if (isLatLng(destination)) return <google.maps.LatLng>destination;
       return null;
     };
-    return directionsResults?.find((res) => place.latLng!.equals(getLatLng(res.request.destination)));
+    return directionsResults?.find((res) =>
+      place.latLng!.equals(getLatLng(res.request.destination))
+    );
   }
 </script>
-
-<style>
-  ul.routes, ul.routes > li {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-</style>
 
 <ul class="routes">
   {#each places as place, index (place.id)}
@@ -171,7 +167,7 @@
           {place}
           directionsResult={getDirectionsResult(place)}
           origin={index === 0}
-          destination={index === (places.length - 1)}
+          destination={index === places.length - 1}
           bind:pressed={handlePressed}
           on:previewRouteTo={previewRoute}
           on:deleteFromRoute={deleteFromRoute}
@@ -182,3 +178,12 @@
     {/if}
   {/each}
 </ul>
+
+<style>
+  ul.routes,
+  ul.routes > li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

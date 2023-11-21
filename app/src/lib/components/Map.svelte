@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
   import pWaitFor from 'p-wait-for';
-  import { v4 as uuidv4 } from "uuid";
-  import { DEFAULT_STAYING_TIME, type Place } from "$lib/models/place";
+  import { v4 as uuidv4 } from 'uuid';
+  import { DEFAULT_STAYING_TIME, type Place } from '$lib/models/place';
 
   /**
    * 選択されている場所
@@ -15,17 +15,22 @@
   /** gmp-advanced-marker タグ */
   let marker: google.maps.marker.AdvancedMarkerElement;
   /** gmpx-place-picker タグ */
-  let placePicker: { value: google.maps.places.Place; };
+  let placePicker: { value: google.maps.places.Place };
   /** ルート描画 */
   let directionsRenderer: google.maps.DirectionsRenderer | undefined;
 
   /**
    * コンポーネントがマウントされたら、google Map が利用可能になるまで待って、クリックイベントのハンドラをセットする
-  */
+   */
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
     map.innerMap.addListener('click', onCLickMap);
-    selected =  { id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME,  placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo', latLng: new google.maps.LatLng({  lat: 35.684022, lng: 139.774474 }) };
+    selected = {
+      id: uuidv4(),
+      stayingTime: DEFAULT_STAYING_TIME,
+      placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo',
+      latLng: new google.maps.LatLng({ lat: 35.684022, lng: 139.774474 })
+    };
   });
 
   /**
@@ -37,7 +42,12 @@
     const place = placePicker.value;
     if (place === undefined) return;
     marker.position = map.center = place.location!;
-    selected = { id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME, placeId: place.id, latLng: place.location! };
+    selected = {
+      id: uuidv4(),
+      stayingTime: DEFAULT_STAYING_TIME,
+      placeId: place.id,
+      latLng: place.location!
+    };
     removeRoute();
   }
 
@@ -50,7 +60,7 @@
   function onCLickMap(event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
     if ((<google.maps.IconMouseEvent>event).placeId) {
       const iconMouseEvent = <google.maps.IconMouseEvent>event;
-      selected = { ...iconMouseEvent,  id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME };
+      selected = { ...iconMouseEvent, id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME };
       marker.position = map.center = iconMouseEvent.latLng!;
       removeRoute();
     }
@@ -85,9 +95,22 @@
   }
 </script>
 
+<section>
+  <gmpx-place-picker
+    placeholder="Enter a place"
+    id="place-picker"
+    style="width: 100%"
+    on:gmpx-placechange={placechange}
+    bind:this={placePicker}
+  ></gmpx-place-picker>
+  <gmp-map center="35.684022,139.774474" zoom="13" map-id="DEMO_MAP_ID" bind:this={map}>
+    <gmp-advanced-marker position="35.684022,139.774474" bind:this={marker}></gmp-advanced-marker>
+  </gmp-map>
+</section>
+
 <style>
-	section {
-    display:flex;
+  section {
+    display: flex;
     flex-direction: column;
     height: 100%;
   }
@@ -96,10 +119,3 @@
     overflow-y: auto;
   }
 </style>
-
-<section>
-  <gmpx-place-picker placeholder="Enter a place" id="place-picker" style="width: 100%" on:gmpx-placechange={placechange} bind:this={placePicker}></gmpx-place-picker>
-  <gmp-map center="35.684022,139.774474" zoom="13" map-id="DEMO_MAP_ID" bind:this={map} >
-    <gmp-advanced-marker position="35.684022,139.774474" bind:this={marker}></gmp-advanced-marker>
-  </gmp-map>
-</section>

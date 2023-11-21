@@ -5,12 +5,7 @@
   export let open: boolean = false;
 </script>
 
-<Dialog
-  bind:open
-  scrimClickAction=""
-  escapeKeyAction=""
-  aria-describedby="mandatory-content"
->
+<Dialog bind:open scrimClickAction="" escapeKeyAction="" aria-describedby="mandatory-content">
   <Content id="mandatory-content">
     <img alt="running...." src={anime} width="250px" />
   </Content>

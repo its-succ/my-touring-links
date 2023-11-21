@@ -5,45 +5,45 @@ import type { Place } from './place';
  * ルート
  */
 export class Route {
-	private places: Place[] = [];
-	private calculated?: google.maps.DirectionsResult[];
+  private places: Place[] = [];
+  private calculated?: google.maps.DirectionsResult[];
 
-	/**
-	 * ルートの最後に場所を追加する
-	 * @param place - 場所
-	 */
-	add(place: Place) {
-		this.places.push(place);
-	}
+  /**
+   * ルートの最後に場所を追加する
+   * @param place - 場所
+   */
+  add(place: Place) {
+    this.places.push(place);
+  }
 
-	/**
-	 * ルートを取得する
-	 * @returns ルート
-	 */
-	get() {
-		return this.places;
-	}
+  /**
+   * ルートを取得する
+   * @returns ルート
+   */
+  get() {
+    return this.places;
+  }
 
-	/**
-	 * ルートを設定する
-	 * ソートしたあとでの書き換えなどで利用する
-	 * @returns ルート
-	 */
-	set(places: Place[]) {
-		this.places = places;
-	}
+  /**
+   * ルートを設定する
+   * ソートしたあとでの書き換えなどで利用する
+   * @returns ルート
+   */
+  set(places: Place[]) {
+    this.places = places;
+  }
 
-	/**
-	 * ルートを計算する
-	 * @param departureTime - 出発日時
-	 * @return 計算結果
-	 */
-	async calc(departureTime: Date) {
+  /**
+   * ルートを計算する
+   * @param departureTime - 出発日時
+   * @return 計算結果
+   */
+  async calc(departureTime: Date) {
     let waypoints: google.maps.DirectionsWaypoint[] = [];
     let origin: google.maps.LatLng | undefined = undefined;
-		this.calculated = [];
-		for (let i = 1; i < this.places.length; i++) {
-      if (this.places[i].waypoint === true && i < (this.places.length - 1)) {
+    this.calculated = [];
+    for (let i = 1; i < this.places.length; i++) {
+      if (this.places[i].waypoint === true && i < this.places.length - 1) {
         waypoints.push({ location: this.places[i].latLng! });
         if (origin === undefined) {
           origin = this.places[i - 1].latLng!;
@@ -54,70 +54,78 @@ export class Route {
         origin = this.places[i - 1].latLng!;
       }
       const request: google.maps.DirectionsRequest = {
-				origin,
-				destination: this.places[i].latLng!,
+        origin,
+        destination: this.places[i].latLng!,
         waypoints,
-				travelMode: google.maps.TravelMode.DRIVING,
-				drivingOptions: { departureTime }
-			};
-			const service = new google.maps.DirectionsService();
-			const result = await (async () => {
-				const cached = cache.get(request);
-				if (cached) return cached;
-				const result = await service.route(request);
-				cache.set(request, result);
-				return result;
-			})();
-			this.calculated.push(result);
-			departureTime = DateTime.fromJSDate(departureTime)
-				.plus({ second: result.routes[0].legs.map((l) => l.duration!.value).reduce((sum, val) => sum + val, 0) })
-				.plus({ minutes: this.places[i].stayingTime })
-				.toJSDate();
+        travelMode: google.maps.TravelMode.DRIVING,
+        drivingOptions: { departureTime }
+      };
+      const service = new google.maps.DirectionsService();
+      const result = await (async () => {
+        const cached = cache.get(request);
+        if (cached) return cached;
+        const result = await service.route(request);
+        cache.set(request, result);
+        return result;
+      })();
+      this.calculated.push(result);
+      departureTime = DateTime.fromJSDate(departureTime)
+        .plus({
+          second: result.routes[0].legs
+            .map((l) => l.duration!.value)
+            .reduce((sum, val) => sum + val, 0)
+        })
+        .plus({ minutes: this.places[i].stayingTime })
+        .toJSDate();
       waypoints = [];
       origin = undefined;
     }
-		return this.calculated;
-	}
+    return this.calculated;
+  }
 
-	/**
-	 * ルート計算結果をクリアする
-	 */
-	resetCalculated() {
-		this.calculated = undefined;
-	}
+  /**
+   * ルート計算結果をクリアする
+   */
+  resetCalculated() {
+    this.calculated = undefined;
+  }
 }
 
 /**
  * DirectionsResult のキャッシュクラス
  */
 export class DirectionsResultCache extends Map<string, google.maps.DirectionsResult> {
-	set(request: string | google.maps.DirectionsRequest, result: google.maps.DirectionsResult): this {
-		const key =
-			request instanceof String
-				? <string>request
-				: this.generateKey(<google.maps.DirectionsRequest>request);
-		return super.set(key, result);
-	}
+  set(request: string | google.maps.DirectionsRequest, result: google.maps.DirectionsResult): this {
+    const key =
+      request instanceof String
+        ? <string>request
+        : this.generateKey(<google.maps.DirectionsRequest>request);
+    return super.set(key, result);
+  }
 
-	get(request: string | google.maps.DirectionsRequest): google.maps.DirectionsResult | undefined {
-		const key =
-			request instanceof String
-				? <string>request
-				: this.generateKey(<google.maps.DirectionsRequest>request);
-		return super.get(key);
-	}
+  get(request: string | google.maps.DirectionsRequest): google.maps.DirectionsResult | undefined {
+    const key =
+      request instanceof String
+        ? <string>request
+        : this.generateKey(<google.maps.DirectionsRequest>request);
+    return super.get(key);
+  }
 
-	has(request: string | google.maps.DirectionsRequest): boolean {
-		const key =
-			request instanceof String
-				? <string>request
-				: this.generateKey(<google.maps.DirectionsRequest>request);
-		return super.has(key);
-	}
+  has(request: string | google.maps.DirectionsRequest): boolean {
+    const key =
+      request instanceof String
+        ? <string>request
+        : this.generateKey(<google.maps.DirectionsRequest>request);
+    return super.has(key);
+  }
 
-	private generateKey(request: google.maps.DirectionsRequest): string {
-		return `${request.origin.toString()}-${request.waypoints?.map((w) => w.location?.toString()).join('+')}-${request.destination.toString()}-${request.drivingOptions?.departureTime.getTime()}}`;
-	}
+  private generateKey(request: google.maps.DirectionsRequest): string {
+    return `${request.origin.toString()}-${request.waypoints
+      ?.map((w) => w.location?.toString())
+      .join(
+        '+'
+      )}-${request.destination.toString()}-${request.drivingOptions?.departureTime.getTime()}}`;
+  }
 }
 
 /** ルート検索結果のキャッシュ  */
