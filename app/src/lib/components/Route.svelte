@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PlaceElement from "./Place.svelte";
-	import { isSpot, type Place, type Spot } from "$lib/models/place";
+	import { isLatLng, isPlace, isSpot, type Place } from "$lib/models/place";
 	import type { Route } from "$lib/models/route";
   import { createEventDispatcher } from 'svelte';
 
@@ -32,11 +32,6 @@
    export function reset() {
     directionsResults = undefined;
     places = places;
-  }
-
-  /** スポットで返却する */
-  function toSpot(place: Place)  {
-    return <Spot>place;
   }
 
   /**
@@ -79,9 +74,8 @@
     const from = Number(source);
     const to = Number(dragged.index);
     const newList = [...places];
-    newList[from] = [newList[to], (newList[to] = newList[from])][0];
     directionsResults = undefined;
-    places = newList;
+    places =  newList.toSpliced(from, 1).toSpliced(to, 0, places[from]);
     value?.set(places);
   }
 
@@ -93,10 +87,11 @@
    */
   function previewRoute(e: CustomEvent<string>) {
     const id = e.detail;
-    const to = places.findIndex((p) => id === p.id );
-    if (to === undefined || to === 0) return false;
-    if (directionsResults === undefined) return false;
-    dispatch('previewRoute', directionsResults[to - 1]);
+    const place = places.find((p) => id === p.id );
+    if (place === undefined) return false;
+    const directionsResult = getDirectionsResult(place);
+    if (directionsResult === undefined) return false;
+    dispatch('previewRoute', directionsResult);
   }
 
   /**
@@ -125,13 +120,31 @@
   }
 
   /**
-   * 指定番目のルート計算結果を取得する
-   * @param index - 場所の繰り返しindex
-   * @returns ルート計算結果の0番目は、場所[1]のルート計算結果なので、 index - 1 番目の計算結果が戻る
+   * 経由地の設定を更新する
+   * @param e - 場所IDと経由地フラグを含むカスタムイベント
    */
-  function getDirectionsResult(index: number) {
-    if (index === 0) return undefined;
-    return directionsResults ? directionsResults[index - 1] : undefined;
+   function changeWaypoint(e: CustomEvent<{ id: string, value: boolean }>) {
+    const { id, value: waypoint  } = e.detail;
+    const target = places.findIndex((p) => id === p.id );
+    places[target].waypoint = waypoint;
+    directionsResults = undefined;
+    places = places;
+    value?.set(places);
+  }
+
+  /**
+   * 到着場所が一致するルート計算結果を取得する
+   * @param place - 場所
+   * @returns 指定した到着場所のルート計算結果がない場合は undefined
+   */
+  function getDirectionsResult(place: Place) {
+    const getLatLng = (destination: Parameters<typeof isPlace>[0] | string): google.maps.LatLng | null => {
+      if (typeof destination === 'string') return null;
+      if(isPlace(destination)) destination = (<google.maps.Place>destination).location!;
+      if(isLatLng(destination)) return <google.maps.LatLng>destination;
+      return null;
+    };
+    return directionsResults?.find((res) => place.latLng!.equals(getLatLng(res.request.destination)));
   }
 </script>
 
@@ -155,13 +168,15 @@
         on:drop|preventDefault={onDrop}
       >
         <PlaceElement
-          place={toSpot(place)}
-          directionsResult={getDirectionsResult(index)}
-          isLatest={index === (places.length - 1)}
+          {place}
+          directionsResult={getDirectionsResult(place)}
+          origin={index === 0}
+          destination={index === (places.length - 1)}
           bind:pressed={handlePressed}
           on:previewRouteTo={previewRoute}
           on:deleteFromRoute={deleteFromRoute}
           on:changeStayingTime={changeStayingTime}
+          on:changeWaypoint={changeWaypoint}
         ></PlaceElement>
       </li>
     {/if}
