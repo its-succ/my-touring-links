@@ -154,28 +154,26 @@
 
 <ul class="routes">
   {#each places as place, index (place.id)}
-    {#if isSpot(place)}
-      <li
-        data-index={index}
-        data-id={place.id}
-        draggable="true"
-        on:dragstart={onDragStart}
-        on:dragover|preventDefault={() => {}}
-        on:drop|preventDefault={onDrop}
-      >
-        <PlaceElement
-          {place}
-          directionsResult={getDirectionsResult(place)}
-          origin={index === 0}
-          destination={index === places.length - 1}
-          bind:pressed={handlePressed}
-          on:previewRouteTo={previewRoute}
-          on:deleteFromRoute={deleteFromRoute}
-          on:changeStayingTime={changeStayingTime}
-          on:changeWaypoint={changeWaypoint}
-        ></PlaceElement>
-      </li>
-    {/if}
+    <li
+      data-index={index}
+      data-id={place.id}
+      draggable="true"
+      on:dragstart={onDragStart}
+      on:dragover|preventDefault={() => {}}
+      on:drop|preventDefault={onDrop}
+    >
+      <PlaceElement
+        {place}
+        directionsResult={getDirectionsResult(place)}
+        origin={index === 0}
+        destination={index === places.length - 1}
+        bind:pressed={handlePressed}
+        on:previewRouteTo={previewRoute}
+        on:deleteFromRoute={deleteFromRoute}
+        on:changeStayingTime={changeStayingTime}
+        on:changeWaypoint={changeWaypoint}
+      ></PlaceElement>
+    </li>
   {/each}
 </ul>
 

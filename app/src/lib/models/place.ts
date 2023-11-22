@@ -28,6 +28,15 @@ export const isSpot = (place: Place) => {
 };
 
 /**
+ * Location の緯度経度を小数点6桁のカンマ区切りでフォーマットする
+ * @param location - Location オブジェクト
+ * @returns  フォーマット済み文字列
+ */
+export function formatLocation(location?: Location) {
+  return (location ? `${location.latLng?.lat().toFixed(6)}, ${location.latLng?.lng().toFixed(6)}` : undefined) || '';
+}
+
+/**
  * @see https://github.com/googlemaps/extended-component-library/blob/main/src/utils/place_utils.ts#L54
  */
 export function isPlace(

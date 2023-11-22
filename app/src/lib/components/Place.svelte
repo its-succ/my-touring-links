@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { ComponentType, SvelteComponent } from 'svelte';
   import IconButton from '@smui/icon-button';
-  import type { Place } from '$lib/models/place';
+  import { isSpot, type Place } from '$lib/models/place';
   import DirectionsResult from './Place/DirectionsResult.svelte';
   import Menu from './Place/Menu.svelte';
   import Spot from './Place/Spot.svelte';
   import SpotWaypoint from './Place/SpotWaypoint.svelte';
+  import Location from './Place/Location.svelte';
+  import LocationWaypoint from './Place/LocationWaypoint.svelte';
 
   /** Place */
   export let place: Place;
@@ -20,7 +22,15 @@
 
   type Constraint = SvelteComponent<{ place: Place }>;
   let component: ComponentType<Constraint>;
-  $: component = place.waypoint && !origin && !destination ? SpotWaypoint : Spot;
+  $: component = detectPlaceComponent(place, origin, destination);
+
+  function detectPlaceComponent(place: Place, origin: boolean, destination: boolean): ComponentType<Constraint> {
+    if (isSpot(place)) {
+      return place.waypoint && !origin && !destination ? SpotWaypoint : Spot;
+    } else {
+      return place.waypoint && !origin && !destination ? LocationWaypoint : Location;
+    }
+  }
 </script>
 
 <svelte:component this={component} {place}>
