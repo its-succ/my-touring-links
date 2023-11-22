@@ -26,29 +26,19 @@
   /**
    * タブを閉じる
    */
-   function close() {
+  function close() {
     dispatch('close');
   }
 </script>
 
-<style>
-  header {
-    position: sticky;
-    background-color: #fff;
-    top: 0;
-    z-index: 3;
-  }
-  nav {
-    display: block;
-    text-align: right;
-    padding: 1em;
-  }
-</style>
-
 <header>
   <TabBar tabs={planDates} let:tab bind:active>
     <Tab {tab} minWidth>
-      <Label>{DateTime.fromJSDate(tab).setZone('Asia/Tokyo').toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label>
+      <Label
+        >{DateTime.fromJSDate(tab)
+          .setZone('Asia/Tokyo')
+          .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label
+      >
     </Tab>
     {#if tab === planDates[planDates.length - 1]}
       <Tab tab={'+'} minWidth on:click={add}>
@@ -67,3 +57,17 @@
     </Button>
   </nav>
 </header>
+
+<style>
+  header {
+    position: sticky;
+    background-color: #fff;
+    top: 0;
+    z-index: 3;
+  }
+  nav {
+    display: block;
+    text-align: right;
+    padding: 1em;
+  }
+</style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Place, Spot } from '$lib/models/place';
+  import type { Place, Spot } from '$lib/models/place';
 
   /** 場所 */
   export let place: Place;
@@ -8,14 +8,26 @@
   $: spot = <Spot>place;
 </script>
 
+<gmpx-place-data-provider place={spot.placeId}>
+  <gmpx-place-photo-gallery max-tiles="1"></gmpx-place-photo-gallery>
+  <header class="mdc-typography--subtitle1">
+    <gmpx-place-field-text field="displayName"></gmpx-place-field-text>
+  </header>
+  <p class="detail">
+    <slot name="detail" />
+  </p>
+  <div class="meta">
+    <slot name="meta" />
+  </div>
+</gmpx-place-data-provider>
+
 <style>
   gmpx-place-data-provider {
     display: grid;
     grid-template:
-      "img name meta" auto
-      "img address meta" auto
-      /50px 1fr
-    ;
+      'img name meta' auto
+      'img address meta' auto
+      / 50px 1fr;
     gap: 0 10px;
     padding: 5px;
     border-radius: 4px;
@@ -50,16 +62,3 @@
     grid-area: meta;
   }
 </style>
-
-<gmpx-place-data-provider place="{spot.placeId}">
-  <gmpx-place-photo-gallery max-tiles="1"></gmpx-place-photo-gallery>
-  <header class="mdc-typography--subtitle1">
-    <gmpx-place-field-text field="displayName"></gmpx-place-field-text>
-  </header>
-  <p class="detail">
-    <slot name="detail"></slot>
-  </p>
-  <div class="meta">
-    <slot name="meta"></slot>
-  </div>
-</gmpx-place-data-provider>
