@@ -58,12 +58,9 @@
    * @param event イベント
    */
   function onCLickMap(event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
-    if ((<google.maps.IconMouseEvent>event).placeId) {
-      const iconMouseEvent = <google.maps.IconMouseEvent>event;
-      selected = { ...iconMouseEvent, id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME };
-      marker.position = map.center = iconMouseEvent.latLng!;
-      removeRoute();
-    }
+    selected = { ...event, id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME };
+    marker.position = map.center = event.latLng!;
+    removeRoute();
   }
 
   /**
