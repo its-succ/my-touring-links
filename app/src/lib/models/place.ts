@@ -33,7 +33,11 @@ export const isSpot = (place: Place) => {
  * @returns  フォーマット済み文字列
  */
 export function formatLocation(location?: Location) {
-  return (location ? `${location.latLng?.lat().toFixed(6)}, ${location.latLng?.lng().toFixed(6)}` : undefined) || '';
+  return (
+    (location
+      ? `${location.latLng?.lat().toFixed(6)}, ${location.latLng?.lng().toFixed(6)}`
+      : undefined) || ''
+  );
 }
 
 /**

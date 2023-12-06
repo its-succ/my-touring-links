@@ -8,7 +8,7 @@
   import Progress from './Progress.svelte';
   import Button, { Icon, Label } from '@smui/button';
   import elementResizeDetectorMaker from '@andybeersdev/element-resize-detector';
-  import { Routes } from '$lib/models/routes';
+  import { Routes, type RoutesJSON } from '$lib/models/routes';
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
 
@@ -148,6 +148,27 @@
     progressOpen = true;
     await routeElement.calc(active);
     progressOpen = false;
+  }
+
+  /**
+   * 出発日時別ルートを取得する
+   * @returns Routes クラスのオブジェクト
+   */
+  export function getRoutes() {
+    return routes;
+  }
+
+  /**
+   * 出発日時別ルートを設定する。
+   * ページリロード時など、セッションから復帰するときに呼び出される
+   * 復帰オブジェクトが空の場合は何もしない
+   * @param routes - 出発日時別ルートのJSON形式
+   */
+  export async function setRoutes(value: RoutesJSON) {
+    if (Object.keys(value).length === 0 && value.constructor === Object) return;
+    await routes.fromJSON(value);
+    tabs = routes.getDepartureDateTimes();
+    setTimeout(() => (active = tabs[0]));
   }
 </script>
 

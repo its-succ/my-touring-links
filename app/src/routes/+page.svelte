@@ -1,5 +1,17 @@
 <script lang="ts">
+  import type { Snapshot } from './$types';
   import Edit from 'components/Edit.svelte';
+
+  /** ルート編集コンポーネント */
+  let edit: Edit;
+
+  /**
+   * ページのSnapshotをSessionStorageに保持する
+   */
+  export const snapshot: Snapshot<string> = {
+    capture: () => JSON.stringify(edit.getRoutes().toJSON()),
+    restore: (value) => edit.setRoutes(JSON.parse(value))
+  };
 </script>
 
 <article>
@@ -7,7 +19,7 @@
     <h3>Welcome to My Touring Links</h3>
   </header>
   <main>
-    <Edit />
+    <Edit bind:this={edit} />
   </main>
   <footer>@copy-right: ESM</footer>
 </article>
