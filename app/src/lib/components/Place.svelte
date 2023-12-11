@@ -24,7 +24,11 @@
   let component: ComponentType<Constraint>;
   $: component = detectPlaceComponent(place, origin, destination);
 
-  function detectPlaceComponent(place: Place, origin: boolean, destination: boolean): ComponentType<Constraint> {
+  function detectPlaceComponent(
+    place: Place,
+    origin: boolean,
+    destination: boolean
+  ): ComponentType<Constraint> {
     if (isSpot(place)) {
       return place.waypoint && !origin && !destination ? SpotWaypoint : Spot;
     } else {

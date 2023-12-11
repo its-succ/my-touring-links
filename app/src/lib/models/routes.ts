@@ -1,5 +1,8 @@
+import pWaitFor from 'p-wait-for';
 import type { Place } from './place';
 import { Route } from './route';
+
+export type RoutesJSON = { [index: string]: Place[] };
 
 /**
  * 出発日時別ルート
@@ -81,5 +84,44 @@ export class Routes {
     this.routes.set(to, route);
     route.resetCalculated();
     return this.removeDepartureDateTimeFromRoutes(from);
+  }
+
+  /**
+   * シリアライズ可能なJSONオブジェクトに変換する
+   * @returns  このオブジェクトのJSON形式
+   */
+  toJSON() {
+    const ret: RoutesJSON = {};
+    Array.from(this.routes.keys()).forEach(
+      (key) => (ret[key.toISOString()] = this.routes.get(key)!.get())
+    );
+    return ret;
+  }
+
+  /**
+   * toJSON() で出力されたJSON形式からクラスオブジェクトを復元する
+   * @param json - RoutesのJSON形式
+   */
+  async fromJSON(json: RoutesJSON) {
+    await pWaitFor(() => {
+      try {
+        // googlle maps SDK は script タグでロードしているので、sessionStorageからの復元時にまだクラスがロードされていない場合がある
+        // そのため、ここでクラスインスタンスが生成できるまで待機する
+        new google.maps.LatLng({ lat: 0, lng: 0 });
+        return true;
+      } catch (e) {
+        return false;
+      }
+    });
+    this.routes.clear();
+    Object.keys(json).forEach((key) => {
+      const route = new Route();
+      route.set(
+        json[key].map((p) => {
+          return { ...p, latLng: new google.maps.LatLng(p.latLng!) };
+        })
+      );
+      this.routes.set(new Date(key), route);
+    });
   }
 }
