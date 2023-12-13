@@ -1,6 +1,6 @@
 <script lang="ts">
   import PlaceElement from './Place.svelte';
-    import type { Place } from '$lib/models/place';
+  import type { Place } from '$lib/models/place';
   import type { Route } from '$lib/models/route';
   import { createEventDispatcher } from 'svelte';
   import { isLatLng, isPlace } from '$lib/utils/googlemaps-util';
