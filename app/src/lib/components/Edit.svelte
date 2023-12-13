@@ -164,9 +164,9 @@
    * 復帰オブジェクトが空の場合は何もしない
    * @param routes - 出発日時別ルートのJSON形式
    */
-  export async function setRoutes(value: RoutesJSON) {
+  export function setRoutes(value: RoutesJSON) {
     if (Object.keys(value).length === 0 && value.constructor === Object) return;
-    await routes.fromJSON(value);
+    routes.fromJSON(value);
     tabs = routes.getDepartureDateTimes();
     setTimeout(() => (active = tabs[0]));
   }

@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import type { Place } from './place';
+import { TravelMode, latLngToString } from '$lib/utils/googlemaps-util';
 
 /**
  * ルート
@@ -40,7 +41,7 @@ export class Route {
    */
   async calc(departureTime: Date) {
     let waypoints: google.maps.DirectionsWaypoint[] = [];
-    let origin: google.maps.LatLng | undefined = undefined;
+    let origin: google.maps.LatLngLiteral | undefined = undefined;
     this.calculated = [];
     for (let i = 1; i < this.places.length; i++) {
       if (this.places[i].waypoint === true && i < this.places.length - 1) {
@@ -57,7 +58,7 @@ export class Route {
         origin,
         destination: this.places[i].latLng!,
         waypoints,
-        travelMode: google.maps.TravelMode.DRIVING,
+        travelMode: TravelMode.DRIVING,
         drivingOptions: { departureTime }
       };
       const service = new google.maps.DirectionsService();
@@ -120,11 +121,11 @@ export class DirectionsResultCache extends Map<string, google.maps.DirectionsRes
   }
 
   private generateKey(request: google.maps.DirectionsRequest): string {
-    return `${request.origin.toString()}-${request.waypoints
-      ?.map((w) => w.location?.toString())
+    return `${latLngToString(request.origin)}-${request.waypoints
+      ?.map((w) => latLngToString(w.location!))
       .join(
         '+'
-      )}-${request.destination.toString()}-${request.drivingOptions?.departureTime.getTime()}}`;
+      )}-${latLngToString(request.destination)}-${request.drivingOptions?.departureTime.getTime()}}`;
   }
 }
 

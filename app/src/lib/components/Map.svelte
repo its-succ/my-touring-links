@@ -25,11 +25,12 @@
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
     map.innerMap.addListener('click', onCLickMap);
+    map.center = { lat: 35.684022, lng: 139.774474 };
     selected = {
       id: uuidv4(),
       stayingTime: DEFAULT_STAYING_TIME,
       placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo',
-      latLng: new google.maps.LatLng({ lat: 35.684022, lng: 139.774474 })
+      latLng: { lat: 35.684022, lng: 139.774474 }
     };
   });
 
@@ -46,7 +47,7 @@
       id: uuidv4(),
       stayingTime: DEFAULT_STAYING_TIME,
       placeId: place.id,
-      latLng: place.location!
+      latLng: place.location!.toJSON()
     };
     removeRoute();
   }
@@ -58,7 +59,7 @@
    * @param event イベント
    */
   function onCLickMap(event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
-    selected = { ...event, id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME };
+    selected = { ...event, id: uuidv4(), stayingTime: DEFAULT_STAYING_TIME, latLng: event.latLng!.toJSON() };
     marker.position = map.center = event.latLng!;
     removeRoute();
   }
@@ -100,8 +101,10 @@
     on:gmpx-placechange={placechange}
     bind:this={placePicker}
   ></gmpx-place-picker>
-  <gmp-map center="35.684022,139.774474" zoom="13" map-id="DEMO_MAP_ID" bind:this={map}>
-    <gmp-advanced-marker position="35.684022,139.774474" bind:this={marker}></gmp-advanced-marker>
+  <gmp-map zoom={13} map-id="DEMO_MAP_ID" bind:this={map}>
+    {#if selected !== undefined}
+      <gmp-advanced-marker position={{ lat: 35.684022, lng: 139.774474 }} bind:this={marker}></gmp-advanced-marker>
+    {/if}
   </gmp-map>
 </section>
 

@@ -1,6 +1,6 @@
-import pWaitFor from 'p-wait-for';
 import type { Place } from './place';
 import { Route } from './route';
+import { DateTime } from 'luxon';
 
 export type RoutesJSON = { [index: string]: Place[] };
 
@@ -8,13 +8,16 @@ export type RoutesJSON = { [index: string]: Place[] };
  * 出発日時別ルート
  */
 export class Routes {
-  private routes: Map<Date, Route>;
+  /**
+   * 現在日時（タイムスタンプ）をキーとする Route クラスのマッピング
+   */
+  private routes: Map<number, Route>;
 
   /**
    * コンストラクタ
    */
   constructor() {
-    this.routes = new Map([[new Date(), new Route()]]);
+    this.routes = new Map([[DateTime.now().toJSDate().getTime(), new Route()]]);
   }
 
   /**
@@ -22,7 +25,7 @@ export class Routes {
    * @returns 古い順にソートされた出発日時一覧
    */
   getDepartureDateTimes() {
-    return Array.from(this.routes.keys()).sort((a: Date, b: Date) => a.getTime() - b.getTime());
+    return Array.from(this.routes.keys()).sort((a: number, b: number) => a - b).map((time) => new Date(time));
   }
 
   /**
@@ -31,7 +34,7 @@ export class Routes {
    * @returns ルート
    */
   findRoutesByDepartureDateTime(departureDateTime: Date): Route | undefined {
-    return this.routes.get(departureDateTime);
+    return this.routes.get(departureDateTime.getTime());
   }
 
   /**
@@ -40,10 +43,10 @@ export class Routes {
    * @returns 追加された出発日時のルート。すでに出発日時が存在している場合は、存在しているルート
    */
   addDepartureDateTimeToRoutes(departureDateTime: Date): Route {
-    if (this.routes.has(departureDateTime))
+    if (this.routes.has(departureDateTime.getTime()))
       return this.findRoutesByDepartureDateTime(departureDateTime)!;
     const route = new Route();
-    this.routes.set(departureDateTime, route);
+    this.routes.set(departureDateTime.getTime(), route);
     return route;
   }
 
@@ -53,7 +56,7 @@ export class Routes {
    * @returns 削除できた場合は true
    */
   removeDepartureDateTimeFromRoutes(departureDateTime: Date) {
-    return this.routes.delete(departureDateTime);
+    return this.routes.delete(departureDateTime.getTime());
   }
 
   /**
@@ -80,8 +83,8 @@ export class Routes {
   changeDepartureDateTimeToRoutes(from: Date, to: Date): boolean {
     const route = this.findRoutesByDepartureDateTime(from);
     if (route === undefined) return false;
-    if (this.routes.has(to)) return false;
-    this.routes.set(to, route);
+    if (this.routes.has(to.getTime())) return false;
+    this.routes.set(to.getTime(), route);
     route.resetCalculated();
     return this.removeDepartureDateTimeFromRoutes(from);
   }
@@ -93,7 +96,7 @@ export class Routes {
   toJSON() {
     const ret: RoutesJSON = {};
     Array.from(this.routes.keys()).forEach(
-      (key) => (ret[key.toISOString()] = this.routes.get(key)!.get())
+      (key) => (ret[new Date(key).toISOString()] = this.routes.get(key)!.get())
     );
     return ret;
   }
@@ -102,26 +105,12 @@ export class Routes {
    * toJSON() で出力されたJSON形式からクラスオブジェクトを復元する
    * @param json - RoutesのJSON形式
    */
-  async fromJSON(json: RoutesJSON) {
-    await pWaitFor(() => {
-      try {
-        // googlle maps SDK は script タグでロードしているので、sessionStorageからの復元時にまだクラスがロードされていない場合がある
-        // そのため、ここでクラスインスタンスが生成できるまで待機する
-        new google.maps.LatLng({ lat: 0, lng: 0 });
-        return true;
-      } catch (e) {
-        return false;
-      }
-    });
+  fromJSON(json: RoutesJSON) {
     this.routes.clear();
     Object.keys(json).forEach((key) => {
       const route = new Route();
-      route.set(
-        json[key].map((p) => {
-          return { ...p, latLng: new google.maps.LatLng(p.latLng!) };
-        })
-      );
-      this.routes.set(new Date(key), route);
+      route.set(json[key]);
+      this.routes.set(new Date(key).getTime(), route);
     });
   }
 }

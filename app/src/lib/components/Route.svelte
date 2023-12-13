@@ -1,8 +1,9 @@
 <script lang="ts">
   import PlaceElement from './Place.svelte';
-  import { isLatLng, isPlace, isSpot, type Place } from '$lib/models/place';
+    import type { Place } from '$lib/models/place';
   import type { Route } from '$lib/models/route';
   import { createEventDispatcher } from 'svelte';
+  import { isLatLng, isPlace } from '$lib/utils/googlemaps-util';
 
   /**  ルート */
   export let value: Route | undefined;
@@ -147,7 +148,7 @@
       return null;
     };
     return directionsResults?.find((res) =>
-      place.latLng!.equals(getLatLng(res.request.destination))
+      new google.maps.LatLng(place.latLng!).equals(getLatLng(res.request.destination))
     );
   }
 </script>
