@@ -1,5 +1,5 @@
-import type { Timestamp } from "firebase/firestore";
-import type { RoutesJSON } from "./routes";
+import type { Timestamp } from 'firebase/firestore';
+import type { RoutesJSON } from './routes';
 
 export type EntityDate = Date | Timestamp;
 
@@ -22,4 +22,4 @@ export interface RoutesEntity extends BaseEntity {
   routes: RoutesJSON;
   /** 作成者ID */
   userId: string;
-};
+}

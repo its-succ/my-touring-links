@@ -12,9 +12,10 @@ type PlaceBase = {
 export const DEFAULT_STAYING_TIME = 10;
 
 /** Place API で取得できるスポットの ID(placeId) を含む場所  */
-export type Spot = PlaceBase & Pick<google.maps.IconMouseEvent, 'placeId'> & { latLng: google.maps.LatLngLiteral; };
+export type Spot = PlaceBase &
+  Pick<google.maps.IconMouseEvent, 'placeId'> & { latLng: google.maps.LatLngLiteral };
 /** 座標による地点 */
-export type Location = PlaceBase & { latLng: google.maps.LatLngLiteral; };
+export type Location = PlaceBase & { latLng: google.maps.LatLngLiteral };
 /** 場所  */
 export type Place = Spot | Location;
 
