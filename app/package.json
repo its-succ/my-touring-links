@@ -10,9 +10,11 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
+    "firebase": "firebase",
     "format": "prettier --plugin-search-dir . --write .",
     "test:integration": "playwright test",
     "test:unit": "vitest",
+    "test:firestore": "firebase emulators:exec --only firestore 'vitest run'",
     "prepare": "npm run smui-theme-light && npm run smui-theme-dark",
     "smui-theme-light": "smui-theme compile static/smui.css -i src/theme",
     "smui-theme-dark": "smui-theme compile static/smui-dark.css -i src/theme/dark"
@@ -20,6 +22,7 @@
   "devDependencies": {
     "@andybeersdev/element-resize-detector": "^1.0.1",
     "@faker-js/faker": "^8.3.1",
+    "@firebase/rules-unit-testing": "^3.0.1",
     "@googlemaps/extended-component-library": "^0.4.3",
     "@googlemaps/jest-mocks": "^2.21.4",
     "@material/typography": "^14.0.0",
@@ -46,10 +49,12 @@
     "@types/uuid": "^9.0.6",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "app-root-path": "^3.1.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-svelte": "^2.30.0",
+    "firebase": "^10.7.1",
     "jsdom": "^23.0.1",
     "luxon": "^3.4.3",
     "p-wait-for": "^5.0.2",
@@ -60,10 +65,11 @@
     "svelte-check": "^3.4.3",
     "svelty-picker": "^5.2.0",
     "tslib": "^2.4.1",
-    "typescript": "^5.0.0",
+    "typescript": "^5.3.3",
     "uuid": "^9.0.1",
     "vite": "^4.4.2",
-    "vitest": "^0.34.6"
+    "vitest": "^0.34.6",
+    "vitest-environment-firestore-emulator": "^0.0.19"
   },
   "type": "module"
 }
