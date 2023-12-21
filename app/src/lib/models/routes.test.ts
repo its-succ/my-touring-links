@@ -1,22 +1,22 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from 'vitest';
 import { v4 as uuidv4 } from 'uuid';
-import { Routes } from "./routes";
-import { Settings } from "luxon";
-import { Route } from "./route";
-import { DEFAULT_STAYING_TIME, type Spot } from "./place";
+import { Routes } from './routes';
+import { Settings } from 'luxon';
+import { Route } from './route';
+import { DEFAULT_STAYING_TIME, type Spot } from './place';
 
 vi.mock('$lib/utils/googlemaps-util', () => ({
-  TravelMode: { DRIVING: 'DRIVING' },
+  TravelMode: { DRIVING: 'DRIVING' }
 }));
 
 const spot: Spot = {
   id: uuidv4(),
   stayingTime: DEFAULT_STAYING_TIME,
   placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo',
-  latLng: { lat: 35.6842334, lng: 139.7718872 },
+  latLng: { lat: 35.6842334, lng: 139.7718872 }
 };
 
-describe("Routes", () => {
+describe('Routes', () => {
   describe('constructor', () => {
     it('現在日時で空のルートが生成されること', () => {
       // arrange
@@ -25,7 +25,7 @@ describe("Routes", () => {
       // action
       const routes = new Routes();
       // assert
-      const days = routes.getDepartureDateTimes()
+      const days = routes.getDepartureDateTimes();
       expect(days).toEqual([now]);
       expect(routes.findRoutesByDepartureDateTime(now)).toBeInstanceOf(Route);
     });
@@ -40,7 +40,7 @@ describe("Routes", () => {
       const added = new Date('2023-12-23T10:00+09:00');
       routes.addDepartureDateTimeToRoutes(added);
       // action
-      const days = routes.getDepartureDateTimes()
+      const days = routes.getDepartureDateTimes();
       // assert
       expect(days).toEqual([added, now]);
     });
@@ -63,7 +63,9 @@ describe("Routes", () => {
       Settings.now = () => now.getTime();
       const routes = new Routes();
       // action & assert
-      expect(routes.findRoutesByDepartureDateTime(new Date('2023-12-20T12:00+09:00'))).toBeUndefined();
+      expect(
+        routes.findRoutesByDepartureDateTime(new Date('2023-12-20T12:00+09:00'))
+      ).toBeUndefined();
     });
   });
 });
@@ -87,7 +89,9 @@ describe('removeDepartureDateTimeFromRoutes', () => {
     Settings.now = () => now.getTime();
     const routes = new Routes();
     // action & assert
-    expect(routes.removeDepartureDateTimeFromRoutes(new Date('2023-12-20T12:00+09:00'))).toBeFalsy();
+    expect(
+      routes.removeDepartureDateTimeFromRoutes(new Date('2023-12-20T12:00+09:00'))
+    ).toBeFalsy();
   });
 });
 
@@ -107,7 +111,9 @@ describe('addPlaceByDepartureDateTimeToRoutes', () => {
     Settings.now = () => now.getTime();
     const routes = new Routes();
     // action & assert
-    expect(routes.addPlaceByDepartureDateTimeToRoutes(new Date('2023-12-20T12:00+09:00'), spot)).toBeUndefined();
+    expect(
+      routes.addPlaceByDepartureDateTimeToRoutes(new Date('2023-12-20T12:00+09:00'), spot)
+    ).toBeUndefined();
   });
 });
 
@@ -130,7 +136,9 @@ describe('changeDepartureDateTimeToRoutes', () => {
     const routes = new Routes();
     const to = new Date('2023-12-24T10:00+09:00');
     // action & assert
-    expect(routes.changeDepartureDateTimeToRoutes(new Date('2023-12-20T12:00+09:00'), to)).toBeFalsy();
+    expect(
+      routes.changeDepartureDateTimeToRoutes(new Date('2023-12-20T12:00+09:00'), to)
+    ).toBeFalsy();
   });
   it('変更後の日付が存在する場合はfalseになること', () => {
     // arrange
@@ -139,7 +147,7 @@ describe('changeDepartureDateTimeToRoutes', () => {
     const routes = new Routes();
     const added = new Date('2023-12-23T10:00+09:00');
     routes.addDepartureDateTimeToRoutes(added);
-  // action & assert
+    // action & assert
     expect(routes.changeDepartureDateTimeToRoutes(now, added)).toBeFalsy();
   });
 
@@ -169,12 +177,12 @@ describe('changeDepartureDateTimeToRoutes', () => {
       // action
       routes.fromJSON({
         [added.toISOString()]: [spot],
-        [now.toISOString()]: [],
+        [now.toISOString()]: []
       });
       // assert
       const days = routes.getDepartureDateTimes();
       expect(days).toEqual([added, now]);
-      expect(routes.findRoutesByDepartureDateTime(added)?.get()).toEqual([spot])
+      expect(routes.findRoutesByDepartureDateTime(added)?.get()).toEqual([spot]);
       expect(routes.findRoutesByDepartureDateTime(now)?.get()).toEqual([]);
     });
   });

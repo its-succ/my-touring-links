@@ -123,9 +123,9 @@ export class DirectionsResultCache extends Map<string, google.maps.DirectionsRes
   private generateKey(request: google.maps.DirectionsRequest): string {
     return `${latLngToString(request.origin)}-${request.waypoints
       ?.map((w) => latLngToString(w.location!))
-      .join(
-        '+'
-      )}-${latLngToString(request.destination)}-${request.drivingOptions?.departureTime.getTime()}}`;
+      .join('+')}-${latLngToString(
+      request.destination
+    )}-${request.drivingOptions?.departureTime.getTime()}}`;
   }
 }
 

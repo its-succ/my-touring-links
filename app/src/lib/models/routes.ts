@@ -25,7 +25,9 @@ export class Routes {
    * @returns 古い順にソートされた出発日時一覧
    */
   getDepartureDateTimes() {
-    return Array.from(this.routes.keys()).sort((a: number, b: number) => a - b).map((time) => new Date(time));
+    return Array.from(this.routes.keys())
+      .sort((a: number, b: number) => a - b)
+      .map((time) => new Date(time));
   }
 
   /**
