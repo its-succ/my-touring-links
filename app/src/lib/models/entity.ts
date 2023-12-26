@@ -20,6 +20,8 @@ export interface RoutesEntity extends BaseEntity {
   name: string;
   /** ルート情報 */
   routes: RoutesJSON;
+  /** 公開フラグ */
+  publish?: boolean;
   /** 作成者ID */
   userId: string;
 }
