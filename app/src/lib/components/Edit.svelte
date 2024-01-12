@@ -32,7 +32,7 @@
   let active = tabs[0];
   /** アクティブなタブのルート */
   let route: Route | undefined;
-  $: route = routes.findRoutesByDepartureDateTime(active);
+  $: route = active instanceof Date ? routes.findRoutesByDepartureDateTime(active) : route;
   /** ルートエレメント */
   let routeElement: RouteElement;
   /** プログレスダイアログの表示状態 */

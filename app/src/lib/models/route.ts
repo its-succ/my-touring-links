@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import type { Place } from './place';
-import { TravelMode, latLngToString } from '$lib/utils/googlemaps-util';
+import { travelMode, latLngToString } from '$lib/utils/googlemaps-util';
 
 /**
  * ルート
@@ -58,7 +58,7 @@ export class Route {
         origin,
         destination: this.places[i].latLng!,
         waypoints,
-        travelMode: TravelMode.DRIVING,
+        travelMode: travelMode().DRIVING,
         drivingOptions: { departureTime }
       };
       const service = new google.maps.DirectionsService();

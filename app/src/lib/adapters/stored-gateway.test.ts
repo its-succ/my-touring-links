@@ -15,7 +15,7 @@ import {
 } from '$lib/utils/test-helper';
 
 vi.mock('$lib/utils/googlemaps-util', () => ({
-  TravelMode: { DRIVING: 'DRIVING' }
+  travelMode: () => ({ DRIVING: 'DRIVING' })
 }));
 
 let testEnv: RulesTestEnvironment;
@@ -26,7 +26,8 @@ beforeAll(async () => {
   testEnv = await initializeTestEnvironment({
     projectId: PROJECT_ID,
     firestore: {
-      host: 'localhost',
+      // @see https://github.com/firebase/firebase-tools/issues/4741
+      host: '127.0.0.1',
       port: 8082,
       rules: readFileSync(`${appRoot}/firestore.rules`, 'utf8')
     }

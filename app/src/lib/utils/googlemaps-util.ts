@@ -3,9 +3,9 @@
 // googlemaps のユーティリティからポーティングしたモジュールなどを定義するファイルです。
 
 /**
- * vitest の実行でモックが必要が enum 定数
+ * vitest の実行でモックが必要が enum 定数を戻す
  */
-export const TravelMode = google.maps.TravelMode;
+export const travelMode = () => google.maps.TravelMode;
 
 /**
  * ルートのキャッシュキーに利用する文字列を位置情報から変換する
