@@ -6,7 +6,7 @@ import { Route } from './route';
 import { DEFAULT_STAYING_TIME, type Spot } from './place';
 
 vi.mock('$lib/utils/googlemaps-util', () => ({
-  TravelMode: { DRIVING: 'DRIVING' }
+  travelMode: () => ({ DRIVING: 'DRIVING' })
 }));
 
 const spot: Spot = {

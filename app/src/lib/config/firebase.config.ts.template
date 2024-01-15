@@ -1,0 +1,10 @@
+import type { FirebaseOptions } from 'firebase/app';
+
+export const firebaseConfig: FirebaseOptions = {
+  apiKey: "xxxx",
+  authDomain: "xxxx.firebaseapp.com",
+  projectId: "xxxx",
+  storageBucket: "xxxxx.appspot.com",
+  messagingSenderId: "99999999",
+  appId: "xxxxxxxx99999"
+};

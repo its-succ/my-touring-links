@@ -14,15 +14,17 @@
   "emulators": {
     "singleProjectMode": true,
     "firestore": {
-      "host": "0.0.0.0",
+      "host": "localhost",
       "port": 8082,
       "websocketPort": 8052
     },
-    "hosting": {
-      "port": 5000
-    },
     "ui": {
+      "host": "localhost",
       "enabled": true
+    },
+    "auth": {
+      "host": "localhost",
+      "port": 9099
     }
   }
 }

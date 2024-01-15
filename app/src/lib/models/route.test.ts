@@ -33,7 +33,7 @@ class MockDirectionsService extends DirectionsService {
 beforeEach(() => {
   initialize();
   vi.mock('$lib/utils/googlemaps-util', () => ({
-    TravelMode: { DRIVING: 'DRIVING' },
+    travelMode: () => ({ DRIVING: 'DRIVING' }),
     latLngToString: (data: google.maps.LatLngLiteral) => `${(data.lat, data.lng)}`
   }));
 });

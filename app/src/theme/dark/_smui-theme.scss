@@ -1,27 +1,27 @@
-@use 'sass:color';
-
-@use '@material/theme/color-palette';
-
-// Svelte Colors! (Dark Theme)
-@use '@material/theme/index' as theme with (
-  $primary: #ff3e00,
-  $secondary: color.scale(#676778, $whiteness: -10%),
-  $surface: color.adjust(color-palette.$grey-900, $blue: +4),
-  $background: #000,
-  $error: color-palette.$red-700
-);
-
 @use '../typography/Typography';
+@use '../token.scss';
+
+:root {
+  --mdc-theme-primary: var(--md-sys-color-primary-dark);
+  --mdc-theme-secondary: var(--md-sys-color-secondary-dark);
+  --mdc-theme-background: var(--md-sys-color-background-dark);
+  --mdc-theme-surface: var(--md-sys-color-surface-dark);
+  --mdc-theme-on-primary: var(--md-sys-color-on-primary-dark);
+  --mdc-theme-on-secondary: var(--md-sys-color-on-secondary-dark);
+  --mdc-theme-on-surface: var(--md-sys-color-on-surface-dark);
+  --mdc-theme-shadow: var(--md-sys-color-shadow-dark);
+  --mdc-theme-tertiary-container-light: var(--md-sys-color-tertiary-container-dark);
+  --mdc-theme-on-tertiary-container-light: var(--md-sys-color-on-tertiary-container-dark);
+  --mdc-text-button-disabled-label-text-color: color-mix(in srgb, var(--mdc-theme-primary) 38%, var(--mdc-theme-on-primary));
+
+  --gmpx-color-surface: #242f3e;
+  --gmpx-color-on-surface: #746855;
+  --gmpx-color-on-primary: #242f3e;
+  --gmpx-color-on-surface-variant: #d59563;
+}
 
 html,
 body {
   background-color: #000;
-  color: theme.$on-surface;
-}
-
-a {
-  color: #40b3ff;
-}
-a:visited {
-  color: color.scale(#40b3ff, $lightness: -35%);
+  color: var(--mdc-theme-on-surface);
 }
