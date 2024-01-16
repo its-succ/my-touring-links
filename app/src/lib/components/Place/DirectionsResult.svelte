@@ -24,19 +24,32 @@
   }
 </script>
 
-<Set chips={['ルート情報']} nonInteractive style="padding:0">
-  <Chip chip="到着時刻" style="margin:2px 4px;padding:0 8px;height:26px">
-    <LeadingIcon class="material-icons">check_circle</LeadingIcon>
-    <Text>{arrivalTime().toFormat('HH:mm')}</Text>
-  </Chip>
-  {#if !destination}
-    <Chip chip="滞在時間" style="margin:2px 4px;padding:0 8px;height:26px">
-      <LeadingIcon class="material-icons">local_parking</LeadingIcon>
-      <Text>{place.stayingTime}分</Text>
+<div>
+  <Set chips={['ルート情報']} nonInteractive style="padding:0">
+    <Chip chip="到着時刻" style="margin:2px 4px;padding:0 8px;height:26px">
+      <LeadingIcon class="material-icons">check_circle</LeadingIcon>
+      <Text>{arrivalTime().toFormat('HH:mm')}</Text>
     </Chip>
-    <Chip chip="出発時刻" style="margin:2px 4px;margin-right:0;padding:0 8px;height:26px">
-      <LeadingIcon class="material-icons">forward</LeadingIcon>
-      <Text>{arrivalTime().plus({ minutes: place.stayingTime }).toFormat('HH:mm')}</Text>
-    </Chip>
-  {/if}
-</Set>
+    {#if !destination}
+      <Chip chip="滞在時間" style="margin:2px 4px;padding:0 8px;height:26px">
+        <LeadingIcon class="material-icons">local_parking</LeadingIcon>
+        <Text>{place.stayingTime}分</Text>
+      </Chip>
+      <Chip chip="出発時刻" style="margin:2px 4px;margin-right:0;padding:0 8px;height:26px">
+        <LeadingIcon class="material-icons">forward</LeadingIcon>
+        <Text>{arrivalTime().plus({ minutes: place.stayingTime }).toFormat('HH:mm')}</Text>
+      </Chip>
+    {/if}
+  </Set>
+</div>
+
+<style>
+  * :global(.mdc-chip) {
+    background-color: var(--md-theme-surface-variant);
+    color: var(--md-theme-on-surface-variant);
+    border: thin solid var(--md-theme-on-surface-variant);
+  }
+  * :global(.mdc-chip__icon--leading) {
+    color: var(--md-theme-on-surface-variant);
+  }
+</style>

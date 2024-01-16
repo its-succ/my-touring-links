@@ -31,7 +31,8 @@
     gap: 0 10px;
     padding: 5px;
     border-radius: 4px;
-    background-color: #f0f1f1;
+    color: var(--md-theme-on-secondary-container);
+    background-color: var(--md-theme-secondary-container);
   }
 
   gmpx-place-photo-gallery {

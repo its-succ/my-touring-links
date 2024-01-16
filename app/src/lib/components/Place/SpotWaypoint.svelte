@@ -32,7 +32,8 @@
     gap: 0 10px;
     padding: 5px 5px 5px 40px;
     border-radius: 4px;
-    background-color: white;
+    color: var(--md-theme-on-secondary-container);
+    background-color: var(--md-theme-secondary-container);
   }
 
   .icon {
