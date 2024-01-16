@@ -54,4 +54,10 @@
       padding: 8px;
     }
   }
+  :global(.mdc-dialog .mdc-dialog__title) {
+    color: var(--mdc-theme-on-surface);
+  }
+  :global(.mdc-dialog .mdc-dialog__content) {
+    color: var(--mdc-theme-on-surface);
+  }
 </style>

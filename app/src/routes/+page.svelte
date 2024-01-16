@@ -15,7 +15,9 @@
   });
 
   onMount(async () => {
-    edit.setRoutes(JSON.parse($unsaved));
+    try {
+      edit.setRoutes(JSON.parse($unsaved));
+    } catch(e) {}
   });
 </script>
 

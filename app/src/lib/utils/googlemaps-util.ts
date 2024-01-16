@@ -34,3 +34,13 @@ export function isLatLng(
 ): data is google.maps.LatLng {
   return typeof data.lat === 'function';
 }
+
+/**
+ * シンプルなマーカーを作成してマップに追加する
+ * @param map - マーカーの追加先マップ
+ * @param position - 初期位置
+ * @returns マーカーのインスタンス
+ */
+export function createSimpleMarker(map: google.maps.MapElement, position: google.maps.LatLng | google.maps.LatLngLiteral) {
+  return new google.maps.Marker({ position, map: map.innerMap });
+}

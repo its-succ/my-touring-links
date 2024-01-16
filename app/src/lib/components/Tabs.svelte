@@ -34,15 +34,15 @@
 <header>
   <TabBar tabs={planDates} let:tab bind:active>
     <Tab {tab} minWidth>
-      <Label
+      <Label class="tab-label"
         >{DateTime.fromJSDate(tab)
           .setZone('Asia/Tokyo')
           .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label
       >
     </Tab>
     {#if tab === planDates[planDates.length - 1]}
-      <Tab tab={'+'} minWidth on:click={add}>
-        <Icon class="material-icons">add</Icon>
+      <Tab tab={'+'} minWidth on:click={add} indicatorSpanOnlyContent>
+        <Icon class="material-icons tab-label">add</Icon>
       </Tab>
     {/if}
   </TabBar>
@@ -61,7 +61,7 @@
 <style>
   header {
     position: sticky;
-    background-color: #fff;
+    background-color: var(--mdc-theme-background);
     top: 0;
     z-index: 3;
   }
@@ -69,5 +69,8 @@
     display: block;
     text-align: right;
     padding: 1em;
+  }
+  * :global(.tab-label) {
+    color: var(--mdc-theme-on-surface);
   }
 </style>
