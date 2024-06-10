@@ -44,7 +44,7 @@
     "@smui/top-app-bar": "^7.0.0-beta.15",
     "@sveltejs/adapter-auto": "^3.1.0",
     "@sveltejs/adapter-static": "^3.0.1",
-    "@sveltejs/kit": "^2.3.0",
+    "@sveltejs/kit": "^2.4.3",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@types/element-resize-detector": "^1.1.5",
     "@types/google.maps": "^3.54.10",
@@ -71,7 +71,7 @@
     "tslib": "^2.4.1",
     "typescript": "^5.3.3",
     "uuid": "^9.0.1",
-    "vite": "^5.0.11",
+    "vite": "^5.0.13",
     "vitest": "^0.34.6"
   },
   "type": "module"

@@ -20,6 +20,6 @@
     "firebase": "firebase"
   },
   "devDependencies": {
-    "firebase-tools": "^13.0.2"
+    "firebase-tools": "^13.6.0"
   }
 }
