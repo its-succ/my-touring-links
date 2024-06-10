@@ -3,6 +3,8 @@
   import pWaitFor from 'p-wait-for';
   import { v4 as uuidv4 } from 'uuid';
   import { DEFAULT_STAYING_TIME, type Place } from '$lib/models/place';
+  import { initThemeChanger } from '$lib/utils/theme';
+  import { createSimpleMarker } from '$lib/utils/googlemaps-util';
 
   /**
    * 選択されている場所
@@ -12,8 +14,8 @@
 
   /** gmp-map タグ */
   let map: google.maps.MapElement;
-  /** gmp-advanced-marker タグ */
-  let marker: google.maps.marker.AdvancedMarkerElement;
+  /** マーカー */
+  let marker: google.maps.Marker;
   /** gmpx-place-picker タグ */
   let placePicker: { value: google.maps.places.Place };
   /** ルート描画 */
@@ -25,7 +27,9 @@
   onMount(async () => {
     await pWaitFor(() => map.innerMap !== undefined);
     map.innerMap.addListener('click', onCLickMap);
+    initThemeChanger(map);
     map.center = { lat: 35.684022, lng: 139.774474 };
+    marker = createSimpleMarker(map, map.center);
     selected = {
       id: uuidv4(),
       stayingTime: DEFAULT_STAYING_TIME,
@@ -42,7 +46,8 @@
   function placechange() {
     const place = placePicker.value;
     if (place === undefined) return;
-    marker.position = map.center = place.location!;
+    map.center = place.location!;
+    marker.setPosition(place.location);
     selected = {
       id: uuidv4(),
       stayingTime: DEFAULT_STAYING_TIME,
@@ -65,7 +70,8 @@
       stayingTime: DEFAULT_STAYING_TIME,
       latLng: event.latLng!.toJSON()
     };
-    marker.position = map.center = event.latLng!;
+    map.center = event.latLng!;
+    marker.setPosition(event.latLng);
     removeRoute();
   }
 
@@ -82,7 +88,7 @@
    * マーカーを削除する
    */
   function removeMarker() {
-    marker.position = null;
+    marker.setPosition(null);
   }
 
   /**
@@ -106,11 +112,7 @@
     on:gmpx-placechange={placechange}
     bind:this={placePicker}
   ></gmpx-place-picker>
-  <gmp-map zoom={13} map-id="DEMO_MAP_ID" bind:this={map}>
-    {#if selected !== undefined}
-      <gmp-advanced-marker position={{ lat: 35.684022, lng: 139.774474 }} bind:this={marker}
-      ></gmp-advanced-marker>
-    {/if}
+  <gmp-map zoom={13} bind:this={map}>
   </gmp-map>
 </section>
 
@@ -123,5 +125,31 @@
   gmp-map {
     flex-grow: 1;
     overflow-y: auto;
+  }
+  gmpx-place-picker {
+    --gmpx-color-surface: var(--mdc-theme-surface);
+    --gmpx-color-on-surface: var(--mdc-theme-on-surface);
+    --gmpx-color-on-primary: var(--mdc-theme-on-primary);
+    --gmpx-color-on-surface-variant: var(--mdc-theme-on-secondary);
+  }
+  /**
+   * @see https://developers.google.com/maps/documentation/javascript/places-autocomplete?hl=ja#style-autocomplete
+   */
+  :global(.pac-container) {
+    background-color: var(--mdc-theme-background);
+  }
+  :global(.pac-item) {
+    border: 0;
+    color:  color-mix(in srgb, var(--mdc-theme-on-surface) 62%, var(--mdc-theme-background));
+  }
+  :global(.pac-item-selected, .pac-item:hover) {
+    background-color: var(--mdc-theme-primary);
+    color:  color-mix(in srgb, var(--mdc-theme-on-primary) 62%, var(--mdc-theme-primary));
+  }
+  :global(.pac-item-query) {
+    color:  var(--mdc-theme-on-surface);
+  }
+  :global(.pac-item-selected > .pac-item-query, .pac-item:hover > .pac-item-query) {
+    color:  var(--mdc-theme-on-primary);
   }
 </style>

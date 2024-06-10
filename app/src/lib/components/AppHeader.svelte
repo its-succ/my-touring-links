@@ -82,10 +82,10 @@
             {#if loggedIn}
               <Subheader>{user?.displayName}</Subheader>
             {/if}
-            <Item on:SMUI:action={login} disabled={loggedIn}>
+            <Item on:SMUI:action={login} disabled={loggedIn} class="menu-item">
               <Text>Googleアカウントでログイン</Text>
             </Item>
-            <Item on:SMUI:action={logout} disabled={!loggedIn}>
+            <Item on:SMUI:action={logout} disabled={!loggedIn} class="menu-item">
               <Text>ログアウト</Text>
             </Item>
           </List>
@@ -103,5 +103,11 @@
     color: var(--mdc-theme-primary);
     margin-top: 4px;
     margin-right: 16px;
+  }
+  :global(.mdc-top-app-bar__title) {
+    color: var(--mdc-theme-on-primary);
+  }
+  * :global(.menu-item) {
+    color: var(--mdc-theme-on-surface);
   }
 </style>
