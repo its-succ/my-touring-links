@@ -38,7 +38,7 @@
     "@smui/list": "^7.0.0-beta.15",
     "@smui/menu": "^7.0.0-beta.15",
     "@smui/menu-surface": "^7.0.0-beta.15",
-    "@smui/slider": "^7.0.0-beta.15",
+    "@smui/slider": "^8.0.0-alpha.0",
     "@smui/tab": "^7.0.0-beta.15",
     "@smui/tab-bar": "^7.0.0-beta.15",
     "@smui/top-app-bar": "^7.0.0-beta.15",
