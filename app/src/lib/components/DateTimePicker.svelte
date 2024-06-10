@@ -109,7 +109,9 @@
     /* time picker */
     --sdt-clock-selected-bg: var(--mdc-theme-primary); /** selected time background color */
     --sdt-clock-bg: var(--mdc-theme-background); /** time picker inner circle background color */
-    --sdt-clock-color: var(--mdc-theme-on-surface); /** time picker text color (watch "--sdt-color") */
+    --sdt-clock-color: var(
+      --mdc-theme-on-surface
+    ); /** time picker text color (watch "--sdt-color") */
     --sdt-clock-color-hover: var(
       --sdt-color
     ); /** time picker hover text color (watch "--sdt-color") */

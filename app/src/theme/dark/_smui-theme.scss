@@ -10,14 +10,18 @@
   --mdc-theme-on-secondary: var(--md-sys-color-on-secondary-dark);
   --mdc-theme-on-surface: var(--md-sys-color-on-surface-dark);
   --mdc-theme-shadow: var(--md-sys-color-shadow-dark);
-  --mdc-text-button-disabled-label-text-color: color-mix(in srgb, var(--mdc-theme-primary) 38%, var(--mdc-theme-on-primary));
+  --mdc-text-button-disabled-label-text-color: color-mix(
+    in srgb,
+    var(--mdc-theme-primary) 38%,
+    var(--mdc-theme-on-primary)
+  );
   --md-theme-secondary-container: var(--md-sys-color-secondary-container-dark);
   --md-theme-on-secondary-container: var(--md-sys-color-on-secondary-container-dark);
   --md-theme-outline: var(--md-sys-color-outline-dark);
   --mdc-checkbox-unchecked-color: var(--mdc-theme-on-surface);
   --md-theme-surface-variant: var(--md-sys-color-surface-variant-dark);
   --md-theme-on-surface-variant: var(--md-sys-color-on-surface-variant-dark);
-  --mdc-theme-text-primary-on-background: var(--mdc-theme-on-primary):
+  --mdc-theme-text-primary-on-background: var(--mdc-theme-on-primary): ;
 }
 
 html,

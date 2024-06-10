@@ -73,7 +73,8 @@
 </div>
 
 <style>
-  * :global(.mdc-typography--caption), * :global(.mdc-checkbox__native-control) {
+  * :global(.mdc-typography--caption),
+  * :global(.mdc-checkbox__native-control) {
     color: var(--mdc-theme-on-surface);
   }
 </style>
