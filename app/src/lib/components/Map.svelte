@@ -112,8 +112,7 @@
     on:gmpx-placechange={placechange}
     bind:this={placePicker}
   ></gmpx-place-picker>
-  <gmp-map zoom={13} bind:this={map} map-id="DEMO_MAP_ID">
-  </gmp-map>
+  <gmp-map zoom={13} rendering-type="raster" bind:this={map}> </gmp-map>
 </section>
 
 <style>
@@ -140,16 +139,16 @@
   }
   :global(.pac-item) {
     border: 0;
-    color:  color-mix(in srgb, var(--mdc-theme-on-surface) 62%, var(--mdc-theme-background));
+    color: color-mix(in srgb, var(--mdc-theme-on-surface) 62%, var(--mdc-theme-background));
   }
   :global(.pac-item-selected, .pac-item:hover) {
     background-color: var(--mdc-theme-primary);
-    color:  color-mix(in srgb, var(--mdc-theme-on-primary) 62%, var(--mdc-theme-primary));
+    color: color-mix(in srgb, var(--mdc-theme-on-primary) 62%, var(--mdc-theme-primary));
   }
   :global(.pac-item-query) {
-    color:  var(--mdc-theme-on-surface);
+    color: var(--mdc-theme-on-surface);
   }
   :global(.pac-item-selected > .pac-item-query, .pac-item:hover > .pac-item-query) {
-    color:  var(--mdc-theme-on-primary);
+    color: var(--mdc-theme-on-primary);
   }
 </style>
