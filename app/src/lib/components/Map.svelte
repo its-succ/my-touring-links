@@ -112,7 +112,7 @@
     on:gmpx-placechange={placechange}
     bind:this={placePicker}
   ></gmpx-place-picker>
-  <gmp-map zoom={13} bind:this={map}>
+  <gmp-map zoom={13} bind:this={map} map-id="DEMO_MAP_ID">
   </gmp-map>
 </section>
 
