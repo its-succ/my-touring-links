@@ -1,6 +1,6 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
-  import { persistBrowserSession } from '@macfja/svelte-persistent-store'
+  import { persistBrowserSession } from '@macfja/svelte-persistent-store';
   import Edit from 'components/Edit.svelte';
   import { beforeNavigate } from '$app/navigation';
   import { onMount } from 'svelte';
@@ -17,7 +17,9 @@
   onMount(async () => {
     try {
       edit.setRoutes(JSON.parse($unsaved));
-    } catch(e) {}
+    } catch (e) {
+      // ignore error
+    }
   });
 </script>
 

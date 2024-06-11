@@ -41,6 +41,9 @@ export function isLatLng(
  * @param position - 初期位置
  * @returns マーカーのインスタンス
  */
-export function createSimpleMarker(map: google.maps.MapElement, position: google.maps.LatLng | google.maps.LatLngLiteral) {
+export function createSimpleMarker(
+  map: google.maps.MapElement,
+  position: google.maps.LatLng | google.maps.LatLngLiteral
+) {
   return new google.maps.Marker({ position, map: map.innerMap });
 }
