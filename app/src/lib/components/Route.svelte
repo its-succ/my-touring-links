@@ -3,7 +3,7 @@
   import type { Place } from '$lib/models/place';
   import type { Route } from '$lib/models/route';
   import { createEventDispatcher } from 'svelte';
-  import { isLatLng, isPlace } from '$lib/utils/googlemaps-util';
+  import Editor from './Place/Editor.svelte';
 
   /**  ルート */
   export let value: Route | undefined;
@@ -12,8 +12,8 @@
   $: places = value ? value.get() : [];
   /** 場所をソートするハンドルアイコンが押されているかどうか */
   let handlePressed: boolean;
-  /** ルート計算結果 */
-  let directionsResults: google.maps.DirectionsResult[] | undefined;
+  /** 場所編集ダイアログ */
+  let placeEditor: Editor;
 
   /** イベントディスパッチャー */
   const dispatch = createEventDispatcher();
@@ -23,7 +23,7 @@
    * @param departureTime - 出発日時
    */
   export async function calc(departureTime: Date) {
-    directionsResults = await value?.calc(departureTime);
+    await value?.calc(departureTime);
     places = places;
   }
 
@@ -31,7 +31,7 @@
    * ルートをリセットする
    */
   export function reset() {
-    directionsResults = undefined;
+    value?.resetCalculated();
     places = places;
   }
 
@@ -75,7 +75,7 @@
     const from = Number(source);
     const to = Number(dragged.index);
     const newList = [...places];
-    directionsResults = undefined;
+    value?.resetCalculated();
     places = newList.toSpliced(from, 1).toSpliced(to, 0, places[from]);
     value?.set(places);
   }
@@ -90,7 +90,7 @@
     const id = e.detail;
     const place = places.find((p) => id === p.id);
     if (place === undefined) return false;
-    const directionsResult = getDirectionsResult(place);
+    const directionsResult = value?.getDirectionsResult(place);
     if (directionsResult === undefined) return false;
     dispatch('previewRoute', directionsResult);
   }
@@ -102,54 +102,42 @@
   function deleteFromRoute(e: CustomEvent<string>) {
     const id = e.detail;
     const to = places.findIndex((p) => id === p.id);
-    directionsResults = undefined;
+    value?.resetCalculated();
     places = places.toSpliced(to, 1);
     value?.set(places);
   }
 
   /**
-   * 滞在時間を更新する
-   * @param e - 場所IDと滞在時間を含むカスタムイベント
+   * 場所の変更を開始する
    */
-  function changeStayingTime(e: CustomEvent<{ id: string; value: number }>) {
-    const { id, value: stayingTime } = e.detail;
-    const target = places.findIndex((p) => id === p.id);
-    places[target].stayingTime = stayingTime;
-    directionsResults = undefined;
-    places = places;
-    value?.set(places);
+  function editPlace(e: CustomEvent<{ place: Place; displayNameOnly: boolean }>) {
+    placeEditor.edit(e.detail.place, e.detail.displayNameOnly);
   }
 
   /**
-   * 経由地の設定を更新する
-   * @param e - 場所IDと経由地フラグを含むカスタムイベント
+   * 場所を更新する
+   * @param e - 場所IDと場所の変更内容を含むカスタムイベント
    */
-  function changeWaypoint(e: CustomEvent<{ id: string; value: boolean }>) {
-    const { id, value: waypoint } = e.detail;
+  function placeChanged(
+    e: CustomEvent<{
+      id: string;
+      value: Pick<Place, 'displayName' | 'stayingTime' | 'waypoint' | 'icon'>;
+    }>
+  ) {
+    const { id, value: changed } = e.detail;
     const target = places.findIndex((p) => id === p.id);
-    places[target].waypoint = waypoint;
-    directionsResults = undefined;
+    places[target].displayName = changed.displayName;
+    places[target].icon = changed.icon;
+    if (
+      places[target].stayingTime !== changed.stayingTime ||
+      places[target].waypoint !== changed.waypoint
+    ) {
+      places[target].stayingTime = changed.stayingTime;
+      places[target].waypoint = changed.waypoint;
+      value?.resetCalculated();
+    }
     places = places;
     value?.set(places);
-  }
-
-  /**
-   * 到着場所が一致するルート計算結果を取得する
-   * @param place - 場所
-   * @returns 指定した到着場所のルート計算結果がない場合は undefined
-   */
-  function getDirectionsResult(place: Place) {
-    const getLatLng = (
-      destination: Parameters<typeof isPlace>[0] | string
-    ): google.maps.LatLng | null => {
-      if (typeof destination === 'string') return null;
-      if (isPlace(destination)) destination = (<google.maps.Place>destination).location!;
-      if (isLatLng(destination)) return <google.maps.LatLng>destination;
-      return null;
-    };
-    return directionsResults?.find((res) =>
-      new google.maps.LatLng(place.latLng!).equals(getLatLng(res.request.destination))
-    );
   }
 </script>
 
@@ -165,18 +153,19 @@
     >
       <PlaceElement
         {place}
-        directionsResult={getDirectionsResult(place)}
+        hasDirectionsResult={value?.getDirectionsResult(place) !== undefined}
+        arrivalTime={value?.getArrivalTime(place)}
         origin={index === 0}
         destination={index === places.length - 1}
         bind:pressed={handlePressed}
         on:previewRouteTo={previewRoute}
         on:deleteFromRoute={deleteFromRoute}
-        on:changeStayingTime={changeStayingTime}
-        on:changeWaypoint={changeWaypoint}
+        on:editPlace={editPlace}
       ></PlaceElement>
     </li>
   {/each}
 </ul>
+<Editor bind:this={placeEditor} on:change={placeChanged}></Editor>
 
 <style>
   ul.routes,

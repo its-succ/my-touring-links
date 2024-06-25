@@ -1,20 +1,21 @@
 <script lang="ts">
   import type { ComponentType, SvelteComponent } from 'svelte';
   import IconButton from '@smui/icon-button';
-  import { isSpot, type Place } from '$lib/models/place';
+  import { type Place } from '$lib/models/place';
   import DirectionsResult from './Place/DirectionsResult.svelte';
   import Menu from './Place/Menu.svelte';
-  import Spot from './Place/Spot.svelte';
-  import SpotWaypoint from './Place/SpotWaypoint.svelte';
   import Location from './Place/Location.svelte';
   import LocationWaypoint from './Place/LocationWaypoint.svelte';
+  import StayingTime from './Place/StayingTime.svelte';
 
   /** Place */
   export let place: Place;
   /** ソートハンドルアイコンが押されているかどうか */
   export let pressed: boolean;
-  /** ルート計算結果 */
-  export let directionsResult: google.maps.DirectionsResult | undefined;
+  /** ルート計算されているかどうか */
+  export let hasDirectionsResult: boolean;
+  /** 到着予定時刻 */
+  export let arrivalTime: Date | undefined;
   /** 出発地かどうか */
   export let origin: boolean = false;
   /** 最終目的地かどうか */
@@ -29,30 +30,29 @@
     origin: boolean,
     destination: boolean
   ): ComponentType<Constraint> {
-    if (isSpot(place)) {
-      return place.waypoint && !origin && !destination ? SpotWaypoint : Spot;
-    } else {
-      return place.waypoint && !origin && !destination ? LocationWaypoint : Location;
-    }
+    return place.waypoint && !origin && !destination ? LocationWaypoint : Location;
   }
 </script>
 
 <svelte:component this={component} {place}>
   <div slot="detail">
-    {#if directionsResult !== undefined}
-      <DirectionsResult {place} {directionsResult} {destination}></DirectionsResult>
+    {#if hasDirectionsResult}
+      {#if arrivalTime !== undefined}
+        <DirectionsResult {place} {arrivalTime} {destination}></DirectionsResult>
+      {/if}
+    {:else if !origin && !destination}
+      <StayingTime {place}></StayingTime>
     {/if}
   </div>
   <div slot="meta">
     <Menu
       {place}
-      {directionsResult}
+      {hasDirectionsResult}
       {origin}
       {destination}
       on:previewRouteTo
       on:deleteFromRoute
-      on:changeStayingTime
-      on:changeWaypoint
+      on:editPlace
     ></Menu>
     <div on:pointerdown={() => (pressed = true)} on:pointerleave={() => (pressed = false)}>
       <IconButton class="material-icons" size="button" ripple={false}>drag_handle</IconButton>

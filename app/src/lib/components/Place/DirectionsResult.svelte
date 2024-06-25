@@ -1,55 +1,41 @@
 <script lang="ts">
   import { DateTime } from 'luxon';
-  import Chip, { Set, LeadingIcon, Text } from '@smui/chips';
+  import { Set } from '@smui/chips';
   import type { Place } from '$lib/models/place';
+  import Chip from './Chip.svelte';
 
   /** Place */
   export let place: Place;
-  /** ルート計算結果 */
-  export let directionsResult: google.maps.DirectionsResult;
+  /** 到着予定時刻 */
+  export let arrivalTime: Date;
   /** 最終目的地かどうか */
   export let destination: boolean = false;
-
-  /**
-   * 出発日時を計算する
-   * @returns 出発日時
-   */
-  function arrivalTime() {
-    const duration = directionsResult.routes[0].legs
-      .map((l) => l.duration!.value)
-      .reduce((sum, val) => sum + val, 0);
-    return DateTime.fromJSDate(directionsResult.request.drivingOptions!.departureTime)
-      .setZone('Asia/Tokyo')
-      .plus({ seconds: duration });
-  }
 </script>
 
 <div>
   <Set chips={['ルート情報']} nonInteractive style="padding:0">
-    <Chip chip="到着時刻" style="margin:2px 4px;padding:0 8px;height:26px">
-      <LeadingIcon class="material-icons">check_circle</LeadingIcon>
-      <Text>{arrivalTime().toFormat('HH:mm')}</Text>
-    </Chip>
+    <Chip
+      name="到着時刻"
+      icon="check_circle"
+      text={DateTime.fromJSDate(arrivalTime).setZone('Asia/Tokyo').toFormat('HH:mm')}
+      style="margin:2px 4px;padding:0 8px;height:26px"
+    />
     {#if !destination}
-      <Chip chip="滞在時間" style="margin:2px 4px;padding:0 8px;height:26px">
-        <LeadingIcon class="material-icons">local_parking</LeadingIcon>
-        <Text>{place.stayingTime}分</Text>
-      </Chip>
-      <Chip chip="出発時刻" style="margin:2px 4px;margin-right:0;padding:0 8px;height:26px">
-        <LeadingIcon class="material-icons">forward</LeadingIcon>
-        <Text>{arrivalTime().plus({ minutes: place.stayingTime }).toFormat('HH:mm')}</Text>
-      </Chip>
+      <Chip
+        name="滞在時間"
+        icon="local_parking"
+        text="{place.stayingTime}分"
+        style="margin:2px 4px;padding:0 8px;height:26px"
+      />
+      <Chip
+        name="出発時刻"
+        icon="forward"
+        text={DateTime.fromJSDate(arrivalTime)
+          .setZone('Asia/Tokyo')
+          .plus({ minutes: place.stayingTime })
+          .toFormat('HH:mm')}
+        style="margin:2px 4px;margin-right:0;padding:0 8px;height:26px"
+      />
     {/if}
   </Set>
 </div>
-
-<style>
-  * :global(.mdc-chip) {
-    background-color: var(--md-theme-surface-variant);
-    color: var(--md-theme-on-surface-variant);
-    border: thin solid var(--md-theme-on-surface-variant);
-  }
-  * :global(.mdc-chip__icon--leading) {
-    color: var(--md-theme-on-surface-variant);
-  }
-</style>

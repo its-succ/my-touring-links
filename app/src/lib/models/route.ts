@@ -7,7 +7,8 @@ import { travelMode, latLngToString } from '$lib/utils/googlemaps-util';
  */
 export class Route {
   private places: Place[] = [];
-  private calculated?: google.maps.DirectionsResult[];
+  private calculated: { [placeId: string]: google.maps.DirectionsResult } = {};
+  private arrivalTimes: { [placeId: string]: number } = {};
 
   /**
    * ルートの最後に場所を追加する
@@ -35,6 +36,24 @@ export class Route {
   }
 
   /**
+   * 場所の到着時刻を取得する
+   * @param place - 場所
+   * @returns 到着時刻
+   */
+  getArrivalTime(place: Place): Date | undefined {
+    return new Date(this.arrivalTimes[place.id]);
+  }
+
+  /**
+   * 場所の計算結果を取得する
+   * @param place - 場所
+   * @returns 計算結果
+   */
+  getDirectionsResult(place: Place): google.maps.DirectionsResult | undefined {
+    return this.calculated[place.id];
+  }
+
+  /**
    * ルートを計算する
    * @param departureTime - 出発日時
    * @return 計算結果
@@ -42,7 +61,8 @@ export class Route {
   async calc(departureTime: Date) {
     let waypoints: google.maps.DirectionsWaypoint[] = [];
     let origin: google.maps.LatLngLiteral | undefined = undefined;
-    this.calculated = [];
+    this.calculated = {};
+    this.arrivalTimes = {};
     for (let i = 1; i < this.places.length; i++) {
       if (this.places[i].waypoint === true && i < this.places.length - 1) {
         waypoints.push({ location: this.places[i].latLng! });
@@ -69,15 +89,14 @@ export class Route {
         cache.set(request, result);
         return result;
       })();
-      this.calculated.push(result);
-      departureTime = DateTime.fromJSDate(departureTime)
-        .plus({
-          second: result.routes[0].legs
-            .map((l) => l.duration!.value)
-            .reduce((sum, val) => sum + val, 0)
-        })
-        .plus({ minutes: this.places[i].stayingTime })
-        .toJSDate();
+      this.calculated[this.places[i].id] = result;
+      const arrivalTime = DateTime.fromJSDate(departureTime).plus({
+        second: result.routes[0].legs
+          .map((l) => l.duration!.value)
+          .reduce((sum, val) => sum + val, 0)
+      });
+      this.arrivalTimes[this.places[i].id] = arrivalTime.toMillis();
+      departureTime = arrivalTime.plus({ minutes: this.places[i].stayingTime }).toJSDate();
       waypoints = [];
       origin = undefined;
     }
@@ -88,7 +107,8 @@ export class Route {
    * ルート計算結果をクリアする
    */
   resetCalculated() {
-    this.calculated = undefined;
+    this.calculated = {};
+    this.arrivalTimes = {};
   }
 }
 

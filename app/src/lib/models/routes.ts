@@ -1,6 +1,7 @@
 import type { Place } from './place';
 import { Route } from './route';
 import { DateTime } from 'luxon';
+import { v4 as uuidv4 } from 'uuid';
 
 export type RoutesJSON = { [index: string]: Place[] };
 
@@ -70,7 +71,7 @@ export class Routes {
   addPlaceByDepartureDateTimeToRoutes(departureDateTime: Date, place: Place): Route | undefined {
     const route = this.findRoutesByDepartureDateTime(departureDateTime);
     if (route === undefined) return undefined;
-    route.add(place);
+    route.add({ ...place, id: uuidv4() });
     return route;
   }
 

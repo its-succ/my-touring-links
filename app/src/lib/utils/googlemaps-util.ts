@@ -47,3 +47,16 @@ export function createSimpleMarker(
 ) {
   return new google.maps.Marker({ position, map: map.innerMap });
 }
+
+/**
+ * Place の fetchFieldsを実行する
+ * @param placeId - 場所ID
+ * @param options - オプション
+ * @returns 実行結果
+ */
+export const fetchFields = async (
+  placeId: string,
+  options: google.maps.places.FetchFieldsRequest
+) => {
+  return new google.maps.places.Place({ id: placeId }).fetchFields(options);
+};
