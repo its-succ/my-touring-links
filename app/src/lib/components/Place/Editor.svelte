@@ -9,7 +9,7 @@
   import SegmentedButton, { Segment, Icon } from '@smui/segmented-button';
   import Wrapper from '@smui/touch-target';
   import { createEventDispatcher } from 'svelte';
-  import type { Place } from '$lib/models/place';
+  import { formatLocation, type Place } from '$lib/models/place';
   import { filterIcons, type IconElement } from '$lib/models/material-icons';
   import { icons } from '$lib/models/material-icons.json';
 
@@ -20,12 +20,13 @@
    */
   export function edit(target: Place, displayNameOnly = false) {
     place = target;
-    displayName = place.displayName || '';
+    displayName = place.displayName || formatLocation(place);
     stayingTime = place.stayingTime;
     waypoint = place.waypoint || false;
     searchIcon = place.icon || 'location_on';
     icon = icons.filter((icon) => icon.name === searchIcon)[0];
     displayNameOnlyEdit = displayNameOnly;
+    formValidity = true;
     open = true;
   }
   /** ダイアログの開閉状態 */
@@ -45,10 +46,15 @@
   let icon: IconElement | undefined;
   /** フォーム */
   let form: HTMLFormElement;
+  /** フォームのバリデーション状態 */
+  let formValidity: boolean;
 
   /** イベントディスパッチャー */
   let dispatch = createEventDispatcher();
 
+  function validate() {
+    formValidity = form.checkValidity();
+  }
   /**
    * フォームを実行する
    */
@@ -78,6 +84,7 @@
           required
           helperLine$style="width: 100%;"
           class="form-field"
+          on:change={validate}
         >
           <TextIcon class="material-icons" slot="leadingIcon">{icon?.name}</TextIcon>
           <div slot="helper">
@@ -130,7 +137,7 @@
       <Button action="cancel">
         <Label>キャンセル</Label>
       </Button>
-      <Button action="accept" on:click={handleSubmit}>
+      <Button action="accept" on:click={handleSubmit} disabled={!formValidity}>
         <Label>適用</Label>
       </Button>
     </Actions>
