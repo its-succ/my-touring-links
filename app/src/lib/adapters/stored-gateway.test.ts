@@ -4,7 +4,7 @@ import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/
 import { createStoredGateway } from './stored-gateway';
 import { DEFAULT_STAYING_TIME, type Spot } from '$lib/models/place';
 import { faker } from '@faker-js/faker/locale/ja';
-import { Routes } from '$lib/models/routes';
+import { Touring } from '$lib/models/touring';
 import { Settings } from 'luxon';
 import { readFileSync } from 'node:fs';
 import appRoot from 'app-root-path';
@@ -52,23 +52,23 @@ const fakeSpot = (args: Partial<Spot> = {}): Spot => {
   };
 };
 
-describe('FirestoreRoutesGateway', () => {
+describe('FirestoreTouringGateway', () => {
   describe('save', () => {
     it('認証されていない場合はエラーになる', async () => {
       // arrange
       const unauthedDb = testEnv.unauthenticatedContext().firestore();
-      const target = createStoredGateway(unauthedDb as unknown as Firestore, 'routes');
+      const target = createStoredGateway(unauthedDb as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       // action & assert
       await expectFirestorePermissionDenied(
         target.save({
           name: 'テストルート',
-          routes: routes.toJSON(),
+          touring: touring.toJSON(),
           userId: 'test-user'
         })
       );
@@ -77,18 +77,18 @@ describe('FirestoreRoutesGateway', () => {
     it('他人では追加できない', async () => {
       // arrange
       const alice = testEnv.authenticatedContext('alice').firestore();
-      const target = createStoredGateway(alice as unknown as Firestore, 'routes');
+      const target = createStoredGateway(alice as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       // action & assert
       await expectFirestorePermissionDenied(
         target.save({
           name: 'テストルート',
-          routes: routes.toJSON(),
+          touring: touring.toJSON(),
           userId: 'bob'
         })
       );
@@ -97,79 +97,79 @@ describe('FirestoreRoutesGateway', () => {
     it('認証されている場合は追加できる', async () => {
       // arrange
       const db = testEnv.authenticatedContext('alice').firestore();
-      const target = createStoredGateway(db as unknown as Firestore, 'routes');
+      const target = createStoredGateway(db as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       // action
       const results = await expectFirestorePermissionUpdateSucceeds(
         target.save({
-          name: 'テストルート',
-          routes: routes.toJSON(),
+          name: 'テストツーリング',
+          touring: touring.toJSON(),
           userId: 'alice'
         })
       );
       // assert
       expect(results.id).not.toBeUndefined();
-      const actual = (await db.collection('routes').doc(results.id).get()).data();
+      const actual = (await db.collection('tourings').doc(results.id).get()).data();
       actual!.id = results.id;
       actual!.createdAt = actual?.createdAt.toDate();
       actual!.updatedAt = actual?.updatedAt.toDate();
       expect(actual).toEqual(results);
     });
 
-    it('他人のルートは更新できない', async () => {
+    it('他人のツーリングは更新できない', async () => {
       // arrange
       const alice = testEnv.authenticatedContext('alice').firestore();
       const bob = testEnv.authenticatedContext('bob').firestore();
-      const target = createStoredGateway(alice as unknown as Firestore, 'routes');
+      const target = createStoredGateway(alice as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       const entity = {
-        name: 'テストルート',
-        routes: routes.toJSON(),
+        name: 'テストツーリング',
+        touring: touring.toJSON(),
         userId: 'bob',
         createdAt: now,
         updatedAt: now
       };
-      const { id } = await bob.collection('routes').add(entity);
+      const { id } = await bob.collection('tourings').add(entity);
       // action & assert
       await expectFirestorePermissionDenied(
-        target.save({ ...entity, name: 'ルート変更', userId: 'alice', id })
+        target.save({ ...entity, name: 'ツーリング変更', userId: 'alice', id })
       );
     });
 
-    it('自分のルートは更新できる', async () => {
+    it('自分のツーリングは更新できる', async () => {
       // arrange
       const db = testEnv.authenticatedContext('alice').firestore();
-      const target = createStoredGateway(db as unknown as Firestore, 'routes');
+      const target = createStoredGateway(db as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       const entity = {
-        name: 'テストルート',
-        routes: routes.toJSON(),
+        name: 'テストツーリング',
+        touring: touring.toJSON(),
         userId: 'alice',
         createdAt: now,
         updatedAt: now
       };
-      const { id } = await db.collection('routes').add(entity);
+      const { id } = await db.collection('tourings').add(entity);
       // action
       const results = await expectFirestorePermissionUpdateSucceeds(
-        target.save({ ...entity, name: 'ルート変更', userId: 'alice', id })
+        target.save({ ...entity, name: 'ツーリング変更', userId: 'alice', id })
       );
       // assert
-      const actual = (await db.collection('routes').doc(results.id).get()).data();
+      const actual = (await db.collection('tourings').doc(results.id).get()).data();
       actual!.id = results.id;
       actual!.createdAt = actual?.createdAt.toDate();
       actual!.updatedAt = actual?.updatedAt.toDate();
@@ -182,92 +182,92 @@ describe('FirestoreRoutesGateway', () => {
       // arrange
       const alice = testEnv.authenticatedContext('alice').firestore();
       const unauthedDb = testEnv.unauthenticatedContext().firestore();
-      const target = createStoredGateway(unauthedDb as unknown as Firestore, 'routes');
+      const target = createStoredGateway(unauthedDb as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       const entity = {
-        name: 'テストルート',
-        routes: routes.toJSON(),
+        name: 'テストツーリング',
+        touring: touring.toJSON(),
         userId: 'alice',
         createdAt: now,
         updatedAt: now
       };
-      const saved = await alice.collection('routes').add(entity);
+      const saved = await alice.collection('tourings').add(entity);
       // action & assert
       await expectFirestorePermissionDenied(target.findById(saved.id));
     });
 
-    it('他人のルートは取得できない', async () => {
+    it('他人のツーリングは取得できない', async () => {
       // arrange
       const alice = testEnv.authenticatedContext('alice').firestore();
       const bob = testEnv.authenticatedContext('bob').firestore();
-      const target = createStoredGateway(alice as unknown as Firestore, 'routes');
+      const target = createStoredGateway(alice as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       const entity = {
-        name: 'テストルート',
-        routes: routes.toJSON(),
+        name: 'テストツーリング',
+        touring: touring.toJSON(),
         userId: 'bob',
         createdAt: now,
         updatedAt: now
       };
-      const saved = await bob.collection('routes').add(entity);
+      const saved = await bob.collection('tourings').add(entity);
       // action & assert
       await expectFirestorePermissionDenied(target.findById(saved.id));
     });
 
-    it('自分のルートが取得できる', async () => {
+    it('自分のツーリングが取得できる', async () => {
       // arrange
       const alice = testEnv.authenticatedContext('alice').firestore();
-      const target = createStoredGateway(alice as unknown as Firestore, 'routes');
+      const target = createStoredGateway(alice as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       const entity = {
-        name: 'テストルート',
-        routes: routes.toJSON(),
+        name: 'テストツーリング',
+        touring: touring.toJSON(),
         userId: 'alice',
         createdAt: now,
         updatedAt: now
       };
-      const saved = await alice.collection('routes').add(entity);
+      const saved = await alice.collection('tourings').add(entity);
       // action
       const results = await expectPermissionGetSucceeds(target.findById(saved.id));
       // assert
       expect({ ...entity, id: saved.id }).toEqual(results);
     });
 
-    it('公開指定されている場合はURLを知っている誰でもルートが取得できる', async () => {
+    it('公開指定されている場合はURLを知っている誰でもツーリングが取得できる', async () => {
       // arrange
       const alice = testEnv.authenticatedContext('alice').firestore();
       const unauthedDb = testEnv.unauthenticatedContext().firestore();
-      const target = createStoredGateway(unauthedDb as unknown as Firestore, 'routes');
+      const target = createStoredGateway(unauthedDb as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
-      const routes = new Routes();
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'spot1' }));
-      routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+      const touring = new Touring();
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'spot1' }));
+      touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
       const entity = {
-        name: 'テストルート',
-        routes: routes.toJSON(),
+        name: 'テストツーリング',
+        touring: touring.toJSON(),
         publish: true,
         userId: 'alice',
         createdAt: now,
         updatedAt: now
       };
-      const saved = await alice.collection('routes').add(entity);
+      const saved = await alice.collection('tourings').add(entity);
       // action
       const results = await expectPermissionGetSucceeds(target.findById(saved.id));
       // assert
@@ -276,11 +276,11 @@ describe('FirestoreRoutesGateway', () => {
   });
 
   describe('findAllByUserId', () => {
-    it('自分のルートがすべて取得できる', async () => {
+    it('自分のツーリングがすべて取得できる', async () => {
       // arrange
       const alice = testEnv.authenticatedContext('alice').firestore();
       const bob = testEnv.authenticatedContext('bob').firestore();
-      const target = createStoredGateway(alice as unknown as Firestore, 'routes');
+      const target = createStoredGateway(alice as unknown as Firestore, 'tourings');
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
       const all = [
@@ -291,27 +291,27 @@ describe('FirestoreRoutesGateway', () => {
         { db: alice, user: 'alice', from: '2024-01-20T10:00+09:00' }
       ];
       all.forEach(async (data, index) => {
-        const routes = new Routes();
-        routes.changeDepartureDateTimeToRoutes(now, new Date(data.from));
-        routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'start' }));
-        routes.addPlaceByDepartureDateTimeToRoutes(now, fakeSpot({ placeId: 'goal' }));
+        const touring = new Touring();
+        touring.changeDepartureDateTimeToTouring(now, new Date(data.from));
+        touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'start' }));
+        touring.addPlaceByDepartureDateTimeToTouring(now, fakeSpot({ placeId: 'goal' }));
         const entity = {
-          name: `${data.user}のルート${index}`,
-          routes: routes.toJSON(),
+          name: `${data.user}のツーリング${index}`,
+          touring: touring.toJSON(),
           userId: data.user,
           createdAt: now,
           updatedAt: now
         };
-        await data.db.collection('routes').add(entity);
+        await data.db.collection('tourings').add(entity);
       });
       // action
       const results = await expectPermissionGetSucceeds(target.findAllByUserId('alice'));
       // assert
       expect(results).toHaveLength(3);
       expect(results.map((r) => r.name).sort()).toEqual([
-        'aliceのルート0',
-        'aliceのルート2',
-        'aliceのルート4'
+        'aliceのツーリング0',
+        'aliceのツーリング2',
+        'aliceのツーリング4'
       ]);
     });
   });

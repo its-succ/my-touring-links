@@ -1,26 +1,22 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
   import { persistBrowserSession } from '@macfja/svelte-persistent-store';
-  import Edit from 'components/Edit.svelte';
-  import { beforeNavigate } from '$app/navigation';
+  import { beforeNavigate, goto } from '$app/navigation';
   import { onMount } from 'svelte';
+  import type { TouringEntity } from '$lib/models/entity';
 
   /** セッションストア */
-  let unsaved = persistBrowserSession(writable('UnsavedRoute'), 'unsaved-route');
-  /** ルート編集コンポーネント */
-  let edit: Edit;
-
-  beforeNavigate(() => {
-    $unsaved = JSON.stringify(edit.getRoutes().toJSON());
-  });
+  const unsaved = persistBrowserSession(writable('UnsavedTouring'), 'unsaved-touring');
 
   onMount(async () => {
+    let touringEntity: TouringEntity | undefined;
+    let id = 'new';
     try {
-      edit.setRoutes(JSON.parse($unsaved));
+      touringEntity = JSON.parse($unsaved);
+      if (touringEntity?.id) id = touringEntity.id;
     } catch (e) {
       // ignore error
     }
+    await goto(`/tourings/${id}`, { replaceState: true });
   });
 </script>
-
-<Edit bind:this={edit} />

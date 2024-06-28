@@ -1,4 +1,4 @@
-import type { RoutesEntity, BaseEntity } from '$lib/models/entity';
+import type { TouringEntity, BaseEntity } from '$lib/models/entity';
 import type {
   Firestore,
   FirestoreDataConverter,
@@ -19,21 +19,21 @@ import {
 } from 'firebase/firestore';
 import { DateTime } from 'luxon';
 
-export type DATABASES = 'users' | 'routes';
+export type DATABASES = 'users' | 'tourings';
 
 export interface StoredGateway<T extends BaseEntity> {
   save(entity: T): Promise<T>;
   findById(id: string): Promise<T | undefined>;
 }
 
-export interface RoutesStoredGateway extends StoredGateway<RoutesEntity> {
-  findAllByUserId(userId: string): Promise<RoutesEntity[]>;
+export interface TouringStoredGateway extends StoredGateway<TouringEntity> {
+  findAllByUserId(userId: string): Promise<TouringEntity[]>;
 }
 
 export const createStoredGateway = (db: Firestore, database: DATABASES) => {
   switch (database) {
-    case 'routes':
-      return new FirestoreRoutesGateway(db, database);
+    case 'tourings':
+      return new FirestoreTouringGateway(db, database);
     default:
       throw Error(`unknown databse ${database}`);
   }
@@ -80,15 +80,15 @@ class FirestoreGateway<T extends BaseEntity> implements StoredGateway<T> {
   }
 }
 
-class FirestoreRoutesGateway extends FirestoreGateway<RoutesEntity> implements RoutesStoredGateway {
-  async findAllByUserId(userId: string): Promise<RoutesEntity[]> {
+class FirestoreTouringGateway extends FirestoreGateway<TouringEntity> implements TouringStoredGateway {
+  async findAllByUserId(userId: string): Promise<TouringEntity[]> {
     const querySnapshot = await getDocs(
       query(collection(this.db, this.database), where('userId', '==', userId)).withConverter(
-        converter<RoutesEntity>()
+        converter<TouringEntity>()
       )
     );
-    const routes: RoutesEntity[] = [];
-    querySnapshot.forEach((doc) => routes.push({ ...doc.data(), id: doc.id }));
-    return routes;
+    const touring: TouringEntity[] = [];
+    querySnapshot.forEach((doc) => touring.push({ ...doc.data(), id: doc.id }));
+    return touring;
   }
 }
