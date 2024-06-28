@@ -1,20 +1,27 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { v4 as uuidv4 } from 'uuid';
 import { Routes } from './routes';
 import { Settings } from 'luxon';
 import { Route } from './route';
 import { DEFAULT_STAYING_TIME, type Spot } from './place';
+import { faker } from '@faker-js/faker';
 
 vi.mock('$lib/utils/googlemaps-util', () => ({
   travelMode: () => ({ DRIVING: 'DRIVING' })
 }));
 
+vi.mock('uuid', () => ({ v4: vi.fn() }));
+
 const spot: Spot = {
-  id: uuidv4(),
+  id: faker.string.uuid(),
   stayingTime: DEFAULT_STAYING_TIME,
   placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo',
   latLng: { lat: 35.6842334, lng: 139.7718872 }
 };
+
+beforeEach(() => {
+  vi.mocked(uuidv4).mockClear();
+});
 
 describe('Routes', () => {
   describe('constructor', () => {
@@ -100,10 +107,12 @@ describe('addPlaceByDepartureDateTimeToRoutes', () => {
     // arrange
     const now = new Date('2023-12-24T12:00+09:00');
     Settings.now = () => now.getTime();
+    const id = faker.string.uuid();
+    vi.mocked(uuidv4).mockReturnValue(id);
     const routes = new Routes();
     // action & assert
     expect(routes.addPlaceByDepartureDateTimeToRoutes(now, spot)).toBeInstanceOf(Route);
-    expect(routes.findRoutesByDepartureDateTime(now)?.get()).toEqual([spot]);
+    expect(routes.findRoutesByDepartureDateTime(now)?.get()).toEqual([{ ...spot, id }]);
   });
   it('存在しない日付の場合はundefinedになること', () => {
     // arrange
@@ -122,12 +131,14 @@ describe('changeDepartureDateTimeToRoutes', () => {
     // arrange
     const now = new Date('2023-12-24T12:00+09:00');
     Settings.now = () => now.getTime();
+    const id = faker.string.uuid();
+    vi.mocked(uuidv4).mockReturnValue(id);
     const routes = new Routes();
     routes.addPlaceByDepartureDateTimeToRoutes(now, spot);
     const to = new Date('2023-12-24T10:00+09:00');
     // action & assert
     expect(routes.changeDepartureDateTimeToRoutes(now, to)).toBeTruthy();
-    expect(routes.findRoutesByDepartureDateTime(to)?.get()).toEqual([spot]);
+    expect(routes.findRoutesByDepartureDateTime(to)?.get()).toEqual([{ ...spot, id }]);
   });
   it('存在しない日付の場合はfalseになること', () => {
     // arrange
@@ -156,6 +167,8 @@ describe('changeDepartureDateTimeToRoutes', () => {
       // arrange
       const now = new Date('2023-12-24T12:00+09:00');
       Settings.now = () => now.getTime();
+      const id = faker.string.uuid();
+      vi.mocked(uuidv4).mockReturnValue(id);
       const routes = new Routes();
       const added = new Date('2023-12-23T10:00+09:00');
       routes.addDepartureDateTimeToRoutes(added);
@@ -163,7 +176,7 @@ describe('changeDepartureDateTimeToRoutes', () => {
       // action & assert
       expect(routes.toJSON()).toEqual({
         [now.toISOString()]: [],
-        [added.toISOString()]: [spot]
+        [added.toISOString()]: [{ ...spot, id }]
       });
     });
   });

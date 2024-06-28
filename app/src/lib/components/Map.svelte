@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import pWaitFor from 'p-wait-for';
   import { v4 as uuidv4 } from 'uuid';
-  import { DEFAULT_STAYING_TIME, type Place } from '$lib/models/place';
+  import { DEFAULT_STAYING_TIME, fetchDisplayName, type Place } from '$lib/models/place';
   import { initThemeChanger } from '$lib/utils/theme';
   import { createSimpleMarker } from '$lib/utils/googlemaps-util';
 
@@ -34,6 +34,7 @@
       id: uuidv4(),
       stayingTime: DEFAULT_STAYING_TIME,
       placeId: 'ChIJp2YSkviJGGARyhnZ3I29Gzo',
+      displayName: '日本国道路元標・道路元標地点碑',
       latLng: { lat: 35.684022, lng: 139.774474 }
     };
   });
@@ -52,6 +53,7 @@
       id: uuidv4(),
       stayingTime: DEFAULT_STAYING_TIME,
       placeId: place.id,
+      displayName: place.displayName || undefined,
       latLng: place.location!.toJSON()
     };
     removeRoute();
@@ -63,11 +65,16 @@
    * 現在の選択場所も変更する。
    * @param event イベント
    */
-  function onCLickMap(event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
+  async function onCLickMap(event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
+    let displayName;
+    if ((<google.maps.IconMouseEvent>event).placeId !== undefined) {
+      displayName = await fetchDisplayName((<google.maps.IconMouseEvent>event).placeId!);
+    }
     selected = {
       ...event,
       id: uuidv4(),
       stayingTime: DEFAULT_STAYING_TIME,
+      displayName: displayName || undefined,
       latLng: event.latLng!.toJSON()
     };
     map.center = event.latLng!;

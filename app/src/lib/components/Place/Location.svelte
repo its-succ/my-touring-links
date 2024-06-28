@@ -11,7 +11,9 @@
 
 <div class="place">
   <div class="icon">
-    <Icon class="material-icons" style="font-size:30px;color:white;margin:5px;">location_on</Icon>
+    <Icon class="material-icons" style="font-size:30px;color:white;margin:5px;"
+      >{place.icon ?? 'location_on'}</Icon
+    >
   </div>
   <header class="mdc-typography--subtitle1">
     {formatLocation(location)}

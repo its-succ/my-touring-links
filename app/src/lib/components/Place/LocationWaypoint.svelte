@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type Place, type Location, formatLocation } from '$lib/models/place';
-  import { Icon } from '@smui/fab';
+  import { Graphic } from '@smui/list';
 
   /** 場所 */
   export let place: Place;
@@ -11,7 +11,7 @@
 
 <div class="place">
   <div class="icon">
-    <Icon class="material-icons" style="font-size:30px">assistant_navigation</Icon>
+    <Graphic class="material-symbols-outlined" style="font-size:30px">go_to_line</Graphic>
   </div>
   <header class="mdc-typography--subtitle1">
     {formatLocation(location)}
@@ -31,8 +31,7 @@
       'img name meta' auto
       / 30px 1fr;
     gap: 0 10px;
-    padding: 5px 5px 5px 40px;
-    border-radius: 4px;
+    padding: 0px 5px 0px 40px;
     background-color: white;
   }
 
