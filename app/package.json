@@ -72,7 +72,7 @@
     "svelte-check": "^3.8.0",
     "svelty-picker": "^5.2.9",
     "tslib": "^2.6.3",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.3",
     "uuid": "^9.0.1",
     "vite": "^5.2.13",
     "vitest": "^0.34.6"
