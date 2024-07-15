@@ -27,7 +27,7 @@
     "@googlemaps/jest-mocks": "^2.21.4",
     "@macfja/svelte-persistent-store": "^2.4.1",
     "@material/typography": "^14.0.0",
-    "@playwright/test": "^1.44.1",
+    "@playwright/test": "^1.45.1",
     "@smui/button": "^7.0.0",
     "@smui/checkbox": "^7.0.0",
     "@smui/chips": "^7.0.0",
