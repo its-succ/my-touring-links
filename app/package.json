@@ -22,7 +22,7 @@
   "devDependencies": {
     "@andybeersdev/element-resize-detector": "^1.0.1",
     "@faker-js/faker": "^8.4.1",
-    "@firebase/rules-unit-testing": "^3.0.3",
+    "@firebase/rules-unit-testing": "^3.0.4",
     "@googlemaps/extended-component-library": "^0.6.11",
     "@googlemaps/jest-mocks": "^2.21.4",
     "@macfja/svelte-persistent-store": "^2.4.1",
