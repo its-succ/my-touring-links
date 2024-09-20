@@ -1,76 +1,78 @@
 <script lang="ts">
   import { DateTime } from 'luxon';
-  import Button from '@smui/button';
-  import Tab, { Label, Icon } from '@smui/tab';
+  import Tab, { Label } from '@smui/tab';
   import TabBar from '@smui/tab-bar';
-  import { createEventDispatcher } from 'svelte';
+  import Button, { Label as ButtonLabel, Icon } from '@smui/button';
+  import { userStore } from '$lib/models/user';
+  import { page } from '$app/stores';
+  import IconButton from '@smui/icon-button';
+  import Menu from '@smui/menu';
+  import List, { Item } from '@smui/list';
 
   /** PlanDates */
   export let planDates: Date[];
   export let active: Date;
 
-  const dispatch = createEventDispatcher();
+  let loggedIn: boolean = false;
+  let actions = [
+    { name: '設定', icon: 'settings', disabled: false },
+    { name: '保存', icon: 'save', disabled: !loggedIn },
+  ];
+  let menu: Menu;
 
-  /**
-   * アクティブなタブの出発日時を変更する
-   */
-  function changeDepartureDateTime() {
-    dispatch('changeDepartureDateTime');
-  }
-  /**
-   * タブを追加する
-   */
-  function add() {
-    dispatch('add');
-  }
-  /**
-   * タブを閉じる
-   */
-  function close() {
-    dispatch('close');
-  }
+  userStore.subscribe((cur) => {
+    loggedIn = cur.loggedIn;
+    actions = actions;
+  });
 </script>
 
-<header>
-  <TabBar tabs={planDates} let:tab bind:active>
+<nav>
+  <TabBar tabs={planDates} let:tab bind:active class="tabs">
     <Tab {tab} minWidth>
       <Label class="tab-label"
         >{DateTime.fromJSDate(tab)
           .setZone('Asia/Tokyo')
-          .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label
+          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label
       >
     </Tab>
-    {#if tab === planDates[planDates.length - 1]}
-      <Tab tab={'+'} minWidth on:click={add} indicatorSpanOnlyContent>
-        <Icon class="material-icons tab-label">add</Icon>
-      </Tab>
-    {/if}
   </TabBar>
-  <nav>
-    <Button color="secondary" on:click={changeDepartureDateTime}>
-      <Label>出発日時を変更する</Label>
-      <Icon class="material-icons navicon">settings</Icon>
-    </Button>
-    <Button color="secondary" disabled={planDates.length === 1} on:click={close}>
-      <Label>タブを閉じる</Label>
-      <Icon class="material-icons navicon">close</Icon>
-    </Button>
-  </nav>
-</header>
+  <div>
+    <IconButton  class="material-icons" on:click={() => menu.setOpen(true)} aria-label="メニュー">more_vert</IconButton>
+    <Menu bind:this={menu}>
+      <List>
+        <Item>
+          <Button href={`${$page.url.href}/settings`} >
+            <Icon class="material-icons">settings</Icon>
+            <ButtonLabel class="nowrap">出発日時の設定</ButtonLabel>
+          </Button>
+        </Item>
+        <Item>
+          <Button   disabled={!loggedIn}>
+            <Icon class="material-icons">save</Icon>
+            <ButtonLabel class="nowrap">保存</ButtonLabel>
+          </Button>
+         </Item>
+      </List>
+    </Menu>
+  </div>
+</nav>
 
 <style>
-  header {
+  nav {
     position: sticky;
     background-color: var(--mdc-theme-background);
     top: 0;
     z-index: 3;
+    display: flex;
+    flex-direction: row;
   }
-  nav {
-    display: block;
-    text-align: right;
-    padding: 1em;
+  nav :global(.tabs) {
+    overflow-x: scroll;
   }
   * :global(.tab-label) {
     color: var(--mdc-theme-on-surface);
+  }
+  * :global(.nowrap) {
+    text-wrap: nowrap;
   }
 </style>
