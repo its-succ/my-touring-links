@@ -1,14 +1,16 @@
+import type { TouringEntity } from './entity';
 import type { Place } from './place';
 import { Route } from './route';
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 
-export type RoutesJSON = { [index: string]: Place[] };
+export type TouringJSON = { [index: string]: Place[] };
+export type EditTouringEntity = Omit<TouringEntity, 'userId'>;
 
 /**
  * 出発日時別ルート
  */
-export class Routes {
+export class Touring {
   /**
    * 現在日時（タイムスタンプ）をキーとする Route クラスのマッピング
    */
@@ -36,7 +38,7 @@ export class Routes {
    * @param departureDateTime - 出発日時
    * @returns ルート
    */
-  findRoutesByDepartureDateTime(departureDateTime: Date): Route | undefined {
+  findTouringByDepartureDateTime(departureDateTime: Date): Route | undefined {
     return this.routes.get(departureDateTime.getTime());
   }
 
@@ -45,9 +47,9 @@ export class Routes {
    * @param departureDateTime - 出発日時
    * @returns 追加された出発日時のルート。すでに出発日時が存在している場合は、存在しているルート
    */
-  addDepartureDateTimeToRoutes(departureDateTime: Date): Route {
+  addDepartureDateTimeToTouring(departureDateTime: Date): Route {
     if (this.routes.has(departureDateTime.getTime()))
-      return this.findRoutesByDepartureDateTime(departureDateTime)!;
+      return this.findTouringByDepartureDateTime(departureDateTime)!;
     const route = new Route();
     this.routes.set(departureDateTime.getTime(), route);
     return route;
@@ -58,7 +60,7 @@ export class Routes {
    * @param departureDateTime - 出発日時
    * @returns 削除できた場合は true
    */
-  removeDepartureDateTimeFromRoutes(departureDateTime: Date) {
+  removeDepartureDateTimeFromTouring(departureDateTime: Date) {
     return this.routes.delete(departureDateTime.getTime());
   }
 
@@ -68,8 +70,8 @@ export class Routes {
    * @param place - 追加する場所
    * @returns 追加されたルート
    */
-  addPlaceByDepartureDateTimeToRoutes(departureDateTime: Date, place: Place): Route | undefined {
-    const route = this.findRoutesByDepartureDateTime(departureDateTime);
+  addPlaceByDepartureDateTimeToTouring(departureDateTime: Date, place: Place): Route | undefined {
+    const route = this.findTouringByDepartureDateTime(departureDateTime);
     if (route === undefined) return undefined;
     route.add({ ...place, id: uuidv4() });
     return route;
@@ -83,13 +85,13 @@ export class Routes {
    * @param to - 変更後の出発日時
    * @returns 変更前の日時が存在しない、変更後の日時がすでに存在している、変更に失敗した場合は false
    */
-  changeDepartureDateTimeToRoutes(from: Date, to: Date): boolean {
-    const route = this.findRoutesByDepartureDateTime(from);
+  changeDepartureDateTimeToTouring(from: Date, to: Date): boolean {
+    const route = this.findTouringByDepartureDateTime(from);
     if (route === undefined) return false;
     if (this.routes.has(to.getTime())) return false;
     this.routes.set(to.getTime(), route);
     route.resetCalculated();
-    return this.removeDepartureDateTimeFromRoutes(from);
+    return this.removeDepartureDateTimeFromTouring(from);
   }
 
   /**
@@ -97,7 +99,7 @@ export class Routes {
    * @returns  このオブジェクトのJSON形式
    */
   toJSON() {
-    const ret: RoutesJSON = {};
+    const ret: TouringJSON = {};
     Array.from(this.routes.keys()).forEach(
       (key) => (ret[new Date(key).toISOString()] = this.routes.get(key)!.get())
     );
@@ -106,9 +108,9 @@ export class Routes {
 
   /**
    * toJSON() で出力されたJSON形式からクラスオブジェクトを復元する
-   * @param json - RoutesのJSON形式
+   * @param json - TouringのJSON形式
    */
-  fromJSON(json: RoutesJSON) {
+  fromJSON(json: TouringJSON) {
     this.routes.clear();
     Object.keys(json).forEach((key) => {
       const route = new Route();

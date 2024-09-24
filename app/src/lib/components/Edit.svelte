@@ -8,7 +8,7 @@
   import Progress from './Progress.svelte';
   import Button, { Icon, Label } from '@smui/button';
   import elementResizeDetectorMaker from '@andybeersdev/element-resize-detector';
-  import { Routes, type RoutesJSON } from '$lib/models/routes';
+  import { Touring, type EditTouringEntity } from '$lib/models/touring';
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
 
@@ -25,14 +25,19 @@
   /** gmpx-split-layout の固定情報エレメント。ルート一覧の内容が変わったときに高さの変更を検知する用 */
   let fixed: HTMLElement;
   /** 出発日時別ルート */
-  let routes = new Routes();
-  /** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
-  let tabs = routes.getDepartureDateTimes();
+  let touring = new Touring();
+  /** 編集中のエンティティ */
+  let entity: EditTouringEntity = {
+    name: '',
+    touring: touring.toJSON(),
+  };
+/** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
+  let tabs = touring.getDepartureDateTimes();
   /** アクティブなタブ */
   let active = tabs[0];
   /** アクティブなタブのルート */
   let route: Route | undefined;
-  $: route = active instanceof Date ? routes.findRoutesByDepartureDateTime(active) : route;
+  $: route = active instanceof Date ? touring.findTouringByDepartureDateTime(active) : route;
   /** ルートエレメント */
   let routeElement: RouteElement;
   /** プログレスダイアログの表示状態 */
@@ -74,8 +79,8 @@
     if (addTabCallback) {
       addTabCallback(e.detail);
     } else {
-      routes.changeDepartureDateTimeToRoutes(active, e.detail);
-      tabs = routes.getDepartureDateTimes();
+      touring.changeDepartureDateTimeToTouring(active, e.detail);
+      tabs = touring.getDepartureDateTimes();
       routeElement.reset();
       setTimeout(() => (active = e.detail));
     }
@@ -95,8 +100,8 @@
   function addTab() {
     dateTimePicker.open(new Date());
     addTabCallback = (date: Date) => {
-      route = routes.addDepartureDateTimeToRoutes(date);
-      tabs = routes.getDepartureDateTimes();
+      route = touring.addDepartureDateTimeToTouring(date);
+      tabs = touring.getDepartureDateTimes();
       setTimeout(() => (active = date));
       addTabCallback = undefined;
     };
@@ -110,8 +115,8 @@
    */
   function closeTab() {
     const activeIndex = tabs.indexOf(active);
-    routes.removeDepartureDateTimeFromRoutes(active);
-    tabs = routes.getDepartureDateTimes();
+    touring.removeDepartureDateTimeFromTouring(active);
+    tabs = touring.getDepartureDateTimes();
     setTimeout(() => (active = tabs[activeIndex] ?? tabs[activeIndex - 1]));
   }
 
@@ -119,7 +124,7 @@
    * 場所をアクティブなルートに追加する
    */
   function addPlaceToRoute() {
-    route = routes.addPlaceByDepartureDateTimeToRoutes(active, selectedPlace);
+    route = touring.addPlaceByDepartureDateTimeToTouring(active, selectedPlace);
   }
 
   /**
@@ -151,23 +156,24 @@
   }
 
   /**
-   * 出発日時別ルートを取得する
-   * @returns Routes クラスのオブジェクト
+   * 編集中のツーリングを取得する
+   * @returns 編集中のツーリングオブジェクト
    */
-  export function getRoutes() {
-    return routes;
+  export function getTouring(): EditTouringEntity {
+    return { ...entity, touring: touring.toJSON() };
   }
 
   /**
-   * 出発日時別ルートを設定する。
+   * 編集対象のツーリングを設定する。
    * ページリロード時など、セッションから復帰するときに呼び出される
    * 復帰オブジェクトが空の場合は何もしない
-   * @param routes - 出発日時別ルートのJSON形式
+   * @param touring - 編集するツーリングエンティティ
    */
-  export function setRoutes(value: RoutesJSON) {
-    if (Object.keys(value).length === 0 && value.constructor === Object) return;
-    routes.fromJSON(value);
-    tabs = routes.getDepartureDateTimes();
+  export function setTouring(value: EditTouringEntity) {
+    if (Object.keys(value.touring).length === 0 && value.touring.constructor === Object) return;
+    entity = value;
+    touring.fromJSON(value.touring);
+    tabs = touring.getDepartureDateTimes();
     setTimeout(() => (active = tabs[0]));
   }
 </script>

@@ -31,6 +31,7 @@
     "@smui/button": "^7.0.0",
     "@smui/checkbox": "^7.0.0",
     "@smui/chips": "^7.0.0",
+    "@smui/data-table": "^7.0.0",
     "@smui/dialog": "^7.0.0",
     "@smui/fab": "^7.0.0",
     "@smui/form-field": "^7.0.0",

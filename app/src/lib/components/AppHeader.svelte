@@ -6,6 +6,8 @@
   import { userStore } from '$lib/models/user';
   import { auth, provider } from '$lib/config/firebase';
   import { signInWithRedirect, signOut, type UserInfo } from 'firebase/auth';
+  import IconButton from '@smui/icon-button';
+  import { backButton } from '$lib/store/back-button';
 
   /** アカウントメニュー */
   let accoutMenu: Menu;
@@ -42,6 +44,9 @@
 <TopAppBar variant="static" color="primary" style="z-index: 7">
   <Row>
     <Section>
+      {#if $backButton}
+        <IconButton class="material-icons" href=".">arrow_back</IconButton>
+      {/if}
       <Title>Welcome to My Touring Links</Title>
     </Section>
     <Section align="end" toolbar>
