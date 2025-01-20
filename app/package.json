@@ -48,7 +48,7 @@
     "@smui/touch-target": "^7.0.0",
     "@sveltejs/adapter-auto": "^3.2.2",
     "@sveltejs/adapter-static": "^3.0.2",
-    "@sveltejs/kit": "^2.5.18",
+    "@sveltejs/kit": "^2.16.0",
     "@sveltejs/vite-plugin-svelte": "^3.1.1",
     "@types/element-resize-detector": "^1.1.5",
     "@types/google.maps": "^3.55.11",
