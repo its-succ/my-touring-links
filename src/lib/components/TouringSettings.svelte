@@ -16,7 +16,7 @@
   /** 編集中のエンティティ */
   let entity: EditTouringEntity = {
     name: '',
-    touring: touring.toJSON(),
+    touring: touring.toJSON()
   };
   /** 出発日時の一覧 */
   let departureDateTimes: Date[] = [];
@@ -117,12 +117,25 @@
     <Body>
       {#each departureDateTimes as departureDateTime, index}
         <Row>
-          <Cell>{DateTime.fromJSDate(departureDateTime)
-            .setZone('Asia/Tokyo')
-            .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Cell>
+          <Cell
+            >{DateTime.fromJSDate(departureDateTime)
+              .setZone('Asia/Tokyo')
+              .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Cell
+          >
           <Cell class="operation">
-            <IconButton  class="material-icons" on:click={() => change(index)} aria-label="編集" size="mini">edit</IconButton>
-            <IconButton  class="material-icons" on:click={() => remove(index)} aria-label="削除" size="mini" disabled={departureDateTimes.length === 1}>delete</IconButton>
+            <IconButton
+              class="material-icons"
+              on:click={() => change(index)}
+              aria-label="編集"
+              size="mini">edit</IconButton
+            >
+            <IconButton
+              class="material-icons"
+              on:click={() => remove(index)}
+              aria-label="削除"
+              size="mini"
+              disabled={departureDateTimes.length === 1}>delete</IconButton
+            >
           </Cell>
         </Row>
       {/each}
@@ -130,12 +143,7 @@
   </DataTable>
 </div>
 <div class="buttons">
-  <Button
-    variant="unelevated"
-    color="primary"
-    class="button-shaped-round button"
-    on:click={add}
-    >
+  <Button variant="unelevated" color="primary" class="button-shaped-round button" on:click={add}>
     <Icon class="material-icons">add</Icon>
     <Label>出発日時を追加する</Label>
   </Button>

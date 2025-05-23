@@ -24,9 +24,9 @@
   /** 編集中のエンティティ */
   let entity: EditTouringEntity = {
     name: '',
-    touring: touring.toJSON(),
+    touring: touring.toJSON()
   };
-/** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
+  /** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
   let tabs = touring.getDepartureDateTimes();
   /** アクティブなタブ */
   let active = tabs[0];

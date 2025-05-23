@@ -80,7 +80,10 @@ class FirestoreGateway<T extends BaseEntity> implements StoredGateway<T> {
   }
 }
 
-class FirestoreTouringGateway extends FirestoreGateway<TouringEntity> implements TouringStoredGateway {
+class FirestoreTouringGateway
+  extends FirestoreGateway<TouringEntity>
+  implements TouringStoredGateway
+{
   async findAllByUserId(userId: string): Promise<TouringEntity[]> {
     const querySnapshot = await getDocs(
       query(collection(this.db, this.database), where('userId', '==', userId)).withConverter(

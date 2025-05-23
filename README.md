@@ -1,18 +1,34 @@
 # my-touring-links
+
 My Touring Links
 
-## クライアントアプリ
+## Environmet
 
-[appディレクトリ](app/)
+`.env.local` ファイルを作成して Google Maps Platform APIs の API キーを設定します
 
-## Firebase
-
-以下のコマンドでエミュレータをインストールします。
-
-```sh
-$ npm run firebase init emulators
+```
+PUBLIC_GMAP_API_KEY=0987654321
 ```
 
-### クライアントアプリ設定
+設定したあとで `npm run build` しておくこと。
 
-Firebase のコンソールから Web アプリを作成したら、 `app/src/config/firebase.config.ts.template` を `app/src/config/firebase.config.ts` にコピーしてコンソールに表示された値で `firebaseConfig` を設定します。
+## Developing
+
+Once you've created a project and installed dependencies with `npm install`, start a development server:
+
+```bash
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```bash
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
