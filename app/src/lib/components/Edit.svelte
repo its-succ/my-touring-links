@@ -3,7 +3,6 @@
   import { onMount } from 'svelte';
   import Map from './Map.svelte';
   import Tabs from './Tabs.svelte';
-  import DateTimePicker from './DateTimePicker.svelte';
   import RouteElement from './Route.svelte';
   import Progress from './Progress.svelte';
   import Button, { Icon, Label } from '@smui/button';
@@ -12,10 +11,6 @@
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
 
-  /** DateTimePicker タグ */
-  let dateTimePicker: DateTimePicker;
-  /** 新規タブ追加中の場合はコールバックが設定される */
-  let addTabCallback: ((date: Date) => void) | undefined;
   /** Map コンポーネント */
   let map: Map;
   /** Map で選択されている場所 */
@@ -53,72 +48,6 @@
       addButton.scrollIntoView(false);
     });
   });
-
-  /**
-   * 出発日時を変更がクリックされたときのアクション
-   * DateTimePicker を表示する
-   */
-  function changeDepartureDateTime() {
-    dateTimePicker.open(active);
-  }
-
-  /**
-   * 出発日時が変更された後に呼び出される
-   *
-   * ### 新規タブ追加のとき
-   *
-   * - コールバックを呼び出す
-   *
-   * ### 日時変更のとき
-   *
-   * - ルートの出発日を変更する
-   * - 出発日時一覧を更新する
-   * - アクティブタブを更新する
-   */
-  function changedDepartureDateTime(e: CustomEvent) {
-    if (addTabCallback) {
-      addTabCallback(e.detail);
-    } else {
-      touring.changeDepartureDateTimeToTouring(active, e.detail);
-      tabs = touring.getDepartureDateTimes();
-      routeElement.reset();
-      setTimeout(() => (active = e.detail));
-    }
-  }
-
-  /**
-   * 新規タブ追加がクリックされたときのアクション
-   * DateTimePicker を現在日時で開いて、設定後に呼び出されるコールバック関数を設定する
-   *
-   * ### コールバック
-   *
-   * - ルート一覧に追加する
-   * - 出発日時一覧を更新する
-   * - アクティブタブを更新する
-   * - コールバックの無効化
-   */
-  function addTab() {
-    dateTimePicker.open(new Date());
-    addTabCallback = (date: Date) => {
-      route = touring.addDepartureDateTimeToTouring(date);
-      tabs = touring.getDepartureDateTimes();
-      setTimeout(() => (active = date));
-      addTabCallback = undefined;
-    };
-  }
-
-  /**
-   * タブを閉じるがクリックされたときのアクション
-   * - アクティブタブを切り替える（通常は1つ手間だが、先頭の場合はそのまま）
-   * - ルート一覧から出発日時を削除する
-   * - 出発日時一覧を更新する
-   */
-  function closeTab() {
-    const activeIndex = tabs.indexOf(active);
-    touring.removeDepartureDateTimeFromTouring(active);
-    tabs = touring.getDepartureDateTimes();
-    setTimeout(() => (active = tabs[activeIndex] ?? tabs[activeIndex - 1]));
-  }
 
   /**
    * 場所をアクティブなルートに追加する
@@ -184,13 +113,7 @@
     <Map bind:selected={selectedPlace} bind:this={map}></Map>
   </div>
   <div slot="fixed" bind:this={fixed}>
-    <Tabs
-      planDates={tabs}
-      bind:active
-      on:add={addTab}
-      on:close={closeTab}
-      on:changeDepartureDateTime={changeDepartureDateTime}
-    ></Tabs>
+    <Tabs planDates={tabs} bind:active></Tabs>
     <RouteElement value={route} on:previewRoute={previewRoute} bind:this={routeElement}
     ></RouteElement>
     <div id="add-route-wrapper" bind:this={addButton}>
@@ -214,8 +137,6 @@
         <Label>ルートを計算する</Label>
       </Button>
     </div>
-    <DateTimePicker bind:this={dateTimePicker} on:selected={changedDepartureDateTime}
-    ></DateTimePicker>
   </div>
 </gmpx-split-layout>
 <Progress bind:open={progressOpen}></Progress>
