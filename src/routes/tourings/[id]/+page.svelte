@@ -23,7 +23,7 @@
     }
   });
 
-   backButton.set(false);
+  backButton.set(false);
 </script>
 
 <Edit bind:this={edit} />

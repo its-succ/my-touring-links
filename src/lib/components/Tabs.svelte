@@ -16,7 +16,7 @@
   let loggedIn: boolean = false;
   let actions = [
     { name: '設定', icon: 'settings', disabled: false },
-    { name: '保存', icon: 'save', disabled: !loggedIn },
+    { name: '保存', icon: 'save', disabled: !loggedIn }
   ];
   let menu: Menu;
 
@@ -37,21 +37,23 @@
     </Tab>
   </TabBar>
   <div>
-    <IconButton  class="material-icons" on:click={() => menu.setOpen(true)} aria-label="メニュー">more_vert</IconButton>
+    <IconButton class="material-icons" on:click={() => menu.setOpen(true)} aria-label="メニュー"
+      >more_vert</IconButton
+    >
     <Menu bind:this={menu}>
       <List>
         <Item>
-          <Button href={`${$page.url.href}/settings`} >
+          <Button href={`${$page.url.href}/settings`}>
             <Icon class="material-icons">settings</Icon>
             <ButtonLabel class="nowrap">出発日時の設定</ButtonLabel>
           </Button>
         </Item>
         <Item>
-          <Button   disabled={!loggedIn}>
+          <Button disabled={!loggedIn}>
             <Icon class="material-icons">save</Icon>
             <ButtonLabel class="nowrap">保存</ButtonLabel>
           </Button>
-         </Item>
+        </Item>
       </List>
     </Menu>
   </div>

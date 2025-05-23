@@ -73,7 +73,8 @@ web_modules/
 
 # dotenv environment variables file
 .env
-.env.test
+.env.*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -119,3 +120,12 @@ dist
 .pnp.*
 
 .java-version
+
+# Sveltekit
+.DS_Store
+/build
+/.svelte-kit
+/package
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+firebase.config.ts
