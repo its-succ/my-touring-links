@@ -4,8 +4,6 @@
   import { Anchor } from '@smui/menu-surface';
   import List, { Item, Subheader, Text } from '@smui/list';
   import { userStore } from '$lib/models/user';
-  import { auth, provider } from '$lib/config/firebase';
-  import { signInWithRedirect, signOut, type UserInfo } from 'firebase/auth';
   import IconButton from '@smui/icon-button';
   import { backButton } from '$lib/store/back-button';
 
@@ -14,18 +12,19 @@
   let anchor: HTMLDivElement;
   let anchorClasses: { [k: string]: boolean } = {};
   let loggedIn: boolean = false;
-  let user: UserInfo | null;
+  // TODO: ユーザー型はいったんobject
+  let user: object | null;
 
   userStore.subscribe((cur) => {
     loggedIn = cur.loggedIn;
-    user = <UserInfo>cur.user;
+    user = cur.user;
   });
 
   async function login() {
-    signInWithRedirect(auth, provider);
+    // TODO: ログイン処理
   }
   async function logout() {
-    await signOut(auth);
+    // TODO: ログアウト処理
     loggedIn = false;
   }
   function accountButtonClassName(loggedIn: boolean) {

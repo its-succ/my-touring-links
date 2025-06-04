@@ -1,7 +1,7 @@
-import type { Timestamp } from 'firebase/firestore';
 import type { TouringJSON } from './touring';
 
-export type EntityDate = Date | Timestamp;
+// TODO: firebase の Timestamp 型はいったん削除。Datastoreの日付型は後続タスクで確認
+export type EntityDate = Date/** | Timestamp */;
 
 export interface BaseEntity {
   /** ID */

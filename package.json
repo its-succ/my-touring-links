@@ -20,7 +20,6 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
-    "firebase": "firebase",
     "format": "prettier --plugin-search-dir . --write .",
     "test:integration": "playwright test",
     "test:unit": "vitest",
@@ -32,7 +31,6 @@
   "devDependencies": {
     "@andybeersdev/element-resize-detector": "^1.0.1",
     "@faker-js/faker": "^8.4.1",
-    "@firebase/rules-unit-testing": "^3.0.3",
     "@googlemaps/extended-component-library": "^0.6.11",
     "@googlemaps/jest-mocks": "^2.21.4",
     "@macfja/svelte-persistent-store": "^2.4.1",
@@ -72,7 +70,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-svelte": "^2.41.0",
-    "firebase": "^10.7.1",
     "jsdom": "^23.2.0",
     "luxon": "^3.4.3",
     "p-wait-for": "^5.0.2",
