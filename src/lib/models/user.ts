@@ -1,9 +1,9 @@
+import type { User } from '@auth/sveltekit';
 import { writable } from 'svelte/store';
 
 type UserStore = {
   loggedIn: boolean;
-  // TODO: ユーザー型はいったんobjectにする
-  user: object | false;
+  user: User | undefined;
 };
 
-export const userStore = writable<UserStore>({ loggedIn: false, user: false });
+export const userStore = writable<UserStore>({ loggedIn: false, user: undefined });

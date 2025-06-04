@@ -1,14 +1,12 @@
 <script lang="ts">
   import AppHeader from 'components/AppHeader.svelte';
   import { onMount } from 'svelte';
-  import type { LayoutData } from './$types';
   import { userStore } from '$lib/models/user';
-
-  export let data: LayoutData;
+  import { page } from '$app/stores';
 
   onMount(async () => {
-    const user = await data.getAuthUser();
-    const loggedIn = !!user && user?.emailVerified;
+    const user = $page.data.session?.user;
+    const loggedIn = !!user;
     userStore.update((cur) => ({ ...cur, user, loggedIn }));
   });
 </script>
