@@ -55,6 +55,7 @@
     "@smui/top-app-bar": "^7.0.0",
     "@smui/touch-target": "^7.0.0",
     "@sveltejs/adapter-auto": "^3.2.2",
+    "@sveltejs/adapter-node": "^5.2.12",
     "@sveltejs/adapter-static": "^3.0.2",
     "@sveltejs/kit": "^2.5.18",
     "@sveltejs/vite-plugin-svelte": "^3.1.1",
@@ -88,6 +89,7 @@
   "type": "module",
   "dependencies": {
     "@auth/core": "^0.39.1",
-    "@auth/sveltekit": "^1.9.2"
+    "@auth/sveltekit": "^1.9.2",
+    "dotenv": "^16.5.0"
   }
 }
