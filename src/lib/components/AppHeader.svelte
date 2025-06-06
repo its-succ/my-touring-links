@@ -6,14 +6,15 @@
   import { userStore } from '$lib/models/user';
   import IconButton from '@smui/icon-button';
   import { backButton } from '$lib/store/back-button';
+  import { signIn, signOut } from "@auth/sveltekit/client";
+  import type { User } from '@auth/sveltekit';
 
   /** アカウントメニュー */
   let accoutMenu: Menu;
   let anchor: HTMLDivElement;
   let anchorClasses: { [k: string]: boolean } = {};
   let loggedIn: boolean = false;
-  // TODO: ユーザー型はいったんobject
-  let user: object | null;
+  let user: User | undefined;
 
   userStore.subscribe((cur) => {
     loggedIn = cur.loggedIn;
@@ -21,22 +22,22 @@
   });
 
   async function login() {
-    // TODO: ログイン処理
+    return signIn("google")
   }
   async function logout() {
-    // TODO: ログアウト処理
+    await signOut()
     loggedIn = false;
   }
   function accountButtonClassName(loggedIn: boolean) {
-    if (loggedIn && user?.photoURL) {
+    if (loggedIn && user?.image) {
       return 'photo';
     } else {
       return 'material-symbols-outlined';
     }
   }
   $: bgImage =
-    loggedIn && user?.photoURL
-      ? `background-image: url("${user?.photoURL}");background-size: 32px 32px;height: 32px;width: 32px;`
+    loggedIn && user?.image
+      ? `background-image: url("${user?.image}");background-size: 32px 32px;height: 32px;width: 32px;`
       : '';
 </script>
 
@@ -72,7 +73,7 @@
           aria-label="account settings"
           on:click={() => accoutMenu.setOpen(true)}
         >
-          {#if !(loggedIn && user?.photoURL)}
+          {#if !(loggedIn && user?.image)}
             person
           {/if}
         </button>
@@ -84,7 +85,7 @@
         >
           <List>
             {#if loggedIn}
-              <Subheader>{user?.displayName}</Subheader>
+              <Subheader>{user?.name}</Subheader>
             {/if}
             <Item on:SMUI:action={login} disabled={loggedIn} class="menu-item">
               <Text>Googleアカウントでログイン</Text>
