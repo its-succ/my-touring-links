@@ -5,6 +5,8 @@
   import { onMount } from 'svelte';
   import type { TouringEntity } from '$lib/models/entity';
 
+  /** このページはSSRしない */
+  export const ssr = false;
   /** セッションストア */
   const unsaved = persistBrowserSession(writable('UnsavedTouring'), 'unsaved-touring');
 
