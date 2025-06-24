@@ -8,6 +8,7 @@
   import IconButton from '@smui/icon-button';
   import Menu from '@smui/menu';
   import List, { Item } from '@smui/list';
+  import { createEventDispatcher } from 'svelte';
 
   /** PlanDates */
   export let planDates: Date[];
@@ -24,6 +25,13 @@
     loggedIn = cur.loggedIn;
     actions = actions;
   });
+
+  /** イベントディスパッチャー */
+  const dispatch = createEventDispatcher();
+
+  function saveTouring(): void {
+    dispatch('saveTouring');
+  }
 </script>
 
 <nav>
@@ -49,7 +57,7 @@
           </Button>
         </Item>
         <Item>
-          <Button disabled={!loggedIn}>
+          <Button disabled={!loggedIn} on:click={saveTouring}>
             <Icon class="material-icons">save</Icon>
             <ButtonLabel class="nowrap">保存</ButtonLabel>
           </Button>

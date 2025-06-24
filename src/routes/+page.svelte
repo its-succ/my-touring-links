@@ -1,12 +1,10 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
   import { persistBrowserSession } from '@macfja/svelte-persistent-store';
-  import { beforeNavigate, goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import type { TouringEntity } from '$lib/models/entity';
 
-  /** このページはSSRしない */
-  export const ssr = false;
   /** セッションストア */
   const unsaved = persistBrowserSession(writable('UnsavedTouring'), 'unsaved-touring');
 

@@ -10,6 +10,7 @@
   import { Touring, type EditTouringEntity } from '$lib/models/touring';
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
+  import { DateTime } from 'luxon';
 
   /** Map コンポーネント */
   let map: Map;
@@ -105,6 +106,18 @@
     tabs = touring.getDepartureDateTimes();
     setTimeout(() => (active = tabs[0]));
   }
+
+  /**
+   * ツーリングを保存する
+   */
+  async function saveTouring() {
+    if (!entity.id) {
+      const placeholder = `${DateTime.fromJSDate(tabs[0]).setZone('Asia/Tokyo').toFormat('MM/dd', { locale: 'ja' })}出発ツーリング`;
+      const name = prompt('保存するツーリングに名前をつけてください', placeholder);
+      entity.name = name || placeholder;
+      fetch('/api/tourings', { method: 'POST', body: JSON.stringify(entity) });
+    }
+  }
 </script>
 
 <gmpx-api-loader key={PUBLIC_GMAP_API_KEY}></gmpx-api-loader>
@@ -113,7 +126,7 @@
     <Map bind:selected={selectedPlace} bind:this={map}></Map>
   </div>
   <div slot="fixed" bind:this={fixed}>
-    <Tabs planDates={tabs} bind:active></Tabs>
+    <Tabs planDates={tabs} bind:active on:saveTouring={saveTouring}></Tabs>
     <RouteElement value={route} on:previewRoute={previewRoute} bind:this={routeElement}
     ></RouteElement>
     <div id="add-route-wrapper" bind:this={addButton}>
