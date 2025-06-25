@@ -32,3 +32,11 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
+
+### Firesore Emulator を起動
+
+```
+npm run firestore
+```
+
+Firestore Emulator の起動に JDK 21+ が必要になるので、OpenJDK とかインストールしておくこと

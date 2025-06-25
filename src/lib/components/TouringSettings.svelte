@@ -1,7 +1,6 @@
 <script lang="ts">
   import DateTimePicker from './DateTimePicker.svelte';
   import { Touring, type EditTouringEntity } from '$lib/models/touring';
-  import type { Route } from '$lib/models/route';
   import IconButton from '@smui/icon-button';
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import { DateTime } from 'luxon';

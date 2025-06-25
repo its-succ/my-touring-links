@@ -1,7 +1,9 @@
-import type { TouringJSON } from './touring';
+import type { Timestamp } from '@google-cloud/firestore';
+import { touringJsonSchema, type TouringJSON } from './touring';
+import z from 'zod';
+import type { ZodShape } from './zod-shape';
 
-// TODO: firebase の Timestamp 型はいったん削除。Datastoreの日付型は後続タスクで確認
-export type EntityDate = Date/** | Timestamp */;
+export type EntityDate = Date | Timestamp;
 
 export interface BaseEntity {
   /** ID */
@@ -13,7 +15,7 @@ export interface BaseEntity {
 }
 
 /**
- * ルートエンティティ
+ * ツーリングエンティティ
  */
 export interface TouringEntity extends BaseEntity {
   /** 名前 */
@@ -22,6 +24,18 @@ export interface TouringEntity extends BaseEntity {
   touring: TouringJSON;
   /** 公開フラグ */
   publish?: boolean;
-  /** 作成者ID */
-  userId: string;
 }
+
+const touringShape: ZodShape<TouringEntity> = {
+  id: z.string().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+  name: z.string(),
+  touring: touringJsonSchema,
+  publish: z.boolean().optional()
+};
+
+/**
+ * ツーリングスキーマ
+ */
+export const touringSchema = z.object(touringShape);

@@ -1,4 +1,6 @@
 import { fetchFields } from '$lib/utils/googlemaps-util';
+import z from 'zod';
+import type { ZodShape } from './zod-shape';
 
 /** 場所のベース */
 type PlaceBase = {
@@ -25,6 +27,30 @@ export type Spot = PlaceBase & Pick<google.maps.IconMouseEvent, 'placeId'>;
 export type Location = PlaceBase;
 /** 場所  */
 export type Place = Spot | Location;
+
+const latLngLiteralShape: ZodShape<google.maps.LatLngLiteral> = {
+  lat: z.number(),
+  lng: z.number()
+};
+
+const placeShape: ZodShape<PlaceBase> = {
+  id: z.string(),
+  displayName: z.string().optional(),
+  latLng: z.object(latLngLiteralShape),
+  stayingTime: z.number().min(0).max(300).step(10),
+  waypoint: z.boolean().optional(),
+  icon: z.string().optional()
+};
+
+const spotShape: ZodShape<Spot> = {
+  ...placeShape,
+  placeId: z.string().nullable()
+};
+
+/**
+ * 場所スキーマ
+ */
+export const placeSchema = z.union([z.object(spotShape), z.object(placeShape)]);
 
 /**
  * 場所がスポットかどうか

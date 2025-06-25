@@ -6,7 +6,7 @@
   import { userStore } from '$lib/models/user';
   import IconButton from '@smui/icon-button';
   import { backButton } from '$lib/store/back-button';
-  import { signIn, signOut } from "@auth/sveltekit/client";
+  import { signIn, signOut } from '@auth/sveltekit/client';
   import type { User } from '@auth/sveltekit';
 
   /** アカウントメニュー */
@@ -22,10 +22,10 @@
   });
 
   async function login() {
-    return signIn("google")
+    return signIn('google');
   }
   async function logout() {
-    await signOut()
+    await signOut();
     loggedIn = false;
   }
   function accountButtonClassName(loggedIn: boolean) {
