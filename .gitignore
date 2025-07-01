@@ -129,3 +129,4 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 firebase.config.ts
+test-results
