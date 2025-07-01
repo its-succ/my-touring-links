@@ -57,7 +57,7 @@
           </Button>
         </Item>
         <Item>
-          <Button disabled={!loggedIn} on:click={saveTouring}>
+          <Button disabled={!loggedIn} on:click={() => saveTouring()}>
             <Icon class="material-icons">save</Icon>
             <ButtonLabel class="nowrap">保存</ButtonLabel>
           </Button>

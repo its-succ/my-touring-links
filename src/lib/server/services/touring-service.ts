@@ -1,7 +1,11 @@
 import type { TouringEntity } from '$lib/models/entity';
 import type { User } from '@auth/sveltekit';
-import { store } from '$lib/server/models/touring';
+import { findAllByUser, store } from '$lib/server/models/touring';
 
 export const save = async (user: User, entity: TouringEntity): Promise<TouringEntity> => {
   return store(user, entity);
+};
+
+export const all = async (user: User): Promise<TouringEntity[]> => {
+  return findAllByUser(user);
 };

@@ -5,7 +5,7 @@ import { placeSchema } from '$lib/models/place';
 import { zocker } from 'zocker';
 import { DateTime } from 'luxon';
 import z from 'zod';
-import { findById, store } from './touring';
+import { findAllByUser, findById, store } from './touring';
 import { userSchema } from '$lib/models/user';
 import removeUndefinedObjects from 'remove-undefined-objects';
 import { faker } from '@faker-js/faker/locale/ja';
@@ -148,5 +148,39 @@ describe('findById', () => {
 
       expect(results).toBeUndefined();
     });
+  });
+});
+
+describe('findAllByUser', () => {
+  it('ユーザーが一致する一覧が取得できること', async () => {
+    const places = z.array(placeSchema);
+    const tourings = zocker(touringSchema)
+      .supply(touringSchema.shape.touring, () => ({
+        [DateTime.now().toJSDate().getTime()]: zocker(places)
+          .array({ min: 3, max: 5 })
+          .supply(placeSchema.options[0].shape.icon, 'place')
+          .generate()
+      }))
+      .generateMany(4);
+    const users = zocker(userSchema).generateMany(2);
+    const batch = firestore.batch();
+    users.forEach((user, index) => {
+      for (const touring of tourings.slice(index * 2)) {
+        delete touring.id;
+        delete touring.createdAt;
+        delete touring.updatedAt;
+        const doc = firestore.collection('tourings').doc();
+        batch.set(doc, { ...touring, userId: user.id });
+      }
+    });
+    batch.commit();
+
+    const results = await findAllByUser(users[1]);
+
+    expect(results).toHaveLength(2);
+    expect(results[0].name).toEqual(tourings[2].name);
+    expect(results[0].touring).toEqual(removeUndefinedObjects(tourings[2].touring));
+    expect(results[1].name).toEqual(tourings[3].name);
+    expect(results[1].touring).toEqual(removeUndefinedObjects(tourings[3].touring));
   });
 });
