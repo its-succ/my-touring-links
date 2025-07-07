@@ -26,7 +26,6 @@ export const store = async (user: User, entity: TouringEntity): Promise<TouringE
   } else {
     await update(user, entity);
   }
-  await db().doc(entity.id).set(toDatabaseEntity(user, entity));
   return entity;
 };
 
@@ -87,4 +86,15 @@ const toEntity = (
       updatedAt: findResult.updateTime?.toDate()
     }
   };
+};
+
+/**
+ * ユーザーに紐づくツーリングをすべて取得する
+ * @param user 取得するユーザー
+ * @returns ツーリング一覧
+ */
+export const findAllByUser = async (user: User): Promise<TouringEntity[]> => {
+  const results = await db().where('userId', '==', user.id).get();
+  if (results.empty) return [];
+  return results.docs.map((doc) => toEntity(doc).entity);
 };
