@@ -114,8 +114,27 @@
     if (!entity.id) {
       const placeholder = `${DateTime.fromJSDate(tabs[0]).setZone('Asia/Tokyo').toFormat('MM/dd', { locale: 'ja' })}出発ツーリング`;
       const name = prompt('保存するツーリングに名前をつけてください', placeholder);
+      if (name === null) {
+        console.log('canceled save touring');
+        return;
+      }
+      if (name === '') {
+        return saveTouring();
+      }
       entity.name = name || placeholder;
       fetch('/api/tourings', { method: 'POST', body: JSON.stringify(entity) });
+    } else {
+      const name = prompt('ツーリング名', entity.name);
+      if (name === null) {
+        console.log('canceled save touring');
+        return;
+      }
+      if (name === '') {
+        return saveTouring();
+      }
+      entity.name = name;
+      const { createdAt, updatedAt, ...updates } = entity;
+      fetch(`/api/tourings/${entity.id}`, { method: 'PUT', body: JSON.stringify(updates) });
     }
   }
 </script>

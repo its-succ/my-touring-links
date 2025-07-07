@@ -5,6 +5,11 @@
   import Button, { Icon, Label } from '@smui/button';
   import type { TouringEntity } from '$lib/models/entity';
   import { goto } from '$app/navigation';
+  import { writable } from 'svelte/store';
+  import { persistBrowserSession } from '@macfja/svelte-persistent-store';
+
+  /** セッションストア */
+  let unsaved = persistBrowserSession(writable('UnsavedTouring'), 'unsaved-touring');
 
   /** ツーリングの一覧 */
   export let tourings: TouringEntity[];
@@ -14,6 +19,7 @@
    * `/tourings/new` へ遷移する
    */
   async function add() {
+    $unsaved = JSON.stringify({});
     await goto(`/tourings/new`);
   }
 
@@ -23,6 +29,7 @@
    * @param id - 編集対象のツーリングID
    */
   async function change(id?: string) {
+    $unsaved = JSON.stringify({});
     await goto(`/tourings/${id}`);
   }
 
