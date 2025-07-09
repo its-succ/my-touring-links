@@ -5,6 +5,7 @@
   import { beforeNavigate } from '$app/navigation';
   import { onMount } from 'svelte';
   import { backButton } from '$lib/store/back-button';
+  import { page } from '$app/stores';
 
   /** セッションストア */
   let unsaved = persistBrowserSession(writable('UnsavedTouring'), 'unsaved-touring');
@@ -17,7 +18,16 @@
 
   onMount(async () => {
     try {
-      edit.setTouring(JSON.parse($unsaved));
+      const session = JSON.parse($unsaved);
+      if ($page.data.touring === undefined) {
+        edit.setTouring(session);
+      } else {
+        if (Object.keys(session).length === 0) {
+          edit.setTouring($page.data.touring);
+        } else {
+          edit.setTouring(session);
+        }
+      }
     } catch (e) {
       // ignore error
     }
