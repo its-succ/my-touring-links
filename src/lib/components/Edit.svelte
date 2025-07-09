@@ -11,6 +11,7 @@
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
   import { DateTime } from 'luxon';
+  import status from 'http-status';
 
   /** Map コンポーネント */
   let map: Map;
@@ -115,26 +116,32 @@
       const placeholder = `${DateTime.fromJSDate(tabs[0]).setZone('Asia/Tokyo').toFormat('MM/dd', { locale: 'ja' })}出発ツーリング`;
       const name = prompt('保存するツーリングに名前をつけてください', placeholder);
       if (name === null) {
-        console.log('canceled save touring');
         return;
       }
       if (name === '') {
         return saveTouring();
       }
       entity.name = name || placeholder;
-      fetch('/api/tourings', { method: 'POST', body: JSON.stringify(entity) });
+      const response = await fetch('/api/tourings', {
+        method: 'POST',
+        body: JSON.stringify(entity)
+      });
+      if (response.status !== status.OK) alert('保存に失敗しました');
     } else {
       const name = prompt('ツーリング名', entity.name);
       if (name === null) {
-        console.log('canceled save touring');
         return;
       }
       if (name === '') {
         return saveTouring();
       }
       entity.name = name;
-      const { createdAt, updatedAt, ...updates } = entity;
-      fetch(`/api/tourings/${entity.id}`, { method: 'PUT', body: JSON.stringify(updates) });
+      const { createdAt: _createdAt, updatedAt: _updatedAt, ...updates } = entity;
+      const response = await fetch(`/api/tourings/${entity.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updates)
+      });
+      if (response.status !== status.OK) alert('保存に失敗しました');
     }
   }
 </script>

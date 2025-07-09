@@ -5,7 +5,7 @@ import { placeSchema } from '$lib/models/place';
 import { zocker } from 'zocker';
 import { DateTime } from 'luxon';
 import z from 'zod';
-import { findAllByUser, findById, store } from './touring';
+import { findAllByUser, findById, remove, store } from './touring';
 import { userSchema } from '$lib/models/user';
 import removeUndefinedObjects from 'remove-undefined-objects';
 import { faker } from '@faker-js/faker/locale/ja';
@@ -182,5 +182,72 @@ describe('findAllByUser', () => {
     expect(results[0].touring).toEqual(removeUndefinedObjects(tourings[2].touring));
     expect(results[1].name).toEqual(tourings[3].name);
     expect(results[1].touring).toEqual(removeUndefinedObjects(tourings[3].touring));
+  });
+});
+
+describe('removve', () => {
+  it('登録ユーザーのツーリングが削除できること', async () => {
+    const places = z.array(placeSchema);
+    const touring = zocker(touringSchema)
+      .supply(touringSchema.shape.touring, () => ({
+        [DateTime.now().toJSDate().getTime()]: zocker(places)
+          .array({ min: 3, max: 5 })
+          .supply(placeSchema.options[0].shape.icon, 'place')
+          .generate()
+      }))
+      .generate();
+    delete touring.id;
+    delete touring.createdAt;
+    delete touring.updatedAt;
+    const user = zocker(userSchema).generate();
+
+    const created = await store(user, touring);
+    expect(created.id).not.toBeUndefined();
+
+    await remove(user, created.id!);
+
+    const actual = await firestore.collection('tourings').doc(created.id!).get();
+    expect(actual.exists).toBeFalsy();
+  });
+
+  it('異なるユーザーのツーリングは削除できないこと', async () => {
+    const places = z.array(placeSchema);
+    const touring = zocker(touringSchema)
+      .supply(touringSchema.shape.touring, () => ({
+        [DateTime.now().toJSDate().getTime()]: zocker(places)
+          .array({ min: 3, max: 5 })
+          .supply(placeSchema.options[0].shape.icon, 'place')
+          .generate()
+      }))
+      .generate();
+    delete touring.id;
+    delete touring.createdAt;
+    delete touring.updatedAt;
+    const users = zocker(userSchema).generateMany(2);
+
+    const created = await store(users[0], touring);
+    expect(created.id).not.toBeUndefined();
+
+    await expect(() => remove(users[1], created.id!)).rejects.toThrowError();
+  });
+  it('存在しないツーリングは削除できないこと', async () => {
+    const places = z.array(placeSchema);
+    const touring = zocker(touringSchema)
+      .supply(touringSchema.shape.touring, () => ({
+        [DateTime.now().toJSDate().getTime()]: zocker(places)
+          .array({ min: 3, max: 5 })
+          .supply(placeSchema.options[0].shape.icon, 'place')
+          .generate()
+      }))
+      .generate();
+    delete touring.id;
+    delete touring.createdAt;
+    delete touring.updatedAt;
+    const user = zocker(userSchema).generate();
+
+    const created = await store(user, touring);
+    expect(created.id).not.toBeUndefined();
+
+    await expect(() => remove(user, faker.string.uuid())).rejects.toThrowError();
   });
 });

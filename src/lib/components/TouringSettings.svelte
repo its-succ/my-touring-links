@@ -9,7 +9,7 @@
   /** DateTimePicker タグ */
   let dateTimePicker: DateTimePicker;
   /** 新規タブ追加中の場合はコールバックが設定される */
-  let addTabCallback: ((date: Date) => void) | undefined;
+  let addTabCallback: ((_date: Date) => void) | undefined;
   /** 出発日時別ルート */
   let touring = new Touring();
   /** 編集中のエンティティ */

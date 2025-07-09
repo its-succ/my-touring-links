@@ -7,6 +7,7 @@
   import { goto } from '$app/navigation';
   import { writable } from 'svelte/store';
   import { persistBrowserSession } from '@macfja/svelte-persistent-store';
+  import status from 'http-status';
 
   /** セッションストア */
   let unsaved = persistBrowserSession(writable('UnsavedTouring'), 'unsaved-touring');
@@ -36,9 +37,14 @@
   /**
    * 削除がクリックされたときのアクション
    * @param id - 削除対象のツーリングID
+   * @param name - 削除対象のツーリング名
    */
-  function remove(id?: string) {
-    // TODO
+  async function remove(id: string | undefined, name: string) {
+    if (id === undefined) return;
+    if (confirm(`${name}を削除しても良いですか？`) === false) return;
+    const response = await fetch(`/api/tourings/${id}`, { method: 'DELETE' });
+    if (response.status !== status.OK) return alert('削除に失敗しました');
+    tourings = tourings.filter((touring) => touring.id !== id);
   }
 </script>
 
@@ -52,7 +58,7 @@
       </Row>
     </Head>
     <Body>
-      {#each tourings as touring, index}
+      {#each tourings as touring}
         <Row>
           <Cell
             >{DateTime.fromISO(Object.keys(touring.touring)[0])
@@ -69,7 +75,7 @@
             >
             <IconButton
               class="material-icons"
-              on:click={() => remove(touring.id)}
+              on:click={() => remove(touring.id, touring.name)}
               aria-label="削除"
               size="mini">delete</IconButton
             >
