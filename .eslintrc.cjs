@@ -27,7 +27,25 @@ module.exports = {
     'import/no-absolute-path': [2, { commonjs: false, amd: true }],
     'import/no-relative-parent-imports': 'error',
     'no-console': 'error',
-    'object-shorthand': ['error', 'always']
+    'object-shorthand': ['error', 'always'],
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_'
+      }
+    ],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_'
+      }
+    ]
   },
   overrides: [
     {

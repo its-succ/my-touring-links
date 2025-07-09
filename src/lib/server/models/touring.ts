@@ -31,7 +31,7 @@ export const store = async (user: User, entity: TouringEntity): Promise<TouringE
 
 const toDatabaseEntity = (user: User, entity: TouringEntity): TouringDatabaseEntity => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, createdAt, updatedAt, ...toDatabase } = entity;
+  const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...toDatabase } = entity;
   return {
     ...toDatabase,
     userId: user.id!
@@ -97,4 +97,17 @@ export const findAllByUser = async (user: User): Promise<TouringEntity[]> => {
   const results = await db().where('userId', '==', user.id).get();
   if (results.empty) return [];
   return results.docs.map((doc) => toEntity(doc).entity);
+};
+
+/**
+ * データーベースから削除する
+ * @param user 削除するユーザー
+ * @param touringId 削除対象のツーリングID
+ */
+export const remove = async (user: User, touringId: string) => {
+  const doc = db().doc(touringId);
+  const current = await doc.get();
+  const data = current && current.data();
+  if (data?.userId !== user.id) throw Error('Not found remove data');
+  await doc.delete();
 };

@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { faker } from '@faker-js/faker';
 import type { RequestEvent, HttpError } from '@sveltejs/kit';
-import { PUT } from './+server';
+import { DELETE, PUT } from './+server';
 import { zocker } from 'zocker';
 import { userSchema } from '$lib/models/user';
 import { touringSchema } from '$lib/models/entity';
 import { placeSchema } from '$lib/models/place';
 import { DateTime } from 'luxon';
-import { save } from '$lib/server/services/touring-service';
+import { save, del } from '$lib/server/services/touring-service';
 
 vi.mock('$lib/server/services/touring-service');
 
@@ -104,5 +104,64 @@ describe('PUT', () => {
     // assertion
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ id: touring.id });
+  });
+});
+
+describe('DELETE', () => {
+  it('削除するユーザーが取得できないときは401エラーが戻ること', async () => {
+    // arrange
+    const locals: App.Locals = {
+      auth: vi.fn().mockResolvedValue(null),
+      getSession: vi.fn(),
+      signIn: vi.fn(),
+      signOut: vi.fn()
+    };
+    const id = faker.string.uuid();
+    const expects: HttpError = {
+      status: 401,
+      body: { message: 'Error: 401' }
+    };
+    // action
+    expect(() =>
+      DELETE({ locals, params: { id } } as unknown as RequestEvent)
+    ).rejects.toThrowError(expect.objectContaining(expects));
+  });
+  it('バリデーションエラーがあるときは400エラーが戻ること', async () => {
+    // arrange
+    const user = zocker(userSchema).generate();
+    const locals: App.Locals = {
+      auth: vi.fn().mockResolvedValue({ user, expires: faker.date.future().toISOString() }),
+      getSession: vi.fn(),
+      signIn: vi.fn(),
+      signOut: vi.fn()
+    };
+    const expects: HttpError = {
+      status: 400,
+      body: { message: 'Error: 400' }
+    };
+    // action
+    expect(() => DELETE({ locals, params: {} } as unknown as RequestEvent)).rejects.toThrowError(
+      expect.objectContaining(expects)
+    );
+  });
+  it('リクエストに問題ないときは削除を呼び出して削除したidを戻すこと', async () => {
+    // arrange
+    const user = zocker(userSchema).generate();
+    const locals: App.Locals = {
+      auth: vi.fn().mockResolvedValue({ user, expires: faker.date.future().toISOString() }),
+      getSession: vi.fn(),
+      signIn: vi.fn(),
+      signOut: vi.fn()
+    };
+    vi.mocked(del).mockResolvedValue();
+    const id = faker.string.uuid();
+    // action
+    const response = await DELETE({
+      locals,
+      params: { id }
+    } as unknown as RequestEvent);
+    // assertion
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ id });
   });
 });
