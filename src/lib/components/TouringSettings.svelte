@@ -1,10 +1,11 @@
 <script lang="ts">
   import DateTimePicker from './DateTimePicker.svelte';
-  import { Touring, type EditTouringEntity } from '$lib/models/touring';
+  import { Touring } from '$lib/models/touring';
   import IconButton from '@smui/icon-button';
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import { DateTime } from 'luxon';
   import Button, { Icon, Label } from '@smui/button';
+  import type { EditTouringEntity } from '$lib/models/entity';
 
   /** DateTimePicker タグ */
   let dateTimePicker: DateTimePicker;

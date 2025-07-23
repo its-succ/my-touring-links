@@ -1,14 +1,19 @@
-import type { TouringEntity } from './entity';
 import { placeSchema, type Place } from './place';
-import { Route } from './route';
+import { arrivalTimeSchema, Route, type ArrivalTimes } from './route';
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
 
+/**
+ * 出発日時ごと場所
+ */
 export type TouringJSON = { [index: string]: Place[] };
-export type EditTouringEntity = Omit<TouringEntity, 'userId'>;
-
 export const touringJsonSchema = z.record(z.array(placeSchema));
+/**
+ * 出発日時ごと到着時間
+ */
+export type ArrivalTimeJSON = { [index: string]: ArrivalTimes };
+export const arrivalTimeJsonSchema = z.record(z.array(arrivalTimeSchema));
 
 /**
  * 出発日時別ルート
