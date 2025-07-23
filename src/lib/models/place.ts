@@ -33,7 +33,7 @@ const latLngLiteralShape: ZodShape<google.maps.LatLngLiteral> = {
   lng: z.number()
 };
 
-const placeShape: ZodShape<PlaceBase> = {
+export const placeShape: ZodShape<PlaceBase> = {
   id: z.string(),
   displayName: z.string().optional(),
   latLng: z.object(latLngLiteralShape),
@@ -42,7 +42,7 @@ const placeShape: ZodShape<PlaceBase> = {
   icon: z.string().optional()
 };
 
-const spotShape: ZodShape<Spot> = {
+export const spotShape: ZodShape<Spot> = {
   ...placeShape,
   placeId: z.string().nullable()
 };

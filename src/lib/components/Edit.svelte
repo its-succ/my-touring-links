@@ -7,11 +7,12 @@
   import Progress from './Progress.svelte';
   import Button, { Icon, Label } from '@smui/button';
   import elementResizeDetectorMaker from '@andybeersdev/element-resize-detector';
-  import { Touring, type EditTouringEntity } from '$lib/models/touring';
+  import { Touring } from '$lib/models/touring';
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
   import { DateTime } from 'luxon';
   import status from 'http-status';
+  import type { EditTouringEntity } from '$lib/models/entity';
 
   /** Map コンポーネント */
   let map: Map;

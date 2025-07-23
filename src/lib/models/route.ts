@@ -1,6 +1,17 @@
 import { DateTime } from 'luxon';
 import type { Place } from './place';
 import { travelMode, latLngToString } from '$lib/utils/googlemaps-util';
+import z from 'zod';
+
+/**
+ * 到着時間スキーマ
+ */
+export const arrivalTimeSchema = z.record(z.number());
+
+/**
+ * 到着時間
+ */
+export type ArrivalTimes = z.infer<typeof arrivalTimeSchema>;
 
 /**
  * ルート
@@ -8,7 +19,8 @@ import { travelMode, latLngToString } from '$lib/utils/googlemaps-util';
 export class Route {
   private places: Place[] = [];
   private calculated: { [placeId: string]: google.maps.DirectionsResult } = {};
-  private arrivalTimes: { [placeId: string]: number } = {};
+  private arrivalTimes: ArrivalTimes = {};
+  private calcedAt?: Date;
 
   /**
    * ルートの最後に場所を追加する
@@ -51,6 +63,14 @@ export class Route {
    */
   getDirectionsResult(place: Place): google.maps.DirectionsResult | undefined {
     return this.calculated[place.id];
+  }
+
+  /**
+   * ルートを計算した日時を取得する
+   * @returns 計算日時。計算してない場合は undefined が戻る
+   */
+  getCalcedDate(): Date | undefined {
+    return this.calcedAt;
   }
 
   /**
@@ -100,6 +120,7 @@ export class Route {
       waypoints = [];
       origin = undefined;
     }
+    this.calcedAt = new Date();
     return this.calculated;
   }
 
