@@ -67,7 +67,7 @@ const sharedTouringShape: ZodShape<SharedTouringEntity> = {
   name: z.string(),
   touring: sharedTouringJsonSchema,
   sharedBy: z.string(),
-  calcedAt: z.string().datetime(),
+  calcedAt: z.string().datetime()
 };
 
 /**

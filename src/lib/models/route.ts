@@ -57,6 +57,13 @@ export class Route {
   }
 
   /**
+   * @returns 到着時刻一覧を取得する
+   */
+  getArrivalTimes(): ArrivalTimes | undefined {
+    return this.arrivalTimes;
+  }
+
+  /**
    * 場所の計算結果を取得する
    * @param place - 場所
    * @returns 計算結果

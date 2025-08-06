@@ -10,9 +10,10 @@
   import { Touring } from '$lib/models/touring';
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
-  import { DateTime } from 'luxon';
-  import status from 'http-status';
   import type { EditTouringEntity } from '$lib/models/entity';
+  import SaveModal from './SaveModal.svelte';
+  import { Tooltip } from '@svelte-plugins/tooltips';
+  import { userStore } from '$lib/models/user';
 
   /** Map コンポーネント */
   let map: Map;
@@ -40,6 +41,14 @@
   let routeElement: RouteElement;
   /** プログレスダイアログの表示状態 */
   let progressOpen: boolean;
+  /** 保存ダイアログタグ */
+  let saveModal: SaveModal;
+  /** 案内ヘルプ */
+  let stepHelp = true;
+  /** 案内ヘルプ幅 */
+  let stepHelpWidth: number;
+  /** ログインしているかどうか */
+  let loggedIn: boolean = false;
 
   /**
    * コンポーネントがロードされたら、ルート一覧の内容が変わった(高さに変化があった)ときに
@@ -50,6 +59,12 @@
     erdUltraFast.listenTo(fixed, () => {
       addButton.scrollIntoView(false);
     });
+    console.log('window.innerWidth', window.innerWidth)
+    stepHelpWidth = Math.min(400, window.innerWidth - 20)
+  });
+
+  userStore.subscribe((cur) => {
+    loggedIn = cur.loggedIn;
   });
 
   /**
@@ -113,37 +128,26 @@
    * ツーリングを保存する
    */
   async function saveTouring() {
-    if (!entity.id) {
-      const placeholder = `${DateTime.fromJSDate(tabs[0]).setZone('Asia/Tokyo').toFormat('MM/dd', { locale: 'ja' })}出発ツーリング`;
-      const name = prompt('保存するツーリングに名前をつけてください', placeholder);
-      if (name === null) {
-        return;
-      }
-      if (name === '') {
-        return saveTouring();
-      }
-      entity.name = name || placeholder;
-      const response = await fetch('/api/tourings', {
-        method: 'POST',
-        body: JSON.stringify(entity)
-      });
-      if (response.status !== status.OK) alert('保存に失敗しました');
-    } else {
-      const name = prompt('ツーリング名', entity.name);
-      if (name === null) {
-        return;
-      }
-      if (name === '') {
-        return saveTouring();
-      }
-      entity.name = name;
-      const { createdAt: _createdAt, updatedAt: _updatedAt, ...updates } = entity;
-      const response = await fetch(`/api/tourings/${entity.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(updates)
-      });
-      if (response.status !== status.OK) alert('保存に失敗しました');
+    saveModal.save(entity, touring.getArrivalTimeJSON());
+  }
+
+  /**
+   * ルート情報に応じてヘルプメッセージを変更する
+   * @param route - ルート
+   * @param progressOpen - 計算中かどうか
+   * @returns ルート計算できないときは true
+   */
+  function helpMessage(route?: Route, progressOpen?: boolean) {
+    if (routeDisable(route)) {
+      return "出発地、立ち寄り場所、目的地を追加してルートを作成してみましょう";
     }
+    if (route?.getCalcedDate()) {
+      if (loggedIn) {
+        return "ルートの共有準備が完了しました！ ルートを保存してURLをコピーすると共有できます。"
+      }
+      return "ルートの共有準備が完了しました！ Googleアカウントでログインすると、ルートの保存や共有ができるようになります"
+    }
+    return "ルートが作成できたら、出発日時や経由値の滞在時間を設定して、ルート計算してみましょう";
   }
 </script>
 
@@ -157,29 +161,57 @@
     <RouteElement value={route} on:previewRoute={previewRoute} bind:this={routeElement}
     ></RouteElement>
     <div id="add-route-wrapper" bind:this={addButton}>
-      <Button
-        variant="outlined"
-        color="primary"
-        class="button-shaped-round"
-        on:click={addPlaceToRoute}
-      >
-        <Icon class="material-icons">add</Icon>
-        <Label>場所を追加する</Label>
-      </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        class="button-shaped-round"
-        disabled={routeDisable(route)}
-        on:click={calcRoute}
-      >
-        <Icon class="material-icons">alt_route</Icon>
-        <Label>ルートを計算する</Label>
-      </Button>
+      <Tooltip
+        content={helpMessage(route, progressOpen)}
+        position="bottom"
+        bind:show={stepHelp}
+        arrow={true}
+        maxWidth={stepHelpWidth}
+        action="prop">
+        <Button
+          variant="outlined"
+          color="primary"
+          class="button-shaped-round"
+          on:click={addPlaceToRoute}
+        >
+          <Icon class="material-icons">add</Icon>
+          <Label>場所を追加</Label>
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          class="button-shaped-round"
+          disabled={routeDisable(route)}
+          on:click={calcRoute}
+        >
+          <Icon class="material-icons">alt_route</Icon>
+          <Label>ルート計算</Label>
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          class="button-shaped-round"
+          disabled={loggedIn}
+          on:click={saveTouring}
+        >
+          <Icon class="material-icons">bookmark</Icon>
+          <Label>保存</Label>
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          class="button-shaped-round"
+          disabled={loggedIn}
+        >
+          <Icon class="material-icons">share</Icon>
+          <Label>共有</Label>
+        </Button>
+      </Tooltip>
     </div>
   </div>
 </gmpx-split-layout>
 <Progress bind:open={progressOpen}></Progress>
+<SaveModal bind:this={saveModal}></SaveModal>
 
 <style>
   [slot='main'] {
@@ -195,6 +227,7 @@
   #add-route-wrapper {
     padding: 1.5em 0;
     text-align: center;
+    position:  relative;
   }
   * :global(.button-shaped-round) {
     border-radius: 36px;

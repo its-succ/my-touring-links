@@ -126,4 +126,16 @@ export class Touring {
       this.routes.set(new Date(key).getTime(), route);
     });
   }
+
+  /**
+   * 出発日時ごと到着時間を取得する
+   */
+  getArrivalTimeJSON() {
+    const ret: ArrivalTimeJSON = {};
+    Array.from(this.routes.keys()).forEach((key) => {
+      const arrivalTimes = this.routes.get(key)!.getArrivalTimes()
+      if (arrivalTimes !== undefined && Object.keys(arrivalTimes).length !== 0) ret[new Date(key).toISOString()] = arrivalTimes;
+    });
+    return ret;
+  }
 }

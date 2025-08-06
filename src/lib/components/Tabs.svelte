@@ -58,8 +58,8 @@
         </Item>
         <Item>
           <Button disabled={!loggedIn} on:click={() => saveTouring()}>
-            <Icon class="material-icons">save</Icon>
-            <ButtonLabel class="nowrap">保存</ButtonLabel>
+            <Icon class="material-icons">bookmark</Icon>
+            <ButtonLabel class="nowrap">保存と共有</ButtonLabel>
           </Button>
         </Item>
       </List>
