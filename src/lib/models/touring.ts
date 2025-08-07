@@ -1,14 +1,21 @@
-import type { TouringEntity } from './entity';
 import { placeSchema, type Place } from './place';
-import { Route } from './route';
+import { arrivalTimeSchema, Route, type ArrivalTimes } from './route';
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
 
+/**
+ * 出発日時ごと場所
+ */
 export type TouringJSON = { [index: string]: Place[] };
-export type EditTouringEntity = Omit<TouringEntity, 'userId'>;
-
 export const touringJsonSchema = z.record(z.array(placeSchema));
+/**
+ * 出発日時ごと到着時間
+ */
+export type ArrivalTimeJSON = { [index: string]: { arrivalTimes: ArrivalTimes; calcedAt: string } };
+export const arrivalTimeJsonSchema = z.record(
+  z.object({ arrivalTimes: arrivalTimeSchema, calcedAt: z.string().datetime() })
+);
 
 /**
  * 出発日時別ルート
@@ -120,5 +127,20 @@ export class Touring {
       route.set(json[key]);
       this.routes.set(new Date(key).getTime(), route);
     });
+  }
+
+  /**
+   * 出発日時ごと到着時間を取得する
+   */
+  getArrivalTimeJSON() {
+    const ret: ArrivalTimeJSON = {};
+    Array.from(this.routes.keys()).forEach((key) => {
+      const arrivalTimes = this.routes.get(key)!.getArrivalTimes();
+      if (arrivalTimes !== undefined && Object.keys(arrivalTimes).length !== 0) {
+        const calcedAt = this.routes.get(key)!.getCalcedDate()!.toISOString();
+        ret[new Date(key).toISOString()] = { arrivalTimes, calcedAt };
+      }
+    });
+    return ret;
   }
 }

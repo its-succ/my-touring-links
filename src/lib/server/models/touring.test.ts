@@ -41,6 +41,7 @@ describe('store', () => {
 
     const { id, ...data } = await store(user, touring);
     expect(id).not.toBeUndefined();
+    expect(data.sharedTouringId).not.toBeUndefined();
 
     const actual = await firestore.collection('tourings').doc(id!).get();
     expect(actual.createTime?.toDate()).toBeInstanceOf(Date);
