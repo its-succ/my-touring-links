@@ -1,6 +1,7 @@
 import { touringSchema, type TouringEntity } from '$lib/models/entity';
 import type { User } from '@auth/sveltekit';
 import { DocumentReference, Firestore } from '@google-cloud/firestore';
+import { v4 as uuidv4 } from 'uuid';
 
 const db = () => {
   const firestore = new Firestore({ ignoreUndefinedProperties: true });
@@ -40,6 +41,7 @@ const toDatabaseEntity = (user: User, entity: TouringEntity): TouringDatabaseEnt
 
 const create = async (user: User, entity: TouringEntity) => {
   const doc = db().doc();
+  entity.sharedTouringId = uuidv4();
   await doc.set(toDatabaseEntity(user, entity));
   return doc.id;
 };

@@ -95,6 +95,7 @@
     "@auth/sveltekit": "^1.9.2",
     "@google-cloud/firestore": "^7.11.1",
     "@svelte-plugins/tooltips": "^3.0.3",
+    "copy-to-clipboard": "^3.3.3",
     "dotenv": "^16.5.0",
     "http-status": "^2.1.0",
     "zod": "^3.25.67"

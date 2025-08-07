@@ -29,43 +29,44 @@ interface SharedTouringDatabaseEntity
 export const store = async (
   user: User,
   touringEntity: TouringEntity,
-  arrivalTimes: ArrivalTimeJSON,
-  calcedAt: string
+  arrivalTimes: ArrivalTimeJSON
 ): Promise<SharedTouringEntity> => {
   if (touringEntity.id === undefined) throw Error('Can not share unsaved touring');
-  const entity = toDatabaseEntity(user, touringEntity, arrivalTimes, calcedAt);
+  const entity = toDatabaseEntity(user, touringEntity, arrivalTimes);
   const ret: SharedTouringEntity = entity;
   if (touringEntity.sharedTouringId === undefined) {
     throw Error('sharedTouringId not set');
   } else {
     await save(touringEntity.sharedTouringId, entity);
   }
+  ret.id = touringEntity.sharedTouringId;
   return ret;
 };
 
 const toDatabaseEntity = (
   user: User,
   touringEntity: TouringEntity,
-  arrivalTimes: ArrivalTimeJSON,
-  calcedAt: string
+  arrivalTimes: ArrivalTimeJSON
 ): SharedTouringDatabaseEntity => {
   const departureDateTimes = Object.keys(touringEntity.touring);
   const touring: SharedTouringJSON = {};
   departureDateTimes.forEach((departureDateTime) => {
     const places = touringEntity.touring[departureDateTime];
     const arrivalTime = arrivalTimes[departureDateTime];
-    touring[departureDateTime] = places.map((place) => {
-      return {
-        ...place,
-        arrivalTime: arrivalTime[place.id]
-      };
-    });
+    touring[departureDateTime] = {
+      places: places.map((place) => {
+        return {
+          ...place,
+          arrivalTime: arrivalTime.arrivalTimes[place.id]
+        };
+      }),
+      calcedAt: arrivalTime.calcedAt
+    };
   });
   return {
     name: touringEntity.name,
     sharedBy: user.email!.split('@')[0],
-    touring,
-    calcedAt
+    touring
   };
 };
 

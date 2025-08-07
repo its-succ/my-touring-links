@@ -12,8 +12,10 @@ export const touringJsonSchema = z.record(z.array(placeSchema));
 /**
  * 出発日時ごと到着時間
  */
-export type ArrivalTimeJSON = { [index: string]: ArrivalTimes };
-export const arrivalTimeJsonSchema = z.record(z.array(arrivalTimeSchema));
+export type ArrivalTimeJSON = { [index: string]: { arrivalTimes: ArrivalTimes; calcedAt: string } };
+export const arrivalTimeJsonSchema = z.record(
+  z.object({ arrivalTimes: arrivalTimeSchema, calcedAt: z.string().datetime() })
+);
 
 /**
  * 出発日時別ルート
@@ -133,8 +135,11 @@ export class Touring {
   getArrivalTimeJSON() {
     const ret: ArrivalTimeJSON = {};
     Array.from(this.routes.keys()).forEach((key) => {
-      const arrivalTimes = this.routes.get(key)!.getArrivalTimes()
-      if (arrivalTimes !== undefined && Object.keys(arrivalTimes).length !== 0) ret[new Date(key).toISOString()] = arrivalTimes;
+      const arrivalTimes = this.routes.get(key)!.getArrivalTimes();
+      if (arrivalTimes !== undefined && Object.keys(arrivalTimes).length !== 0) {
+        const calcedAt = this.routes.get(key)!.getCalcedDate()!.toISOString();
+        ret[new Date(key).toISOString()] = { arrivalTimes, calcedAt };
+      }
     });
     return ret;
   }

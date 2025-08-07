@@ -56,8 +56,6 @@ export interface SharedTouringEntity extends BaseEntity {
   touring: SharedTouringJSON;
   /** 共有した人のアカウント名 */
   sharedBy: string;
-  /** ルートを計算した日時のISO文字列 */
-  calcedAt: string;
 }
 
 const sharedTouringShape: ZodShape<SharedTouringEntity> = {
@@ -66,8 +64,7 @@ const sharedTouringShape: ZodShape<SharedTouringEntity> = {
   updatedAt: z.date().optional(),
   name: z.string(),
   touring: sharedTouringJsonSchema,
-  sharedBy: z.string(),
-  calcedAt: z.string().datetime()
+  sharedBy: z.string()
 };
 
 /**

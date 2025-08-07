@@ -36,13 +36,14 @@ describe('store', () => {
       .supply(touringSchema.shape.sharedTouringId, faker.string.uuid())
       .generate();
     const user = zocker(userSchema).supply(userSchema.shape.email, 'hoge@example.com').generate();
-    const arrivalTimes: ArrivalTimeJSON = { [departureDateTime]: {} };
-    touring.touring[departureDateTime].forEach((place, index) => {
-      if (index > 0) arrivalTimes[departureDateTime][place.id] = departureDateTime + index * 600000;
-    });
     const calcedAt = faker.date.recent().toISOString();
+    const arrivalTimes: ArrivalTimeJSON = { [departureDateTime]: { arrivalTimes: {}, calcedAt } };
+    touring.touring[departureDateTime].forEach((place, index) => {
+      if (index > 0)
+        arrivalTimes[departureDateTime].arrivalTimes[place.id] = departureDateTime + index * 600000;
+    });
 
-    await store(user, touring, arrivalTimes, calcedAt);
+    await store(user, touring, arrivalTimes);
 
     const actual = await firestore
       .collection('shared-tourings')
@@ -53,13 +54,15 @@ describe('store', () => {
       name: touring.name,
       sharedBy: 'hoge',
       touring: {
-        [departureDateTime]: [
-          { ...touring.touring[departureDateTime][0] },
-          { ...touring.touring[departureDateTime][1], arrivalTime: departureDateTime + 600000 },
-          { ...touring.touring[departureDateTime][2], arrivalTime: departureDateTime + 1200000 }
-        ]
-      },
-      calcedAt
+        [departureDateTime]: {
+          places: [
+            { ...touring.touring[departureDateTime][0] },
+            { ...touring.touring[departureDateTime][1], arrivalTime: departureDateTime + 600000 },
+            { ...touring.touring[departureDateTime][2], arrivalTime: departureDateTime + 1200000 }
+          ],
+          calcedAt
+        }
+      }
     });
   });
 
@@ -75,19 +78,21 @@ describe('store', () => {
       .supply(touringSchema.shape.sharedTouringId, faker.string.uuid())
       .generate();
     const user = zocker(userSchema).supply(userSchema.shape.email, 'hoge@example.com').generate();
-    const arrivalTimes: ArrivalTimeJSON = { [departureDateTime]: {} };
-    touring.touring[departureDateTime].forEach((place, index) => {
-      if (index > 0) arrivalTimes[departureDateTime][place.id] = departureDateTime + index * 600000;
-    });
     const calcedAt = faker.date.recent().toISOString();
-
-    await store(user, touring, arrivalTimes, calcedAt);
-
+    const arrivalTimes: ArrivalTimeJSON = { [departureDateTime]: { arrivalTimes: {}, calcedAt } };
     touring.touring[departureDateTime].forEach((place, index) => {
-      if (index > 0) arrivalTimes[departureDateTime][place.id] = departureDateTime + index * 800000;
+      if (index > 0)
+        arrivalTimes[departureDateTime].arrivalTimes[place.id] = departureDateTime + index * 600000;
     });
 
-    await store(user, touring, arrivalTimes, calcedAt);
+    await store(user, touring, arrivalTimes);
+
+    touring.touring[departureDateTime].forEach((place, index) => {
+      if (index > 0)
+        arrivalTimes[departureDateTime].arrivalTimes[place.id] = departureDateTime + index * 800000;
+    });
+
+    await store(user, touring, arrivalTimes);
 
     const actual = await firestore
       .collection('shared-tourings')
@@ -98,13 +103,15 @@ describe('store', () => {
       name: touring.name,
       sharedBy: 'hoge',
       touring: {
-        [departureDateTime]: [
-          { ...touring.touring[departureDateTime][0] },
-          { ...touring.touring[departureDateTime][1], arrivalTime: departureDateTime + 800000 },
-          { ...touring.touring[departureDateTime][2], arrivalTime: departureDateTime + 1600000 }
-        ]
-      },
-      calcedAt
+        [departureDateTime]: {
+          places: [
+            { ...touring.touring[departureDateTime][0] },
+            { ...touring.touring[departureDateTime][1], arrivalTime: departureDateTime + 800000 },
+            { ...touring.touring[departureDateTime][2], arrivalTime: departureDateTime + 1600000 }
+          ],
+          calcedAt
+        }
+      }
     });
   });
 });
@@ -115,12 +122,14 @@ describe('findById', () => {
     const touring = zocker(sharedTouringSchema)
       .supply(sharedTouringSchema.shape.id, faker.string.uuid())
       .supply(sharedTouringSchema.shape.touring, () => ({
-        [DateTime.now().toJSDate().getTime()]: zocker(places)
-          .array({ min: 3, max: 5 })
-          .supply(sharedPlaceSchema.options[0].shape.icon, 'place')
-          .generate()
+        [DateTime.now().toJSDate().getTime()]: {
+          places: zocker(places)
+            .array({ min: 3, max: 5 })
+            .supply(sharedPlaceSchema.options[0].shape.icon, 'place')
+            .generate(),
+          calcedAt: faker.date.recent().toISOString()
+        }
       }))
-      .supply(sharedTouringSchema.shape.calcedAt, faker.date.recent().toISOString())
       .generate();
     const id = touring.id;
     delete touring.id;
@@ -138,7 +147,6 @@ describe('findById', () => {
     expect(results?.name).toEqual(touring.name);
     expect(results?.touring).toEqual(removeUndefinedObjects(touring.touring));
     expect(results?.sharedBy).toEqual(touring.sharedBy);
-    expect(results?.calcedAt).toEqual(touring.calcedAt);
   });
 
   describe('条件に一致しない場合は undefined が戻ること', () => {
@@ -147,12 +155,14 @@ describe('findById', () => {
       const touring = zocker(sharedTouringSchema)
         .supply(sharedTouringSchema.shape.id, faker.string.uuid())
         .supply(sharedTouringSchema.shape.touring, () => ({
-          [DateTime.now().toJSDate().getTime()]: zocker(places)
-            .array({ min: 3, max: 5 })
-            .supply(sharedPlaceSchema.options[0].shape.icon, 'place')
-            .generate()
+          [DateTime.now().toJSDate().getTime()]: {
+            places: zocker(places)
+              .array({ min: 3, max: 5 })
+              .supply(sharedPlaceSchema.options[0].shape.icon, 'place')
+              .generate(),
+            calcedAt: faker.date.recent().toISOString()
+          }
         }))
-        .supply(sharedTouringSchema.shape.calcedAt, faker.date.recent().toISOString())
         .generate();
       const id = touring.id;
       delete touring.id;
@@ -174,12 +184,14 @@ describe('removve', () => {
     const touring = zocker(sharedTouringSchema)
       .supply(sharedTouringSchema.shape.id, faker.string.uuid())
       .supply(sharedTouringSchema.shape.touring, () => ({
-        [DateTime.now().toJSDate().getTime()]: zocker(places)
-          .array({ min: 3, max: 5 })
-          .supply(sharedPlaceSchema.options[0].shape.icon, 'place')
-          .generate()
+        [DateTime.now().toJSDate().getTime()]: {
+          places: zocker(places)
+            .array({ min: 3, max: 5 })
+            .supply(sharedPlaceSchema.options[0].shape.icon, 'place')
+            .generate(),
+          calcedAt: faker.date.recent().toISOString()
+        }
       }))
-      .supply(sharedTouringSchema.shape.calcedAt, faker.date.recent().toISOString())
       .generate();
     const id = touring.id;
     delete touring.id;

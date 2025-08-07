@@ -23,5 +23,7 @@ const sharedPlaceShape: ZodShape<Location & ArrivalTime> = {
  */
 export const sharedPlaceSchema = z.union([z.object(sharedSpotShape), z.object(sharedPlaceShape)]);
 
-export type SharedTouringJSON = { [index: string]: SharedPlace[] };
-export const sharedTouringJsonSchema = z.record(z.array(sharedPlaceSchema));
+export type SharedTouringJSON = { [index: string]: { places: SharedPlace[]; calcedAt: string } };
+export const sharedTouringJsonSchema = z.record(
+  z.object({ places: z.array(sharedPlaceSchema), calcedAt: z.string().datetime() })
+);

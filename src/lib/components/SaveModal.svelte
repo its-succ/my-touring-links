@@ -1,10 +1,7 @@
 <script lang="ts">
   import Dialog, { Title, Content, Actions } from '@smui/dialog';
   import Button, { Label } from '@smui/button';
-  import FormField from '@smui/form-field';
   import Textfield from '@smui/textfield';
-  import List, { Item, Graphic, Text } from '@smui/list';
-  import Checkbox from '@smui/checkbox';
   import type { ArrivalTimeJSON } from '$lib/models/touring';
   import type { EditTouringEntity } from '$lib/models/entity';
   import { DateTime } from 'luxon';
@@ -13,14 +10,10 @@
   /**
    * ツーリングの保存を開始する
    */
-  export function save(entity: EditTouringEntity, arrivalTime: ArrivalTimeJSON) {
+  export function save(entity: EditTouringEntity) {
     saveTarget = entity;
     const placeholder = `${DateTime.fromISO(Object.keys(entity.touring)[0]).setZone('Asia/Tokyo').toFormat('MM/dd', { locale: 'ja' })}出発ツーリング`;
     saveTarget.name = entity.name || placeholder;
-    calcedDepartureDateTime = Object.keys(arrivalTime);
-    shareable =
-      JSON.stringify(calcedDepartureDateTime.sort()) ===
-      JSON.stringify(Object.keys(saveTarget.touring).sort());
     formValidity = true;
     open = true;
   }
@@ -32,10 +25,6 @@
   let formValidity: boolean;
   /** 保存対象のツーリング */
   let saveTarget: EditTouringEntity;
-  /** 出発日時ごとの計算結果 */
-  let calcedDepartureDateTime: string[];
-  /** 共有できるかどうか */
-  let shareable: boolean;
 
   function validate() {
     formValidity = form.checkValidity();
@@ -58,9 +47,7 @@
       });
       if (response.status !== status.OK) alert('保存に失敗しました');
     }
-    if (saveTarget.publish && shareable) {
-
-    }
+    open = false;
   }
 </script>
 
@@ -71,7 +58,7 @@
     aria-describedby="save-modal-content"
     surface$style="width: 850px"
   >
-    <Title id="save-modal-title">保存と共有</Title>
+    <Title id="save-modal-title">保存</Title>
     <Content id="save-modal-content">
       <form bind:this={form} on:submit|preventDefault={handleSubmit}>
         <Textfield
@@ -83,33 +70,6 @@
           class="form-field"
           on:change={validate}
         ></Textfield>
-        <fieldset>
-          <legend>ツーリング計画の共有</legend>
-          <FormField class="form-field">
-            <Checkbox bind:checked={saveTarget.publish} disabled={!shareable} />
-            <span slot="label"
-              >{shareable ? '共有する' : 'ルート計算されていない日があるので共有できません'}</span
-            >
-          </FormField>
-          <List class="calced-statuses" dense>
-            {#each Object.keys(saveTarget.touring) as departureDateTime}
-              <Item>
-                <Graphic class="material-icons"
-                  >{calcedDepartureDateTime.includes(departureDateTime)
-                    ? 'directions'
-                    : 'directions_off'}</Graphic
-                >
-                <Text
-                  >{DateTime.fromISO(departureDateTime)
-          .setZone('Asia/Tokyo')
-          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' }) + ':' + (calcedDepartureDateTime.includes(departureDateTime)
-                    ? 'ルート計算済'
-                    : 'ルート未計算')}</Text
-                >
-              </Item>
-            {/each}
-          </List>
-        </fieldset>
       </form>
     </Content>
     <Actions>

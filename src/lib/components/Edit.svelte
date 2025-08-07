@@ -14,6 +14,7 @@
   import SaveModal from './SaveModal.svelte';
   import { Tooltip } from '@svelte-plugins/tooltips';
   import { userStore } from '$lib/models/user';
+  import ShareModal from './ShareModal.svelte';
 
   /** Map コンポーネント */
   let map: Map;
@@ -43,6 +44,8 @@
   let progressOpen: boolean;
   /** 保存ダイアログタグ */
   let saveModal: SaveModal;
+  /** 共有ダイアログタグ */
+  let shareModal: ShareModal;
   /** 案内ヘルプ */
   let stepHelp = true;
   /** 案内ヘルプ幅 */
@@ -59,8 +62,7 @@
     erdUltraFast.listenTo(fixed, () => {
       addButton.scrollIntoView(false);
     });
-    console.log('window.innerWidth', window.innerWidth)
-    stepHelpWidth = Math.min(400, window.innerWidth - 20)
+    stepHelpWidth = Math.min(400, window.innerWidth - 20);
   });
 
   userStore.subscribe((cur) => {
@@ -91,6 +93,22 @@
     if (route === undefined) return true;
     if (route.get().length < 2) return true;
     return false;
+  }
+
+  /**
+   * ルート共有できないかどうか
+   * @param loggedIn - ログインしているかどうか
+   * @param entity - 編集中のエンティティ
+   * @param touring - 出発日時別ルート
+   * @returns ルート共有できないときは true
+   */
+  function shareDisable(loggedIn: boolean, entity: EditTouringEntity, touring: Touring) {
+    if (!loggedIn) return true;
+    const calcedDepartureDateTime = Object.keys(touring.getArrivalTimeJSON());
+    return (
+      JSON.stringify(calcedDepartureDateTime.sort()) ===
+      JSON.stringify(Object.keys(entity.touring).sort())
+    );
   }
 
   /**
@@ -128,7 +146,15 @@
    * ツーリングを保存する
    */
   async function saveTouring() {
-    saveModal.save(entity, touring.getArrivalTimeJSON());
+    saveModal.save(entity);
+  }
+
+  /**
+   * ツーリングを共有する
+   */
+  async function shareTouring() {
+    if (entity.id === undefined) throw Error('Unsaved touring can not share');
+    shareModal.share(entity.id, touring.getArrivalTimeJSON());
   }
 
   /**
@@ -139,15 +165,15 @@
    */
   function helpMessage(route?: Route, progressOpen?: boolean) {
     if (routeDisable(route)) {
-      return "出発地、立ち寄り場所、目的地を追加してルートを作成してみましょう";
+      return '出発地、立ち寄り場所、目的地を追加してルートを作成してみましょう';
     }
     if (route?.getCalcedDate()) {
       if (loggedIn) {
-        return "ルートの共有準備が完了しました！ ルートを保存してURLをコピーすると共有できます。"
+        return 'ルートの共有準備が完了しました！ ルートを保存すると共有できます。';
       }
-      return "ルートの共有準備が完了しました！ Googleアカウントでログインすると、ルートの保存や共有ができるようになります"
+      return 'ルートの共有準備が完了しました！ Googleアカウントでログインすると、ルートの保存や共有ができるようになります';
     }
-    return "ルートが作成できたら、出発日時や経由値の滞在時間を設定して、ルート計算してみましょう";
+    return 'ルートが作成できたら、出発日時や経由値の滞在時間を設定して、ルート計算してみましょう';
   }
 </script>
 
@@ -167,7 +193,8 @@
         bind:show={stepHelp}
         arrow={true}
         maxWidth={stepHelpWidth}
-        action="prop">
+        action="prop"
+      >
         <Button
           variant="outlined"
           color="primary"
@@ -191,7 +218,7 @@
           variant="outlined"
           color="secondary"
           class="button-shaped-round"
-          disabled={loggedIn}
+          disabled={!loggedIn}
           on:click={saveTouring}
         >
           <Icon class="material-icons">bookmark</Icon>
@@ -201,7 +228,8 @@
           variant="outlined"
           color="secondary"
           class="button-shaped-round"
-          disabled={loggedIn}
+          disabled={shareDisable(loggedIn, entity, touring)}
+          on:click={shareTouring}
         >
           <Icon class="material-icons">share</Icon>
           <Label>共有</Label>
@@ -212,6 +240,7 @@
 </gmpx-split-layout>
 <Progress bind:open={progressOpen}></Progress>
 <SaveModal bind:this={saveModal}></SaveModal>
+<ShareModal bind:this={shareModal}></ShareModal>
 
 <style>
   [slot='main'] {
@@ -227,7 +256,7 @@
   #add-route-wrapper {
     padding: 1.5em 0;
     text-align: center;
-    position:  relative;
+    position: relative;
   }
   * :global(.button-shaped-round) {
     border-radius: 36px;
