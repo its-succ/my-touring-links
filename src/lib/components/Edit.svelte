@@ -29,7 +29,7 @@
   /** 編集中のエンティティ */
   let entity: EditTouringEntity = {
     name: '',
-    touring: touring.toJSON()
+    touring: {}
   };
   /** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
   let tabs = touring.getDepartureDateTimes();
@@ -106,7 +106,7 @@
     if (!loggedIn) return true;
     const calcedDepartureDateTime = Object.keys(touring.getArrivalTimeJSON());
     return (
-      JSON.stringify(calcedDepartureDateTime.sort()) ===
+      JSON.stringify(calcedDepartureDateTime.sort()) !==
       JSON.stringify(Object.keys(entity.touring).sort())
     );
   }
@@ -124,8 +124,9 @@
    * 編集中のツーリングを取得する
    * @returns 編集中のツーリングオブジェクト
    */
-  export function getTouring(): EditTouringEntity {
-    return { ...entity, touring: touring.toJSON() };
+  export async function getTouring(): Promise<EditTouringEntity> {
+    const serialized = await touring.serialize();
+    return { ...entity, touring: serialized };
   }
 
   /**
@@ -134,10 +135,12 @@
    * 復帰オブジェクトが空の場合は何もしない
    * @param touring - 編集するツーリングエンティティ
    */
-  export function setTouring(value: EditTouringEntity) {
+  export async function setTouring(value: EditTouringEntity) {
     if (Object.keys(value.touring).length === 0 && value.touring.constructor === Object) return;
-    entity = value;
-    touring.fromJSON(value.touring);
+    await touring.deserialize(value.touring);
+    entity = {
+      ...value
+    };
     tabs = touring.getDepartureDateTimes();
     setTimeout(() => (active = tabs[0]));
   }
@@ -146,7 +149,8 @@
    * ツーリングを保存する
    */
   async function saveTouring() {
-    saveModal.save(entity);
+    const serialized = await touring.serialize();
+    saveModal.save({ ...entity, touring: serialized });
   }
 
   /**

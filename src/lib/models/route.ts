@@ -2,6 +2,8 @@ import { DateTime } from 'luxon';
 import type { Place } from './place';
 import { travelMode, latLngToString } from '$lib/utils/googlemaps-util';
 import z from 'zod';
+import SuperJSON from 'superjson';
+import { compress, decompress } from '$lib/utils/compress';
 
 /**
  * 到着時間スキーマ
@@ -137,6 +139,36 @@ export class Route {
   resetCalculated() {
     this.calculated = {};
     this.arrivalTimes = {};
+  }
+
+  /**
+   * 保存用にシリアライズする
+   */
+  async serialize() {
+    const json = SuperJSON.stringify({
+      places: this.places,
+      calculated: this.calculated,
+      arrivalTimes: this.arrivalTimes,
+      calcedAt: this.calcedAt
+    });
+    return compress(json);
+  }
+
+  /**
+   * 保存データからデシリアライズする
+   */
+  async deserialize(seriarized: string) {
+    const decompressed = await decompress(seriarized);
+    const deseriarized = SuperJSON.parse<{
+      places: Place[];
+      calculated: { [placeId: string]: google.maps.DirectionsResult };
+      arrivalTimes: ArrivalTimes;
+      calcedAt?: Date;
+    }>(decompressed);
+    this.places = deseriarized.places;
+    this.calculated = deseriarized.calculated;
+    this.arrivalTimes = deseriarized.arrivalTimes;
+    this.calcedAt = deseriarized.calcedAt;
   }
 }
 

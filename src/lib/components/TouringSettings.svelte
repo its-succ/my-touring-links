@@ -16,7 +16,7 @@
   /** 編集中のエンティティ */
   let entity: EditTouringEntity = {
     name: '',
-    touring: touring.toJSON()
+    touring: {}
   };
   /** 出発日時の一覧 */
   let departureDateTimes: Date[] = [];
@@ -88,8 +88,9 @@
    * 編集中のツーリングを取得する
    * @returns 編集中のツーリングオブジェクト
    */
-  export function getTouring(): EditTouringEntity {
-    return { ...entity, touring: touring.toJSON() };
+  export async function getTouring(): Promise<EditTouringEntity> {
+    const serialized = await touring.serialize();
+    return { ...entity, touring: serialized };
   }
 
   /**
@@ -98,10 +99,12 @@
    * 復帰オブジェクトが空の場合は何もしない
    * @param touring - 編集するツーリングエンティティ
    */
-  export function setTouring(value: EditTouringEntity) {
+  export async function setTouring(value: EditTouringEntity) {
     if (Object.keys(value.touring).length === 0 && value.touring.constructor === Object) return;
-    entity = value;
-    touring.fromJSON(value.touring);
+    await touring.deserialize(value.touring);
+    entity = {
+      ...value
+    };
     departureDateTimes = touring.getDepartureDateTimes();
   }
 </script>

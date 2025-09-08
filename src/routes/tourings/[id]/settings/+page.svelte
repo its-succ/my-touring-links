@@ -1,7 +1,7 @@
 <script lang="ts">
   import { writable } from 'svelte/store';
   import { persistBrowserSession } from '@macfja/svelte-persistent-store';
-  import { beforeNavigate } from '$app/navigation';
+  import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import TouringSettings from 'components/TouringSettings.svelte';
   import { backButton } from '$lib/store/back-button';
@@ -11,13 +11,20 @@
   /** ツーリング設定コンポーネント */
   let settings: TouringSettings;
 
-  beforeNavigate(() => {
-    $unsaved = JSON.stringify(settings.getTouring());
+  let left = false;
+  beforeNavigate(async ({ to, cancel }) => {
+    if (!left) {
+      cancel();
+      const touring = await settings.getTouring();
+      $unsaved = JSON.stringify(touring);
+      left = true;
+      goto(to!.url);
+    }
   });
 
-  onMount(async () => {
+  afterNavigate(async () => {
     try {
-      settings.setTouring(JSON.parse($unsaved));
+      await settings.setTouring(JSON.parse($unsaved));
     } catch (e) {
       // ignore error
     }

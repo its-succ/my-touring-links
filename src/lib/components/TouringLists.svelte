@@ -3,7 +3,7 @@
   import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import { DateTime } from 'luxon';
   import Button, { Icon, Label } from '@smui/button';
-  import type { TouringEntity } from '$lib/models/entity';
+  import type { EntityDate, TouringEntity } from '$lib/models/entity';
   import { goto } from '$app/navigation';
   import { writable } from 'svelte/store';
   import { persistBrowserSession } from '@macfja/svelte-persistent-store';
@@ -46,13 +46,21 @@
     if (response.status !== status.OK) return alert('削除に失敗しました');
     tourings = tourings.filter((touring) => touring.id !== id);
   }
+
+  function formatDate(param?: EntityDate) {
+    if (param === undefined) return '--';
+    const date = param instanceof Date ? param : param.toDate();
+    return DateTime.fromJSDate(date)
+      .setZone('Asia/Tokyo')
+      .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' });
+  }
 </script>
 
 <div class="list">
   <DataTable table$aria-label="ツーリング一覧" style="width: 100%;">
     <Head>
       <Row>
-        <Cell>出発日時</Cell>
+        <Cell>更新日時</Cell>
         <Cell>名前</Cell>
         <Cell class="operation"></Cell>
       </Row>
@@ -60,11 +68,7 @@
     <Body>
       {#each tourings as touring}
         <Row>
-          <Cell
-            >{DateTime.fromISO(Object.keys(touring.touring)[0])
-              .setZone('Asia/Tokyo')
-              .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Cell
-          >
+          <Cell>{formatDate(touring.updatedAt)}</Cell>
           <Cell>{touring.name}</Cell>
           <Cell class="operation">
             <IconButton

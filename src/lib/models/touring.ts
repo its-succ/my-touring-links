@@ -3,6 +3,7 @@ import { arrivalTimeSchema, Route, type ArrivalTimes } from './route';
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
+import type { SerializedTouring } from './entity';
 
 /**
  * 出発日時ごと場所
@@ -127,6 +128,31 @@ export class Touring {
       route.set(json[key]);
       this.routes.set(new Date(key).getTime(), route);
     });
+  }
+
+  /**
+   * Touringモデルをシリアライズ可能なJSONオブジェクトに変換する
+   * @returns  シリアライズされたTouringモデル
+   */
+  async serialize() {
+    const ret: SerializedTouring = {};
+    for (const key of Array.from(this.routes.keys())) {
+      ret[new Date(key).toISOString()] = await this.routes.get(key)!.serialize();
+    }
+    return ret;
+  }
+
+  /**
+   * serialize() で出力されたJSON形式からクラスオブジェクトを復元する
+   * @param serialized - シリアライズされたTouringモデル
+   */
+  async deserialize(serialized: SerializedTouring) {
+    this.routes.clear();
+    for (const key of Object.keys(serialized)) {
+      const route = new Route();
+      await route.deserialize(serialized[key]);
+      this.routes.set(new Date(key).getTime(), route);
+    }
   }
 
   /**

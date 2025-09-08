@@ -15,7 +15,7 @@
       method: 'PUT',
       body: JSON.stringify(entity)
     });
-    if (response.status !== status.OK) alert('保存に失敗しました');
+    if (response.status !== status.OK) alert('共有に失敗しました');
 
     const sharedTouring = await response.json();
     shareUrl = `${location.origin}/shared/tourings/${sharedTouring.id}`;

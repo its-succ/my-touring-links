@@ -1,5 +1,5 @@
 import { Firestore } from '@google-cloud/firestore';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi, type MockedObject } from 'vitest';
 import { sharedTouringSchema, touringSchema } from '$lib/models/entity';
 import { placeSchema } from '$lib/models/place';
 import { zocker } from 'zocker';
@@ -11,6 +11,9 @@ import { faker } from '@faker-js/faker/locale/ja';
 import { findById, remove, store } from './shared';
 import type { ArrivalTimeJSON } from '$lib/models/touring';
 import { sharedPlaceSchema } from '$lib/models/shared';
+import { Route } from '$lib/models/route';
+
+vi.mock('$lib/models/route');
 
 const firestore = new Firestore({
   ignoreUndefinedProperties: true
@@ -26,19 +29,31 @@ afterEach(async () => {
 describe('store', () => {
   it('新規保存できること', async () => {
     const departureDateTime = DateTime.now().toJSDate().getTime();
+    const seriarizedRoute = faker.lorem.slug();
     const touring = zocker(touringSchema)
       .supply(touringSchema.shape.id, faker.string.uuid())
       .supply(touringSchema.shape.touring, () => ({
-        [departureDateTime]: zocker(placeSchema)
-          .supply(placeSchema.options[0].shape.icon, 'place')
-          .generateMany(3)
+        [departureDateTime]: seriarizedRoute
       }))
       .supply(touringSchema.shape.sharedTouringId, faker.string.uuid())
       .generate();
+    const routeDeserialize = vi.fn();
+    const routeGet = vi.fn();
+    vi.mocked(Route).mockImplementation(
+      () =>
+        ({
+          get: routeGet,
+          deserialize: routeDeserialize
+        }) as unknown as MockedObject<Route>
+    );
+    const places = zocker(placeSchema)
+      .supply(placeSchema.options[0].shape.icon, 'place')
+      .generateMany(3);
+    routeGet.mockReturnValue(places);
     const user = zocker(userSchema).supply(userSchema.shape.email, 'hoge@example.com').generate();
     const calcedAt = faker.date.recent().toISOString();
     const arrivalTimes: ArrivalTimeJSON = { [departureDateTime]: { arrivalTimes: {}, calcedAt } };
-    touring.touring[departureDateTime].forEach((place, index) => {
+    places.forEach((place, index) => {
       if (index > 0)
         arrivalTimes[departureDateTime].arrivalTimes[place.id] = departureDateTime + index * 600000;
     });
@@ -56,38 +71,51 @@ describe('store', () => {
       touring: {
         [departureDateTime]: {
           places: [
-            { ...touring.touring[departureDateTime][0] },
-            { ...touring.touring[departureDateTime][1], arrivalTime: departureDateTime + 600000 },
-            { ...touring.touring[departureDateTime][2], arrivalTime: departureDateTime + 1200000 }
+            { ...places[0] },
+            { ...places[1], arrivalTime: departureDateTime + 600000 },
+            { ...places[2], arrivalTime: departureDateTime + 1200000 }
           ],
           calcedAt
         }
       }
     });
+    expect(routeDeserialize).toHaveBeenCalledWith(seriarizedRoute);
   });
 
   it('更新できること', async () => {
     const departureDateTime = DateTime.now().toJSDate().getTime();
+    const seriarizedRoute = faker.lorem.slug();
     const touring = zocker(touringSchema)
       .supply(touringSchema.shape.id, faker.string.uuid())
       .supply(touringSchema.shape.touring, () => ({
-        [departureDateTime]: zocker(placeSchema)
-          .supply(placeSchema.options[0].shape.icon, 'place')
-          .generateMany(3)
+        [departureDateTime]: seriarizedRoute
       }))
       .supply(touringSchema.shape.sharedTouringId, faker.string.uuid())
       .generate();
+    const routeDeserialize = vi.fn();
+    const routeGet = vi.fn();
+    vi.mocked(Route).mockImplementation(
+      () =>
+        ({
+          get: routeGet,
+          deserialize: routeDeserialize
+        }) as unknown as MockedObject<Route>
+    );
+    const places = zocker(placeSchema)
+      .supply(placeSchema.options[0].shape.icon, 'place')
+      .generateMany(3);
+    routeGet.mockReturnValue(places);
     const user = zocker(userSchema).supply(userSchema.shape.email, 'hoge@example.com').generate();
     const calcedAt = faker.date.recent().toISOString();
     const arrivalTimes: ArrivalTimeJSON = { [departureDateTime]: { arrivalTimes: {}, calcedAt } };
-    touring.touring[departureDateTime].forEach((place, index) => {
+    places.forEach((place, index) => {
       if (index > 0)
         arrivalTimes[departureDateTime].arrivalTimes[place.id] = departureDateTime + index * 600000;
     });
 
     await store(user, touring, arrivalTimes);
 
-    touring.touring[departureDateTime].forEach((place, index) => {
+    places.forEach((place, index) => {
       if (index > 0)
         arrivalTimes[departureDateTime].arrivalTimes[place.id] = departureDateTime + index * 800000;
     });
@@ -105,9 +133,9 @@ describe('store', () => {
       touring: {
         [departureDateTime]: {
           places: [
-            { ...touring.touring[departureDateTime][0] },
-            { ...touring.touring[departureDateTime][1], arrivalTime: departureDateTime + 800000 },
-            { ...touring.touring[departureDateTime][2], arrivalTime: departureDateTime + 1600000 }
+            { ...places[0] },
+            { ...places[1], arrivalTime: departureDateTime + 800000 },
+            { ...places[2], arrivalTime: departureDateTime + 1600000 }
           ],
           calcedAt
         }

@@ -1,5 +1,4 @@
 import type { Timestamp } from '@google-cloud/firestore';
-import { touringJsonSchema, type TouringJSON } from './touring';
 import z from 'zod';
 import type { ZodShape } from './zod-shape';
 import { sharedTouringJsonSchema, type SharedTouringJSON } from './shared';
@@ -16,13 +15,21 @@ export interface BaseEntity {
 }
 
 /**
+ * ツーリングのシリアライズ型
+ * - キー: departureTime 出発日時のISO文字列
+ * - 値: superjson で文字列化した touring モデル
+ */
+export type SerializedTouring = { [departureTime: string]: string };
+export const serializedJsonSchema = z.record(z.string());
+
+/**
  * ツーリングエンティティ
  */
 export interface TouringEntity extends BaseEntity {
   /** 名前 */
   name: string;
   /** ルート情報 */
-  touring: TouringJSON;
+  touring: SerializedTouring;
   /** 公開フラグ */
   publish?: boolean;
   /** 共有ID */
@@ -34,7 +41,7 @@ const touringShape: ZodShape<TouringEntity> = {
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   name: z.string(),
-  touring: touringJsonSchema,
+  touring: serializedJsonSchema,
   publish: z.boolean().optional(),
   sharedTouringId: z.string().optional()
 };

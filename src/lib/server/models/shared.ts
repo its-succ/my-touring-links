@@ -3,6 +3,7 @@ import {
   type SharedTouringEntity,
   type TouringEntity
 } from '$lib/models/entity';
+import { Route } from '$lib/models/route';
 import type { SharedTouringJSON } from '$lib/models/shared';
 import type { ArrivalTimeJSON } from '$lib/models/touring';
 import type { User } from '@auth/sveltekit';
@@ -51,7 +52,9 @@ const toDatabaseEntity = (
   const departureDateTimes = Object.keys(touringEntity.touring);
   const touring: SharedTouringJSON = {};
   departureDateTimes.forEach((departureDateTime) => {
-    const places = touringEntity.touring[departureDateTime];
+    const route = new Route();
+    route.deserialize(touringEntity.touring[departureDateTime]);
+    const places = route.get();
     const arrivalTime = arrivalTimes[departureDateTime];
     touring[departureDateTime] = {
       places: places.map((place) => {
