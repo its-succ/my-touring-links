@@ -6,6 +6,8 @@
   import type { EditTouringEntity } from '$lib/models/entity';
   import { DateTime } from 'luxon';
   import status from 'http-status';
+  import { goto } from '$app/navigation';
+  import { createEventDispatcher } from 'svelte';
 
   /**
    * ツーリングの保存を開始する
@@ -25,6 +27,8 @@
   let formValidity: boolean;
   /** 保存対象のツーリング */
   let saveTarget: EditTouringEntity;
+  /** イベントディスパッチャー */
+  let dispatch = createEventDispatcher();
 
   function validate() {
     formValidity = form.checkValidity();
@@ -39,6 +43,8 @@
         body: JSON.stringify(saveTarget)
       });
       if (response.status !== status.OK) alert('保存に失敗しました');
+      const { id } = await response.json();
+      dispatch('saved', { id, name: saveTarget.name });
     } else {
       const { createdAt: _createdAt, updatedAt: _updatedAt, ...updates } = saveTarget;
       const response = await fetch(`/api/tourings/${saveTarget.id}`, {
@@ -46,6 +52,7 @@
         body: JSON.stringify(updates)
       });
       if (response.status !== status.OK) alert('保存に失敗しました');
+      dispatch('saved', { id: saveTarget.id, name: saveTarget.name });
     }
     open = false;
   }

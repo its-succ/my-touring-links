@@ -15,6 +15,7 @@
   import { Tooltip } from '@svelte-plugins/tooltips';
   import { userStore } from '$lib/models/user';
   import ShareModal from './ShareModal.svelte';
+  import { goto } from '$app/navigation';
 
   /** Map コンポーネント */
   let map: Map;
@@ -154,6 +155,19 @@
   }
 
   /**
+   * ツーリング保存結果を受け取る
+   * 保存したidと名前でエンティティを更新してURLをid付きにする
+   */
+  async function handleSaved(e: CustomEvent<{ id: string; name: string }>) {
+    entity = {
+      ...entity,
+      id: e.detail.id,
+      name: e.detail.name
+    };
+    await goto(`/tourings/${entity.id}`);
+  }
+
+  /**
    * ツーリングを共有する
    */
   async function shareTouring() {
@@ -243,7 +257,7 @@
   </div>
 </gmpx-split-layout>
 <Progress bind:open={progressOpen}></Progress>
-<SaveModal bind:this={saveModal}></SaveModal>
+<SaveModal bind:this={saveModal} on:saved={handleSaved}></SaveModal>
 <ShareModal bind:this={shareModal}></ShareModal>
 
 <style>
