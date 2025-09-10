@@ -1,6 +1,19 @@
 import { DateTime } from 'luxon';
 import type { Place } from './place';
 import { travelMode, latLngToString } from '$lib/utils/googlemaps-util';
+import z from 'zod';
+import SuperJSON from 'superjson';
+import { compress, decompress } from '$lib/utils/compress';
+
+/**
+ * 到着時間スキーマ
+ */
+export const arrivalTimeSchema = z.record(z.number());
+
+/**
+ * 到着時間
+ */
+export type ArrivalTimes = z.infer<typeof arrivalTimeSchema>;
 
 /**
  * ルート
@@ -8,7 +21,8 @@ import { travelMode, latLngToString } from '$lib/utils/googlemaps-util';
 export class Route {
   private places: Place[] = [];
   private calculated: { [placeId: string]: google.maps.DirectionsResult } = {};
-  private arrivalTimes: { [placeId: string]: number } = {};
+  private arrivalTimes: ArrivalTimes = {};
+  private calcedAt?: Date;
 
   /**
    * ルートの最後に場所を追加する
@@ -45,12 +59,27 @@ export class Route {
   }
 
   /**
+   * @returns 到着時刻一覧を取得する
+   */
+  getArrivalTimes(): ArrivalTimes | undefined {
+    return this.arrivalTimes;
+  }
+
+  /**
    * 場所の計算結果を取得する
    * @param place - 場所
    * @returns 計算結果
    */
   getDirectionsResult(place: Place): google.maps.DirectionsResult | undefined {
     return this.calculated[place.id];
+  }
+
+  /**
+   * ルートを計算した日時を取得する
+   * @returns 計算日時。計算してない場合は undefined が戻る
+   */
+  getCalcedDate(): Date | undefined {
+    return this.calcedAt;
   }
 
   /**
@@ -100,6 +129,7 @@ export class Route {
       waypoints = [];
       origin = undefined;
     }
+    this.calcedAt = new Date();
     return this.calculated;
   }
 
@@ -109,6 +139,36 @@ export class Route {
   resetCalculated() {
     this.calculated = {};
     this.arrivalTimes = {};
+  }
+
+  /**
+   * 保存用にシリアライズする
+   */
+  async serialize() {
+    const json = SuperJSON.stringify({
+      places: this.places,
+      calculated: this.calculated,
+      arrivalTimes: this.arrivalTimes,
+      calcedAt: this.calcedAt
+    });
+    return compress(json);
+  }
+
+  /**
+   * 保存データからデシリアライズする
+   */
+  async deserialize(seriarized: string) {
+    const decompressed = await decompress(seriarized);
+    const deseriarized = SuperJSON.parse<{
+      places: Place[];
+      calculated: { [placeId: string]: google.maps.DirectionsResult };
+      arrivalTimes: ArrivalTimes;
+      calcedAt?: Date;
+    }>(decompressed);
+    this.places = deseriarized.places;
+    this.calculated = deseriarized.calculated;
+    this.arrivalTimes = deseriarized.arrivalTimes;
+    this.calcedAt = deseriarized.calcedAt;
   }
 }
 

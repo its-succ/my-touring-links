@@ -7,11 +7,15 @@
   import Progress from './Progress.svelte';
   import Button, { Icon, Label } from '@smui/button';
   import elementResizeDetectorMaker from '@andybeersdev/element-resize-detector';
-  import { Touring, type EditTouringEntity } from '$lib/models/touring';
+  import { Touring } from '$lib/models/touring';
   import type { Route } from '$lib/models/route';
   import type { Place } from '$lib/models/place';
-  import { DateTime } from 'luxon';
-  import status from 'http-status';
+  import type { EditTouringEntity } from '$lib/models/entity';
+  import SaveModal from './SaveModal.svelte';
+  import { Tooltip } from '@svelte-plugins/tooltips';
+  import { userStore } from '$lib/models/user';
+  import ShareModal from './ShareModal.svelte';
+  import { goto } from '$app/navigation';
 
   /** Map コンポーネント */
   let map: Map;
@@ -26,7 +30,7 @@
   /** 編集中のエンティティ */
   let entity: EditTouringEntity = {
     name: '',
-    touring: touring.toJSON()
+    touring: {}
   };
   /** 出発日時タブの一覧。工程を管理できるようになるとエンティティのリストになる */
   let tabs = touring.getDepartureDateTimes();
@@ -39,6 +43,16 @@
   let routeElement: RouteElement;
   /** プログレスダイアログの表示状態 */
   let progressOpen: boolean;
+  /** 保存ダイアログタグ */
+  let saveModal: SaveModal;
+  /** 共有ダイアログタグ */
+  let shareModal: ShareModal;
+  /** 案内ヘルプ */
+  let stepHelp = true;
+  /** 案内ヘルプ幅 */
+  let stepHelpWidth: number;
+  /** ログインしているかどうか */
+  let loggedIn: boolean = false;
 
   /**
    * コンポーネントがロードされたら、ルート一覧の内容が変わった(高さに変化があった)ときに
@@ -49,6 +63,11 @@
     erdUltraFast.listenTo(fixed, () => {
       addButton.scrollIntoView(false);
     });
+    stepHelpWidth = Math.min(400, window.innerWidth - 20);
+  });
+
+  userStore.subscribe((cur) => {
+    loggedIn = cur.loggedIn;
   });
 
   /**
@@ -78,6 +97,22 @@
   }
 
   /**
+   * ルート共有できないかどうか
+   * @param loggedIn - ログインしているかどうか
+   * @param entity - 編集中のエンティティ
+   * @param touring - 出発日時別ルート
+   * @returns ルート共有できないときは true
+   */
+  function shareDisable(loggedIn: boolean, entity: EditTouringEntity, touring: Touring) {
+    if (!loggedIn) return true;
+    const calcedDepartureDateTime = Object.keys(touring.getArrivalTimeJSON());
+    return (
+      JSON.stringify(calcedDepartureDateTime.sort()) !==
+      JSON.stringify(Object.keys(entity.touring).sort())
+    );
+  }
+
+  /**
    * ルートを計算する
    */
   async function calcRoute() {
@@ -90,8 +125,9 @@
    * 編集中のツーリングを取得する
    * @returns 編集中のツーリングオブジェクト
    */
-  export function getTouring(): EditTouringEntity {
-    return { ...entity, touring: touring.toJSON() };
+  export async function getTouring(): Promise<EditTouringEntity> {
+    const serialized = await touring.serialize();
+    return { ...entity, touring: serialized };
   }
 
   /**
@@ -100,10 +136,12 @@
    * 復帰オブジェクトが空の場合は何もしない
    * @param touring - 編集するツーリングエンティティ
    */
-  export function setTouring(value: EditTouringEntity) {
+  export async function setTouring(value: EditTouringEntity) {
     if (Object.keys(value.touring).length === 0 && value.touring.constructor === Object) return;
-    entity = value;
-    touring.fromJSON(value.touring);
+    await touring.deserialize(value.touring);
+    entity = {
+      ...value
+    };
     tabs = touring.getDepartureDateTimes();
     setTimeout(() => (active = tabs[0]));
   }
@@ -112,37 +150,48 @@
    * ツーリングを保存する
    */
   async function saveTouring() {
-    if (!entity.id) {
-      const placeholder = `${DateTime.fromJSDate(tabs[0]).setZone('Asia/Tokyo').toFormat('MM/dd', { locale: 'ja' })}出発ツーリング`;
-      const name = prompt('保存するツーリングに名前をつけてください', placeholder);
-      if (name === null) {
-        return;
-      }
-      if (name === '') {
-        return saveTouring();
-      }
-      entity.name = name || placeholder;
-      const response = await fetch('/api/tourings', {
-        method: 'POST',
-        body: JSON.stringify(entity)
-      });
-      if (response.status !== status.OK) alert('保存に失敗しました');
-    } else {
-      const name = prompt('ツーリング名', entity.name);
-      if (name === null) {
-        return;
-      }
-      if (name === '') {
-        return saveTouring();
-      }
-      entity.name = name;
-      const { createdAt: _createdAt, updatedAt: _updatedAt, ...updates } = entity;
-      const response = await fetch(`/api/tourings/${entity.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(updates)
-      });
-      if (response.status !== status.OK) alert('保存に失敗しました');
+    const serialized = await touring.serialize();
+    saveModal.save({ ...entity, touring: serialized });
+  }
+
+  /**
+   * ツーリング保存結果を受け取る
+   * 保存したidと名前でエンティティを更新してURLをid付きにする
+   */
+  async function handleSaved(e: CustomEvent<{ id: string; name: string }>) {
+    entity = {
+      ...entity,
+      id: e.detail.id,
+      name: e.detail.name
+    };
+    await goto(`/tourings/${entity.id}`);
+  }
+
+  /**
+   * ツーリングを共有する
+   */
+  async function shareTouring() {
+    if (entity.id === undefined) throw Error('Unsaved touring can not share');
+    shareModal.share(entity.id, touring.getArrivalTimeJSON());
+  }
+
+  /**
+   * ルート情報に応じてヘルプメッセージを変更する
+   * @param route - ルート
+   * @param progressOpen - 計算中かどうか
+   * @returns ルート計算できないときは true
+   */
+  function helpMessage(route?: Route, progressOpen?: boolean) {
+    if (routeDisable(route)) {
+      return '出発地、立ち寄り場所、目的地を追加してルートを作成してみましょう';
     }
+    if (route?.getCalcedDate()) {
+      if (loggedIn) {
+        return 'ルートの共有準備が完了しました！ ルートを保存すると共有できます。';
+      }
+      return 'ルートの共有準備が完了しました！ Googleアカウントでログインすると、ルートの保存や共有ができるようになります';
+    }
+    return 'ルートが作成できたら、出発日時や経由値の滞在時間を設定して、ルート計算してみましょう';
   }
 </script>
 
@@ -156,29 +205,60 @@
     <RouteElement value={route} on:previewRoute={previewRoute} bind:this={routeElement}
     ></RouteElement>
     <div id="add-route-wrapper" bind:this={addButton}>
-      <Button
-        variant="outlined"
-        color="primary"
-        class="button-shaped-round"
-        on:click={addPlaceToRoute}
+      <Tooltip
+        content={helpMessage(route, progressOpen)}
+        position="bottom"
+        bind:show={stepHelp}
+        arrow={true}
+        maxWidth={stepHelpWidth}
+        action="prop"
       >
-        <Icon class="material-icons">add</Icon>
-        <Label>場所を追加する</Label>
-      </Button>
-      <Button
-        variant="outlined"
-        color="secondary"
-        class="button-shaped-round"
-        disabled={routeDisable(route)}
-        on:click={calcRoute}
-      >
-        <Icon class="material-icons">alt_route</Icon>
-        <Label>ルートを計算する</Label>
-      </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          class="button-shaped-round"
+          on:click={addPlaceToRoute}
+        >
+          <Icon class="material-icons">add</Icon>
+          <Label>場所を追加</Label>
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          class="button-shaped-round"
+          disabled={routeDisable(route)}
+          on:click={calcRoute}
+        >
+          <Icon class="material-icons">alt_route</Icon>
+          <Label>ルート計算</Label>
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          class="button-shaped-round"
+          disabled={!loggedIn}
+          on:click={saveTouring}
+        >
+          <Icon class="material-icons">bookmark</Icon>
+          <Label>保存</Label>
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          class="button-shaped-round"
+          disabled={shareDisable(loggedIn, entity, touring)}
+          on:click={shareTouring}
+        >
+          <Icon class="material-icons">share</Icon>
+          <Label>共有</Label>
+        </Button>
+      </Tooltip>
     </div>
   </div>
 </gmpx-split-layout>
 <Progress bind:open={progressOpen}></Progress>
+<SaveModal bind:this={saveModal} on:saved={handleSaved}></SaveModal>
+<ShareModal bind:this={shareModal}></ShareModal>
 
 <style>
   [slot='main'] {
@@ -194,6 +274,7 @@
   #add-route-wrapper {
     padding: 1.5em 0;
     text-align: center;
+    position: relative;
   }
   * :global(.button-shaped-round) {
     border-radius: 36px;

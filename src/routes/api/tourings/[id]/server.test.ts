@@ -5,7 +5,6 @@ import { DELETE, PUT } from './+server';
 import { zocker } from 'zocker';
 import { userSchema } from '$lib/models/user';
 import { touringSchema } from '$lib/models/entity';
-import { placeSchema } from '$lib/models/place';
 import { DateTime } from 'luxon';
 import { save, del } from '$lib/server/services/touring-service';
 
@@ -63,7 +62,7 @@ describe('PUT', () => {
     };
     const touring = zocker(touringSchema)
       .supply(touringSchema.shape.touring, () => ({
-        [DateTime.now().toJSDate().getTime()]: zocker(placeSchema).generateMany(2)
+        [DateTime.now().toJSDate().getTime()]: faker.lorem.slug()
       }))
       .generate();
     const request = { json: vi.fn() } as unknown as Request;
@@ -89,7 +88,7 @@ describe('PUT', () => {
     };
     const touring = zocker(touringSchema)
       .supply(touringSchema.shape.touring, () => ({
-        [DateTime.now().toJSDate().getTime()]: zocker(placeSchema).generateMany(2)
+        [DateTime.now().toJSDate().getTime()]: faker.lorem.slug()
       }))
       .generate();
     const request = { json: vi.fn() } as unknown as Request;

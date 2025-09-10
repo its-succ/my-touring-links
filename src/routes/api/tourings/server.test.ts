@@ -6,7 +6,6 @@ import { zocker } from 'zocker';
 import { userSchema } from '$lib/models/user';
 import { touringSchema } from '$lib/models/entity';
 import { DateTime } from 'luxon';
-import { placeSchema } from '$lib/models/place';
 import { all, save } from '$lib/server/services/touring-service';
 import removeUndefinedObjects from 'remove-undefined-objects';
 
@@ -62,7 +61,7 @@ describe('POST', () => {
     };
     const touring = zocker(touringSchema)
       .supply(touringSchema.shape.touring, () => ({
-        [DateTime.now().toJSDate().getTime()]: zocker(placeSchema).generateMany(2)
+        [DateTime.now().toJSDate().getTime()]: faker.lorem.slug()
       }))
       .generate();
     const request = { json: vi.fn() } as unknown as Request;
@@ -100,7 +99,7 @@ describe('GET', () => {
     const user = zocker(userSchema).generate();
     const tourings = zocker(touringSchema)
       .supply(touringSchema.shape.touring, () => ({
-        [DateTime.now().toJSDate().getTime()]: zocker(placeSchema).generateMany(2)
+        [DateTime.now().toJSDate().getTime()]: faker.lorem.slug()
       }))
       .generateMany(4);
     const locals: App.Locals = {
