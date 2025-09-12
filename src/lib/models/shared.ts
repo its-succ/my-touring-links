@@ -3,19 +3,19 @@ import z from 'zod';
 import type { ZodShape } from './zod-shape';
 
 type ArrivalTime = {
-  arrivalTime: number;
+  arrivalTime?: number;
 };
 
-type SharedPlace = (Spot & ArrivalTime) | (Location & ArrivalTime);
+export type SharedPlace = (Spot & ArrivalTime) | (Location & ArrivalTime);
 
 const sharedSpotShape: ZodShape<Spot & ArrivalTime> = {
   ...spotShape,
-  arrivalTime: z.number()
+  arrivalTime: z.number().optional()
 };
 
 const sharedPlaceShape: ZodShape<Location & ArrivalTime> = {
   ...placeShape,
-  arrivalTime: z.number()
+  arrivalTime: z.number().optional()
 };
 
 /**
