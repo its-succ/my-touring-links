@@ -11,6 +11,6 @@ export const save = async (
   return store(user, touring, arrivalTime);
 };
 
-export const get = async ( id: string): Promise<SharedTouringEntity | undefined> => {
+export const get = async (id: string): Promise<SharedTouringEntity | undefined> => {
   return findById(id);
 };

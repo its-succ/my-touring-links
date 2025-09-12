@@ -30,7 +30,8 @@
 <svelte:component this={component} {place}>
   <div slot="detail">
     {#if !origin && place.arrivalTime}
-      <DirectionsResult {place} arrivalTime={new Date(place.arrivalTime)} {destination}></DirectionsResult>
+      <DirectionsResult {place} arrivalTime={new Date(place.arrivalTime)} {destination}
+      ></DirectionsResult>
     {/if}
   </div>
   <div slot="meta">

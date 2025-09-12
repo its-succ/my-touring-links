@@ -65,7 +65,7 @@ const toDatabaseEntity = async (
       }),
       calcedAt: arrivalTime.calcedAt
     };
-  };
+  }
   return {
     name: touringEntity.name,
     sharedBy: user.email!.split('@')[0],

@@ -8,14 +8,8 @@
 
 <ul class="routes">
   {#each places as place, index (place.id)}
-    <li
-      data-index={index}
-      data-id={place.id}
-    >
-      <SharedPlaceElement
-        {place}
-        origin={index === 0}
-        destination={index === places.length - 1}
+    <li data-index={index} data-id={place.id}>
+      <SharedPlaceElement {place} origin={index === 0} destination={index === places.length - 1}
       ></SharedPlaceElement>
     </li>
   {/each}
