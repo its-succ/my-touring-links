@@ -49,6 +49,7 @@
     "@smui/menu": "^7.0.0",
     "@smui/menu-surface": "^7.0.0",
     "@smui/segmented-button": "^7.0.0",
+    "@smui/select": "^7.0.0",
     "@smui/slider": "^7.0.0",
     "@smui/tab": "^7.0.0",
     "@smui/tab-bar": "^7.0.0",

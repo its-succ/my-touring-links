@@ -33,7 +33,7 @@ export const store = async (
   arrivalTimes: ArrivalTimeJSON
 ): Promise<SharedTouringEntity> => {
   if (touringEntity.id === undefined) throw Error('Can not share unsaved touring');
-  const entity = toDatabaseEntity(user, touringEntity, arrivalTimes);
+  const entity = await toDatabaseEntity(user, touringEntity, arrivalTimes);
   const ret: SharedTouringEntity = entity;
   if (touringEntity.sharedTouringId === undefined) {
     throw Error('sharedTouringId not set');
@@ -44,16 +44,16 @@ export const store = async (
   return ret;
 };
 
-const toDatabaseEntity = (
+const toDatabaseEntity = async (
   user: User,
   touringEntity: TouringEntity,
   arrivalTimes: ArrivalTimeJSON
-): SharedTouringDatabaseEntity => {
+): Promise<SharedTouringDatabaseEntity> => {
   const departureDateTimes = Object.keys(touringEntity.touring);
   const touring: SharedTouringJSON = {};
-  departureDateTimes.forEach((departureDateTime) => {
+  for (const departureDateTime of departureDateTimes) {
     const route = new Route();
-    route.deserialize(touringEntity.touring[departureDateTime]);
+    await route.deserialize(touringEntity.touring[departureDateTime]);
     const places = route.get();
     const arrivalTime = arrivalTimes[departureDateTime];
     touring[departureDateTime] = {
@@ -65,7 +65,7 @@ const toDatabaseEntity = (
       }),
       calcedAt: arrivalTime.calcedAt
     };
-  });
+  }
   return {
     name: touringEntity.name,
     sharedBy: user.email!.split('@')[0],
