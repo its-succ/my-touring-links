@@ -15,21 +15,22 @@
   function directions(e: CustomEvent<{ to: SharedPlace }>, index: number): void {
     const placeLatLng = (place: SharedPlace) => `${place.latLng.lat},${place.latLng.lng}`;
     const url = new URL('https://www.google.com/maps/dir/?api=1');
-    url.searchParams.append('destination', placeLatLng(e.detail.to));
-    if (Object.hasOwn(e.detail.to, 'placeId')) {
-      const to = e.detail.to as Spot;
-      if (to.placeId) url.searchParams.append('destination_place_id', to.placeId);
-    }
+    const appendPlace = (place: SharedPlace, dir: 'origin' | 'destination') => {
+      const spot = place as Spot;
+      if (spot.placeId) {
+        url.searchParams.append(dir, spot.displayName!);
+        url.searchParams.append(`${dir}_place_id`, spot.placeId);
+      } else {
+        url.searchParams.append(dir, placeLatLng(place));
+      }
+    };
+    appendPlace(e.detail.to, 'destination');
     url.searchParams.append('travelmode', 'driving');
     url.searchParams.append('dir_action', 'navigate');
     const waypoints: SharedPlace[] = [];
-    for (let i = index - 1; i > 0; i--) {
+    for (let i = index - 1; i >= 0; i--) {
       if (!places[i].waypoint) {
-        url.searchParams.append('origin', placeLatLng(places[i]));
-        if (Object.hasOwn(places[i], 'placeId')) {
-          const from = places[i] as Spot;
-          if (from.placeId) url.searchParams.append('origin_place_id', from.placeId);
-        }
+        appendPlace(places[i], 'origin');
         break;
       }
       waypoints.push(places[i]);
