@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ComponentType, SvelteComponent } from 'svelte';
+  import { createEventDispatcher, type ComponentType, type SvelteComponent } from 'svelte';
   import type { SharedPlace } from '$lib/models/shared';
   import DirectionsResult from './Place/DirectionsResult.svelte';
   import Location from './Place/Location.svelte';
@@ -17,6 +17,8 @@
   type Constraint = SvelteComponent<{ place: Place }>;
   let component: ComponentType<Constraint>;
   $: component = detectPlaceComponent(place, origin, destination);
+  /** イベントディスパッチャー */
+  const dispatch = createEventDispatcher();
 
   function detectPlaceComponent(
     place: Place,
@@ -35,7 +37,13 @@
     {/if}
   </div>
   <div slot="meta">
-    <IconButton class="material-symbols-outlined" style="font-size:30px">directions</IconButton>
+    {#if !place.waypoint}
+      <IconButton
+        class="material-symbols-outlined"
+        style="font-size:30px"
+        on:click={() => dispatch('directions', { to: place })}>directions</IconButton
+      >
+    {/if}
   </div>
 </svelte:component>
 
