@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "../app.css"
   import AppHeader from 'components/AppHeader.svelte';
   import { onMount } from 'svelte';
   import { userStore } from '$lib/models/user';
@@ -11,15 +12,21 @@
   });
 </script>
 
+<svelte:head>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+</svelte:head>
+
 <AppHeader />
 <main>
   <article>
     <slot />
   </article>
 </main>
-<footer><small>@ESM.Inc ITS SUCC Community</small></footer>
+<footer class="footer sm:footer-horizontal footer-center bg-base-300 text-base-content px-4 py-1"><aside><p>@ESM.Inc ITS SUCC Community</p></aside></footer>
 
-<style>
+<style lang="postcss">
+  @reference "tailwindcss";
+
   :global(html, body) {
     height: 100vh;
     margin: 0;
@@ -40,22 +47,9 @@
     flex-grow: 1;
     overflow: auto;
   }
-  footer {
-    height: 2em;
-    line-height: 2em;
-    background-color: var(--md-ref-palette-primary20);
-    color: var(--mdc-theme-on-primary);
-    text-align: center;
-  }
   @media screen and (min-width: 650px) {
     article {
       padding: 8px;
     }
-  }
-  :global(.mdc-dialog .mdc-dialog__title) {
-    color: var(--mdc-theme-on-surface);
-  }
-  :global(.mdc-dialog .mdc-dialog__content) {
-    color: var(--mdc-theme-on-surface);
   }
 </style>

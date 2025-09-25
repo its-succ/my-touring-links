@@ -1,10 +1,7 @@
 <script lang="ts">
   import DateTimePicker from './DateTimePicker.svelte';
   import { Touring } from '$lib/models/touring';
-  import IconButton from '@smui/icon-button';
-  import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import { DateTime } from 'luxon';
-  import Button, { Icon, Label } from '@smui/button';
   import type { EditTouringEntity } from '$lib/models/entity';
 
   /** DateTimePicker タグ */
@@ -109,62 +106,40 @@
   }
 </script>
 
-<div class="departureDateTimes">
-  <DataTable table$aria-label="ツーリング出発日時の設定" style="width: 100%;">
-    <Head>
-      <Row>
-        <Cell>出発日時</Cell>
-        <Cell class="operation"></Cell>
-      </Row>
-    </Head>
-    <Body>
+<div class="w-full overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table" aria-label="ツーリング出発日時の設定" >
+    <thead>
+      <tr>
+        <th>出発日時</th>
+        <th class="text-right"></th>
+      </tr>
+    </thead>
+    <tbody>
       {#each departureDateTimes as departureDateTime, index}
-        <Row>
-          <Cell
+        <tr>
+          <td
             >{DateTime.fromJSDate(departureDateTime)
               .setZone('Asia/Tokyo')
-              .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Cell
+              .toFormat('yyyy/MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</td
           >
-          <Cell class="operation">
-            <IconButton
-              class="material-icons"
-              on:click={() => change(index)}
-              aria-label="編集"
-              size="mini">edit</IconButton
-            >
-            <IconButton
-              class="material-icons"
-              on:click={() => remove(index)}
-              aria-label="削除"
-              size="mini"
-              disabled={departureDateTimes.length === 1}>delete</IconButton
-            >
-          </Cell>
-        </Row>
+          <td class="text-right">
+            <button on:click={() => change(index)} aria-label="編集">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button on:click={() => remove(index)} aria-label="削除" disabled={departureDateTimes.length === 1}>
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        </tr>
       {/each}
-    </Body>
-  </DataTable>
+      </tbody>
+    </table>
 </div>
-<div class="buttons">
-  <Button variant="unelevated" color="primary" class="button-shaped-round button" on:click={add}>
-    <Icon class="material-icons">add</Icon>
-    <Label>出発日時を追加する</Label>
-  </Button>
+<div class="p-4">
+  <button class="btn btn-primary w-full rounded-[36px]" on:click={add}>
+    <span class="material-symbols-outlined">add</span>
+    出発日時を追加する
+  </button>
 </div>
 
 <DateTimePicker bind:this={dateTimePicker} on:selected={changedDepartureDateTime}></DateTimePicker>
-
-<style>
-  .buttons {
-    padding: 1rem;
-  }
-  .buttons :global(.button) {
-    width: 100%;
-  }
-  .buttons :global(.button-shaped-round) {
-    border-radius: 36px;
-  }
-  .departureDateTimes :global(.operation) {
-    text-align: right;
-  }
-</style>

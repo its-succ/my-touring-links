@@ -1,10 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import Dialog, { Content } from '@smui/dialog';
   import SveltyPicker from 'svelty-picker';
 
-  /** DateTimePicker の表示状態。true で表示する */
-  let isOpen = false;
+  /** DateTimePicker  */
+  let dateTimePicker: HTMLDialogElement;
   /** 初期表示日時 */
   let initialDate: Date;
   /** DateTimePiker のローカライズ */
@@ -43,7 +42,7 @@
    */
   export function open(date: Date) {
     initialDate = date;
-    isOpen = true;
+    dateTimePicker.showModal();
   }
 
   /** イベントディスパッチャー */
@@ -55,7 +54,7 @@
    * @param e - OKボタンイベント
    */
   function selected(e: CustomEvent) {
-    isOpen = false;
+    dateTimePicker.close();
     dispatch('selected', new Date(e.detail));
   }
 
@@ -64,28 +63,26 @@
    * ダイアログを閉じる
    */
   function cancel() {
-    isOpen = false;
+    dateTimePicker.close();
   }
 </script>
 
-<Dialog bind:open={isOpen} noContentPadding sheet aria-describedby="sheet-no-padding-content">
-  <Content id="sheet-no-padding-content">
-    {#if isOpen}
-      <SveltyPicker
-        autocommit={false}
-        pickerOnly={true}
-        mode="datetime"
-        format="yyyy-mm-dd hh:ii"
-        todayBtn={false}
-        clearBtn={false}
-        i18n={jp}
-        {initialDate}
-        on:change={selected}
-        on:cancel={cancel}
-      />
-    {/if}
-  </Content>
-</Dialog>
+<dialog id="datetime-picker" class="modal" aria-describedby="sheet-no-padding-content" bind:this={dateTimePicker}>
+  <div class="modal-box w-auto">
+    <SveltyPicker
+      autocommit={false}
+      pickerOnly={true}
+      mode="datetime"
+      format="yyyy-mm-dd hh:ii"
+      todayBtn={false}
+      clearBtn={false}
+      i18n={jp}
+      {initialDate}
+      on:change={selected}
+      on:cancel={cancel}
+    />
+  </div>
+</dialog>
 
 <style>
   :root {

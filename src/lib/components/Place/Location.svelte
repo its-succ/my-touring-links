@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type Place, type Location, formatLocation } from '$lib/models/place';
-  import { Icon } from '@smui/fab';
 
   /** 場所 */
   export let place: Place;
@@ -11,8 +10,8 @@
 
 <div class="place">
   <div class="icon">
-    <Icon class="material-icons" style="font-size:30px;color:white;margin:5px;"
-      >{place.icon ?? 'location_on'}</Icon
+    <span class="material-icons" style="font-size:30px;color:white;margin:5px;"
+      >{place.icon ?? 'location_on'}</span
     >
   </div>
   <header class="mdc-typography--subtitle1">

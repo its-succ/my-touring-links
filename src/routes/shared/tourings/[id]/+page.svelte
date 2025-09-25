@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import type { SharedTouringEntity } from '$lib/models/entity';
-  import Select, { Option } from '@smui/select';
   import { DateTime } from 'luxon';
   import SharedRouteElement from '$lib/components/SharedRoute.svelte';
 
@@ -25,16 +24,18 @@
       .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })} に共有
   </p>
 
-  <Select bind:value={selectedDepartureDateTime} label="出発日時">
-    {#each departureTimes as departureTime}
-      <Option value={departureTime}
-        >{DateTime.fromISO(departureTime)
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">出発日時</legend>
+    <select class="select" bind:value={selectedDepartureDateTime}>
+      {#each departureTimes as departureTime}
+        <option value={departureTime}>
+          {DateTime.fromISO(departureTime)
           .setZone('Asia/Tokyo')
-          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Option
-      >
-    {/each}
-  </Select>
-
+          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}
+        </option>
+      {/each}
+    </select>
+  </fieldset>
   <SharedRouteElement places={touring.touring[selectedDepartureDateTime].places}
   ></SharedRouteElement>
 

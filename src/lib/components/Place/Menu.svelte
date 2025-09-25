@@ -1,7 +1,4 @@
 <script lang="ts">
-  import IconButton from '@smui/icon-button';
-  import Menu from '@smui/menu';
-  import List, { Item, Text, Graphic } from '@smui/list';
   import { createEventDispatcher } from 'svelte';
   import { type Place, isSpot, googleMapURI } from '$lib/models/place';
 
@@ -14,51 +11,33 @@
   /** 最終目的地かどうか */
   export let destination: boolean;
 
-  /** Menu コンポーネント */
-  let menu: Menu;
   /** イベントディスパッチャー */
   let dispatch = createEventDispatcher();
 </script>
 
-<div>
-  <IconButton class="material-icons" size="button" on:click={() => menu.setOpen(true)}
-    >more_vert</IconButton
-  >
-  <Menu bind:this={menu}>
-    <List>
-      <Item on:SMUI:action={() => dispatch('deleteFromRoute', place.id)}>
-        <Text class="mdc-typography--caption">ルートから削除</Text>
-      </Item>
-      <Item
-        on:SMUI:action={() =>
-          dispatch('editPlace', {
+<div class="dropdown dropdown-end">
+  <button class="material-icons">more_vert</button>
+  <ul class="menu dropdown-content bg-base-200 rounded-box">
+    <li>
+      <button class="whitespace-nowrap" on:click={() => dispatch('deleteFromRoute', place.id)}>ルートから削除</button>
+    </li>
+    <li>
+      <button class="whitespace-nowrap" on:click={() => dispatch('editPlace', {
             place,
             displayNameOnly: origin === true || destination === true
           })}
-      >
-        <Text class="mdc-typography--caption">場所の編集</Text>
-      </Item>
-      <Item
-        on:SMUI:action={() => dispatch('previewRouteTo', place.id)}
-        disabled={hasDirectionsResult === false || origin === true}
-      >
-        <Text class="mdc-typography--caption">1つ前の場所からのルートを確認</Text>
-      </Item>
-      {#if isSpot(place)}
-        <Item>
-          <a href={googleMapURI(place)} class="mdc-typography--caption" target="_blank"
-            >スポットの詳細を見る</a
-          >
-          <Graphic class="mdc-typography--caption material-icons">open_in_new</Graphic>
-        </Item>
-      {/if}
-    </List>
-  </Menu>
+          >場所の編集</button>
+    </li>
+    <li class={hasDirectionsResult === false || origin === true ? 'menu-disabled': 'text-neutral'}>
+      <button class="whitespace-nowrap" on:click={() => dispatch('previewRouteTo', place.id)} disabled={hasDirectionsResult === false || origin === true}>1つ前の場所からのルートを確認</button>
+    </li>
+    {#if isSpot(place)}
+      <li >
+        <a class="whitespace-nowrap" href={googleMapURI(place)} target="_blank">
+          スポットの詳細を見る
+          <span class="mdc-typography--caption material-icons">open_in_new</span>
+        </a>
+      </li>
+    {/if}
+  </ul>
 </div>
-
-<style>
-  * :global(.mdc-typography--caption),
-  * :global(.mdc-checkbox__native-control) {
-    color: var(--mdc-theme-on-surface);
-  }
-</style>

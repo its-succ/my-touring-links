@@ -1,13 +1,4 @@
 <script lang="ts">
-  import Dialog, { Title, Content, Actions } from '@smui/dialog';
-  import Button, { Label } from '@smui/button';
-  import Slider from '@smui/slider';
-  import FormField from '@smui/form-field';
-  import Textfield from '@smui/textfield';
-  import TextIcon from '@smui/textfield/icon';
-  import Checkbox from '@smui/checkbox';
-  import SegmentedButton, { Segment, Icon } from '@smui/segmented-button';
-  import Wrapper from '@smui/touch-target';
   import { createEventDispatcher } from 'svelte';
   import { formatLocation, type Place } from '$lib/models/place';
   import { filterIcons, type IconElement } from '$lib/models/material-icons';
@@ -27,10 +18,10 @@
     icon = icons.filter((icon) => icon.name === searchIcon)[0];
     displayNameOnlyEdit = displayNameOnly;
     formValidity = true;
-    open = true;
+    editorModal.showModal();
   }
-  /** ダイアログの開閉状態 */
-  let open = false;
+  /** ダイアログ */
+  let editorModal: HTMLDialogElement;
   /** 編集対象の場所 */
   let place: Place;
   /** 表示名 */
@@ -67,108 +58,59 @@
   }
 </script>
 
-{#if open}
-  <Dialog
-    bind:open
-    aria-labelledby="place-editor-title"
-    aria-describedby="place-editor-content"
-    surface$style="width: 850px"
-  >
-    <Title id="place-editor-title">場所の編集</Title>
-    <Content id="place-editor-content">
-      <form bind:this={form} on:submit|preventDefault={handleSubmit}>
-        <Textfield
-          bind:value={displayName}
-          label="表示名"
-          variant="outlined"
-          required
-          helperLine$style="width: 100%;"
-          class="form-field"
-          on:change={validate}
-        >
-          <TextIcon class="material-icons" slot="leadingIcon">{icon?.name}</TextIcon>
-          <div slot="helper">
-            <fieldset>
-              <legend>表示名のアイコン</legend>
-              <Textfield bind:value={searchIcon} style="width: 100%;" />
-              <div class="icons">
-                <SegmentedButton
-                  segments={filterIcons(icons, searchIcon)}
-                  let:segment
-                  singleSelect
-                  bind:selected={icon}
-                  key={(segment) => segment.name}
-                >
-                  <Wrapper>
-                    <Segment {segment} touch title={segment.name}>
-                      <Icon class="material-icons" style="width: 1em; height: auto;"
-                        >{segment.name}</Icon
-                      >
-                    </Segment>
-                  </Wrapper>
-                </SegmentedButton>
-              </div>
-            </fieldset>
+<dialog class="modal"  aria-labelledby="place-editor-title" aria-describedby="place-editor-content" bind:this={editorModal}>
+  <h3 id="place-editor-title" class="text-lg font-bold">場所の編集!</h3>
+  <div id="place-editor-content" class="modal-box w-[850px]">
+    <form bind:this={form} on:submit|preventDefault={handleSubmit}>
+      <fieldset class="fieldset w-full mb-4 pt-0 pb-4 px-4">
+        <legend class="fieldset-legend">表示名</legend>
+        <label class="input">
+          <span class="material-symbols-outlined">{icon?.name}</span>
+          <input type="text" required on:change={validate} bind:value={displayName} />
+        </label>
+      </fieldset>
+      <div>
+        <fieldset class="fieldset w-full mb-4 pt-0 pb-4 px-4">
+          <legend class="fieldset-legend">表示名のアイコン</legend>
+          <input class="input w-full" type="search" bind:value={searchIcon}  />
+          <div class="min-h-[1rem] max-h-20 overflow-y-scroll">
+            <div>
+              {#each filterIcons(icons, searchIcon) as segment}
+                <button on:click={() => icon = segment}>
+                  <span class="material-icons size-[1em] ">{segment.name}</span>
+                </button>
+              {/each}
+            </div>
           </div>
-        </Textfield>
-        {#if !displayNameOnlyEdit}
-          <FormField class="form-field">
-            <Checkbox bind:checked={waypoint} />
-            <span slot="label">経由値</span>
-          </FormField>
-          <FormField style="display: flex" class="form-field staying-time">
+        </fieldset>
+      </div>
+      {#if !displayNameOnlyEdit}
+        <label class="label p-4">
+          <input type="checkbox" bind:checked={waypoint} class="checkbox" />
+          <span class="fieldset-legend">経由値</span>
+        </label>
+        <fieldset class="fieldset w-full mb-4 pt-0 pb-4 px-4 flex">
+          <legend class="fieldset-legend">滞在時間</legend>
+          {#if !waypoint}
+            <input type="range" min="0" max="300" step="10" bind:value={stayingTime} class="range range-primary glow ml-2" />
+          {:else}
+            <input type="range" disabled bind:value={stayingTime} class="range range-primary glow ml-2" />
+          {/if}
+          <span>
             {#if !waypoint}
-              <Slider bind:value={stayingTime} min={0} max={300} step={10} class="slider" />
+              ({stayingTime}分)
             {:else}
-              <Slider bind:value={stayingTime} disabled class="slider" />
+              経由値には滞在時間を設定できません
             {/if}
-            <p slot="label">
-              {#if !waypoint}
-                滞在時間({stayingTime}分)
-              {:else}
-                経由値には滞在時間を設定できません
-              {/if}
-            </p>
-          </FormField>
-        {/if}
+          </span>
+        </fieldset>
+      {/if}
+    </form>
+    <div class="modal-action">
+      <form method="dialog">
+        <button type="button" class="btn" on:click={() => editorModal.close()}>キャンセル</button>
+        <button type="submit" class="btn" on:click={handleSubmit} disabled={!formValidity}>適用</button>
       </form>
-    </Content>
-    <Actions>
-      <Button action="cancel">
-        <Label>キャンセル</Label>
-      </Button>
-      <Button action="accept" on:click={handleSubmit} disabled={!formValidity}>
-        <Label>適用</Label>
-      </Button>
-    </Actions>
-  </Dialog>
-{/if}
-
-<style>
-  form :global(.form-field) {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    width: 100%;
-  }
-  form :global(.staying-time) {
-    display: flex;
-  }
-  form :global(.staying-time .slider) {
-    flex-grow: 1;
-    margin-left: 0.5em;
-  }
-  fieldset {
-    padding: 0 1em 1em 1em;
-    width: 100%;
-    margin-bottom: 1em;
-  }
-  legend {
-    font-size: 0.75rem;
-    padding: 0 0.25rem;
-  }
-  .icons {
-    min-height: 1em;
-    max-height: 5em;
-    overflow-y: scroll;
-  }
-</style>
+    </div>
+  </div>
+</dialog>

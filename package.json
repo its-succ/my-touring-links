@@ -73,10 +73,13 @@
     "@auth/sveltekit": "^1.9.2",
     "@google-cloud/firestore": "^7.11.1",
     "@svelte-plugins/tooltips": "^3.0.3",
+    "@tailwindcss/vite": "^4.1.13",
     "copy-to-clipboard": "^3.3.3",
+    "daisyui": "^5.1.14",
     "dotenv": "^16.5.0",
     "http-status": "^2.1.0",
     "superjson": "^2.2.2",
+    "tailwindcss": "^4.1.13",
     "zod": "^3.25.67"
   }
 }
