@@ -17,7 +17,7 @@
 </svelte:head>
 
 <AppHeader />
-<main>
+<main class="bg-base-200">
   <article>
     <slot />
   </article>

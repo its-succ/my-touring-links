@@ -58,7 +58,7 @@
           person
         {/if}
       </button>
-      <ul class="menu dropdown-content bg-base-200 rounded-box w-56" bind:this={accoutMenu}>
+      <ul class="menu dropdown-content bg-base-100 rounded-box w-56 shadow-sm" bind:this={accoutMenu}>
         {#if loggedIn}
           <li class="menu-title">{user?.name}</li>
         {/if}

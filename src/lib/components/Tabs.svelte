@@ -28,7 +28,7 @@
 </script>
 
 <nav>
-  <div role="tablist" class="tabs tabs-border overflow-x-scroll bg-base-100">
+  <div role="tablist" class="tabs tabs-border overflow-x-scroll bg-base-200">
     {#each planDates as tab}
       <button role="tab" class={"tab" + ((active.getTime() === tab.getTime()) ? " tab-active" : "")} on:click={() => active = tab}>
         {DateTime.fromJSDate(tab)
@@ -37,11 +37,11 @@
       </button>
     {/each}
   </div>
-  <div class="dropdown dropdown-end grow text-right bg-base-100">
+  <div class="dropdown dropdown-end grow text-right bg-base-200">
     <button  aria-label="メニュー">
       <span class="material-symbols-outlined">more_vert</span>
     </button>
-    <ul class="menu dropdown-content bg-base-200 rounded-box w-56">
+    <ul class="menu dropdown-content bg-base-100 rounded-box w-56 shadow-sm">
       <li>
         <a href={`${$page.url.href}/settings`} class="text-nowrap">
           <span class="material-symbols-outlined">settings</span>
@@ -61,7 +61,7 @@
 <style>
   nav {
     position: sticky;
-    background-color: var(--mdc-theme-background);
+    background-color: var(--color-base-200);
     top: 0;
     z-index: 3;
     display: flex;

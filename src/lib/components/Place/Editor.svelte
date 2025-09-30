@@ -109,7 +109,7 @@
     <div class="modal-action">
       <form method="dialog">
         <button type="button" class="btn" on:click={() => editorModal.close()}>キャンセル</button>
-        <button type="submit" class="btn" on:click={handleSubmit} disabled={!formValidity}>適用</button>
+        <button type="submit" class="btn btn-primary" on:click={handleSubmit} disabled={!formValidity}>適用</button>
       </form>
     </div>
   </div>

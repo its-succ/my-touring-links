@@ -17,7 +17,7 @@
 
 <div class="dropdown dropdown-end">
   <button class="material-icons">more_vert</button>
-  <ul class="menu dropdown-content bg-base-200 rounded-box">
+  <ul class="menu dropdown-content bg-base-100 rounded-box shadow-sm">
     <li>
       <button class="whitespace-nowrap" on:click={() => dispatch('deleteFromRoute', place.id)}>ルートから削除</button>
     </li>

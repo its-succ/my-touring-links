@@ -35,7 +35,7 @@
     gap: 0 10px;
     padding: 5px;
     border-radius: 4px;
-    background-color: #f0f1f1;
+    background-color: var(--color-base-100);
   }
 
   .icon {

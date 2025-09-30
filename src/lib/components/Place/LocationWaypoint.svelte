@@ -31,7 +31,7 @@
       / 30px 1fr;
     gap: 0 10px;
     padding: 0px 5px 0px 40px;
-    background-color: white;
+    background-color: var(--color-base-200);
   }
 
   .icon {

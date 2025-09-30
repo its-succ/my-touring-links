@@ -87,27 +87,27 @@
 <style>
   :root {
     /* general */
-    --sdt-bg-main: var(--mdc-theme-background);
+    --sdt-bg-main: var(--color-base-200);
     --sdt-shadow-color: transparent;
-    --sdt-color: var(--mdc-theme-on-surface);
-    --sdt-color-selected: var(--mdc-theme-on-primary);
-    --sdt-header-color: var(--mdc-theme-secondary);
+    --sdt-color: var(--color-base-content);
+    --sdt-color-selected: var(--color-primary-content);
+    --sdt-header-color: var(--color-neutral);
     --sdt-btn-header-bg-hover: #dfdfdf; /** header items hover background color */
-    --sdt-bg-selected: var(--mdc-theme-primary);
+    --sdt-bg-selected: var(--color-primary);
 
     /* action buttons */
-    --sdt-today-bg: var(--mdc-theme-primary);
-    --sdt-today-color: var(--mdc-theme-on-primary);
-    --sdt-clear-color: var(--mdc-theme-primary);
+    --sdt-today-bg: var(--color-primary);
+    --sdt-today-color: var(--color-primary-content);
+    --sdt-clear-color: var(--color-primary);
     --sdt-clear-bg: transparent;
-    --sdt-clear-hover-color: var(--mdc-theme-primary);
+    --sdt-clear-hover-color: var(--color-primary);
     --sdt-clear-hover-bg: transparent;
 
     /* time picker */
-    --sdt-clock-selected-bg: var(--mdc-theme-primary); /** selected time background color */
-    --sdt-clock-bg: var(--mdc-theme-background); /** time picker inner circle background color */
+    --sdt-clock-selected-bg: var(--color-primary); /** selected time background color */
+    --sdt-clock-bg: var(--color-base-100); /** time picker inner circle background color */
     --sdt-clock-color: var(
-      --mdc-theme-on-surface
+      --color-base-content
     ); /** time picker text color (watch "--sdt-color") */
     --sdt-clock-color-hover: var(
       --sdt-color

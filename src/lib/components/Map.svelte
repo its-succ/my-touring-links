@@ -133,29 +133,29 @@
     overflow-y: auto;
   }
   gmpx-place-picker {
-    --gmpx-color-surface: var(--mdc-theme-surface);
-    --gmpx-color-on-surface: var(--mdc-theme-on-surface);
-    --gmpx-color-on-primary: var(--mdc-theme-on-primary);
-    --gmpx-color-on-surface-variant: var(--mdc-theme-on-secondary);
+    --gmpx-color-surface: var(--color-base-200);
+    --gmpx-color-on-surface: var(--color-base-content);
+    --gmpx-color-on-primary: var(--color-primary-content);
+    --gmpx-color-on-surface-variant: var(--color-neutral-content);
   }
   /**
    * @see https://developers.google.com/maps/documentation/javascript/places-autocomplete?hl=ja#style-autocomplete
    */
   :global(.pac-container) {
-    background-color: var(--mdc-theme-background);
+    background-color: var(--color-base-200);
   }
   :global(.pac-item) {
     border: 0;
-    color: color-mix(in srgb, var(--mdc-theme-on-surface) 62%, var(--mdc-theme-background));
+    color: color-mix(in srgb, var(--color-base-content) 62%, var(--color-base-200));
   }
   :global(.pac-item-selected, .pac-item:hover) {
-    background-color: var(--mdc-theme-primary);
-    color: color-mix(in srgb, var(--mdc-theme-on-primary) 62%, var(--mdc-theme-primary));
+    background-color: var(--color-primary);
+    color: color-mix(in srgb, var(--color-primary-content) 62%, var(--color-primary));
   }
   :global(.pac-item-query) {
-    color: var(--mdc-theme-on-surface);
+    color: var(--color-base-content);
   }
   :global(.pac-item-selected > .pac-item-query, .pac-item:hover > .pac-item-query) {
-    color: var(--mdc-theme-on-primary);
+    color: var(--color-primary-content);
   }
 </style>
