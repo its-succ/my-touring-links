@@ -9,6 +9,8 @@
   export let arrivalTime: Date;
   /** 最終目的地かどうか */
   export let destination: boolean = false;
+  /** 滞在時間を表示するかどうか（デフォルトは表示する） */
+  export let parkingDisplayed: boolean = true;
 </script>
 
 <div class="flex flex-row">
@@ -19,12 +21,14 @@
     style="margin:2px 4px;padding:0 8px;height:26px"
   />
   {#if !destination}
-    <Chip
-      name="滞在時間"
-      icon="local_parking"
-      text="{place.stayingTime}分"
-      style="margin:2px 4px;padding:0 8px;height:26px"
-    />
+    {#if parkingDisplayed}
+      <Chip
+        name="滞在時間"
+        icon="local_parking"
+        text="{place.stayingTime}分"
+        style="margin:2px 4px;padding:0 8px;height:26px"
+      />
+    {/if}
     <Chip
       name="出発時刻"
       icon="forward"

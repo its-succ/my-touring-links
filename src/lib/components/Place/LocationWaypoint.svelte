@@ -12,7 +12,7 @@
   <div class="icon">
     <span class="material-symbols-outlined" style="font-size:30px">go_to_line</span>
   </div>
-  <header class="mdc-typography--subtitle1">
+  <header class="text-base leading-7 font-normal">
     {formatLocation(location)}
   </header>
   <p class="detail">

@@ -35,7 +35,7 @@
       <li >
         <a class="whitespace-nowrap" href={googleMapURI(place)} target="_blank">
           スポットの詳細を見る
-          <span class="mdc-typography--caption material-icons">open_in_new</span>
+          <span class="text-xs leading-5 font-normal material-icons">open_in_new</span>
         </a>
       </li>
     {/if}

@@ -31,13 +31,13 @@
 <svelte:component this={component} {place}>
   <div slot="detail">
     {#if !origin && place.arrivalTime}
-      <DirectionsResult {place} arrivalTime={new Date(place.arrivalTime)} {destination}
+      <DirectionsResult {place} arrivalTime={new Date(place.arrivalTime)} {destination} parkingDisplayed={false}
       ></DirectionsResult>
     {/if}
   </div>
   <div slot="meta">
     {#if !place.waypoint}
-      <button class="btn" on:click={() => dispatch('directions', { to: place })}>
+      <button class="btn btn-circle" on:click={() => dispatch('directions', { to: place })}>
         <span class="material-symbols-outlined" style="font-size:30px">directions</span>
       </button>
     {/if}

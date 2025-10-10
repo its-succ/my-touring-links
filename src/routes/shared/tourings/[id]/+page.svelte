@@ -17,8 +17,8 @@
 </script>
 
 <div class="contents">
-  <h2 class="mdc-typography--headline5">{touring.name}</h2>
-  <p class="mdc-typography--body2 text-right">
+  <h2 class="text-2xl leading-8 font-normal tracking-[normal]">{touring.name}</h2>
+  <p class="text-sm leading-5 font-normal tracking-[0.0178571429em] text-right">
     @{touring.sharedBy} が {DateTime.fromJSDate(updatedAt)
       .setZone('Asia/Tokyo')
       .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })} に共有
@@ -39,7 +39,7 @@
   <SharedRouteElement places={touring.touring[selectedDepartureDateTime].places}
   ></SharedRouteElement>
 
-  <p class="mdc-typography--body2 text-right">
+  <p class="text-sm leading-5 font-normal tracking-[0.0178571429em] text-right">
     ルート計算日時: {DateTime.fromISO(touring.touring[selectedDepartureDateTime].calcedAt)
       .setZone('Asia/Tokyo')
       .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}

@@ -223,7 +223,7 @@
           <span class="material-symbols-outlined">alt_route</span>
          ルート計算
         </button>
-        <button class="btn btn-outline btn-secondary button-shaped-round" disabled={loggedIn} on:click={saveTouring}>
+        <button class="btn btn-outline btn-secondary button-shaped-round" disabled={!loggedIn} on:click={saveTouring}>
           <span class="material-symbols-outlined">bookmark</span>
          保存
         </button>

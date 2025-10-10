@@ -14,7 +14,7 @@
       >{place.icon ?? 'location_on'}</span
     >
   </div>
-  <header class="mdc-typography--subtitle1">
+  <header class="text-base leading-7 font-normal">
     {formatLocation(location)}
   </header>
   <p class="detail">
@@ -42,14 +42,15 @@
     grid-area: img;
     max-width: 40px;
     max-height: 40px;
-    margin: 5px;
+    margin: auto 5px;
     border-radius: 100%;
-    background-color: black;
+    background-color: var(--color-neutral);
   }
 
   header {
     grid-area: name;
     align-self: end;
+    padding: 4px;
   }
 
   .detail {

@@ -2,6 +2,7 @@
   import SharedPlaceElement from './SharedPlace.svelte';
   import type { SharedPlace } from '$lib/models/shared';
   import type { Spot } from '$lib/models/place';
+  import LocationWaypoint from './Place/LocationWaypoint.svelte';
 
   /**  場所一覧 */
   export let places: SharedPlace[];
@@ -50,14 +51,16 @@
 
 <ul class="routes">
   {#each places as place, index (place.id)}
-    <li data-index={index} data-id={place.id}>
-      <SharedPlaceElement
-        {place}
-        origin={index === 0}
-        destination={index === places.length - 1}
-        on:directions={(e) => directions(e, index)}
-      ></SharedPlaceElement>
-    </li>
+    {#if !place.waypoint}
+      <li data-index={index} data-id={place.id}>
+        <SharedPlaceElement
+          {place}
+          origin={index === 0}
+          destination={index === places.length - 1}
+          on:directions={(e) => directions(e, index)}
+        ></SharedPlaceElement>
+      </li>
+    {/if}
   {/each}
 </ul>
 
