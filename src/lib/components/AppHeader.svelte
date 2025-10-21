@@ -37,15 +37,15 @@
 <div class="flex flex-row navbar bg-primary text-primary-content" style="z-index: 7">
     <div class="flex-none">
       {#if $backButton}
-        <button class="btn btn-square btn-ghost" on:click={() => location.href="."}>
+        <button class="btn btn-primary" on:click={() => location.href="."}>
           <span class="material-symbols-outlined">
             arrow_back
           </span>
-          </button>
+        </button>
       {/if}
     </div>
   <div class="flex-1">
-    <a class="btn btn-ghost text-xl" href="/tourings">Welcome to My Touring Links</a>
+    <a class="text-xl" href="/tourings">Welcome to My Touring Links</a>
   </div>
   <div class="flex-none">
     <div class="dropdown dropdown-end">

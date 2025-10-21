@@ -28,9 +28,9 @@
 </script>
 
 <nav>
-  <div role="tablist" class="tabs tabs-border overflow-x-scroll bg-base-200">
+  <div role="tablist" class="tabs tabs-lift overflow-x-scroll bg-base-200">
     {#each planDates as tab}
-      <button role="tab" class={"tab" + ((active.getTime() === tab.getTime()) ? " tab-active" : "")} on:click={() => active = tab}>
+      <button role="tab" class={"tab" + ((active.getTime() === tab.getTime()) ? " bg-base-100 tab-active" : " bg-base-300")} on:click={() => active = tab}>
         {DateTime.fromJSDate(tab)
           .setZone('Asia/Tokyo')
           .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}

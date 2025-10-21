@@ -87,7 +87,7 @@
 <style>
   :root {
     /* general */
-    --sdt-bg-main: var(--color-base-200);
+    --sdt-bg-main: var(--color-base-100);
     --sdt-shadow-color: transparent;
     --sdt-color: var(--color-base-content);
     --sdt-color-selected: var(--color-primary-content);

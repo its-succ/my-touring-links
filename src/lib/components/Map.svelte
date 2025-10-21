@@ -133,7 +133,7 @@
     overflow-y: auto;
   }
   gmpx-place-picker {
-    --gmpx-color-surface: var(--color-base-200);
+    --gmpx-color-surface: var(--color-base-100);
     --gmpx-color-on-surface: var(--color-base-content);
     --gmpx-color-on-primary: var(--color-primary-content);
     --gmpx-color-on-surface-variant: var(--color-neutral-content);
