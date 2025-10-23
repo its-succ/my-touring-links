@@ -96,7 +96,7 @@ export const initThemeChanger = (map: google.maps.MapElement) => {
   } else {
     map.innerMap.setOptions({ styles: [], controlSize });
   }
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+  globalThis.matchMedia && globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
     map.innerMap.setOptions({ styles: event.matches ? darkStyles : [] });
   });
 };
@@ -105,4 +105,4 @@ export const initThemeChanger = (map: google.maps.MapElement) => {
  * ダークモードに設定されているかどうか
  * @returns ダークモードなら true
  */
-export const isDarkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+export const isDarkMode = () => globalThis.matchMedia && globalThis.matchMedia('(prefers-color-scheme: dark)').matches;

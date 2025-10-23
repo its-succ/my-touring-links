@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { ComponentType, SvelteComponent } from 'svelte';
-  import IconButton from '@smui/icon-button';
   import { type Place } from '$lib/models/place';
   import DirectionsResult from './Place/DirectionsResult.svelte';
   import Menu from './Place/Menu.svelte';
@@ -55,7 +54,9 @@
       on:editPlace
     ></Menu>
     <div on:pointerdown={() => (pressed = true)} on:pointerleave={() => (pressed = false)}>
-      <IconButton class="material-icons" size="button" ripple={false}>drag_handle</IconButton>
+      <button>
+        <span class="material-symbols-outlined">drag_handle</span>
+      </button>
     </div>
   </div>
 </svelte:component>

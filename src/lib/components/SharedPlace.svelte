@@ -5,7 +5,6 @@
   import Location from './Place/Location.svelte';
   import LocationWaypoint from './Place/LocationWaypoint.svelte';
   import type { Place } from '$lib/models/place';
-  import IconButton from '@smui/icon-button';
 
   /** SharedPlace */
   export let place: SharedPlace;
@@ -32,17 +31,15 @@
 <svelte:component this={component} {place}>
   <div slot="detail">
     {#if !origin && place.arrivalTime}
-      <DirectionsResult {place} arrivalTime={new Date(place.arrivalTime)} {destination}
+      <DirectionsResult {place} arrivalTime={new Date(place.arrivalTime)} {destination} parkingDisplayed={false}
       ></DirectionsResult>
     {/if}
   </div>
   <div slot="meta">
     {#if !place.waypoint}
-      <IconButton
-        class="material-symbols-outlined"
-        style="font-size:30px"
-        on:click={() => dispatch('directions', { to: place })}>directions</IconButton
-      >
+      <button class="btn btn-circle" on:click={() => dispatch('directions', { to: place })}>
+        <span class="material-symbols-outlined" style="font-size:30px">directions</span>
+      </button>
     {/if}
   </div>
 </svelte:component>

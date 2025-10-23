@@ -1,8 +1,5 @@
 <script lang="ts">
-  import IconButton from '@smui/icon-button';
-  import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
   import { DateTime } from 'luxon';
-  import Button, { Icon, Label } from '@smui/button';
   import type { EntityDate, TouringEntity } from '$lib/models/entity';
   import { goto } from '$app/navigation';
   import { writable } from 'svelte/store';
@@ -56,57 +53,36 @@
   }
 </script>
 
-<div class="list">
-  <DataTable table$aria-label="ツーリング一覧" style="width: 100%;">
-    <Head>
-      <Row>
-        <Cell>更新日時</Cell>
-        <Cell>名前</Cell>
-        <Cell class="operation"></Cell>
-      </Row>
-    </Head>
-    <Body>
+<div class="w-full overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table" aria-label="ツーリング一覧" >
+    <thead>
+      <tr>
+        <th>更新日時</th>
+        <th>名前</th>
+        <th class="text-right"></th>
+      </tr>
+    </thead>
+    <tbody>
       {#each tourings as touring}
-        <Row>
-          <Cell>{formatDate(touring.updatedAt)}</Cell>
-          <Cell>{touring.name}</Cell>
-          <Cell class="operation">
-            <IconButton
-              class="material-icons"
-              on:click={() => change(touring.id)}
-              aria-label="編集"
-              size="mini">edit</IconButton
-            >
-            <IconButton
-              class="material-icons"
-              on:click={() => remove(touring.id, touring.name)}
-              aria-label="削除"
-              size="mini">delete</IconButton
-            >
-          </Cell>
-        </Row>
+        <tr>
+          <td>{formatDate(touring.updatedAt)}</td>
+          <td>{touring.name}</td>
+          <td class="text-right">
+            <button on:click={() => change(touring.id)} aria-label="編集">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button on:click={() => remove(touring.id, touring.name)} aria-label="削除">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        </tr>
       {/each}
-    </Body>
-  </DataTable>
+      </tbody>
+    </table>
 </div>
-<div class="buttons">
-  <Button variant="unelevated" color="primary" class="button-shaped-round button" on:click={add}>
-    <Icon class="material-icons">add</Icon>
-    <Label>新しいツーリングを追加する</Label>
-  </Button>
+<div class="p-4">
+  <button class="btn btn-primary w-full rounded-[36px]" on:click={add}>
+    <span class="material-symbols-outlined">add</span>
+    新しいツーリングを追加する
+  </button>
 </div>
-
-<style>
-  .buttons {
-    padding: 1rem;
-  }
-  .buttons :global(.button) {
-    width: 100%;
-  }
-  .buttons :global(.button-shaped-round) {
-    border-radius: 36px;
-  }
-  .list :global(.operation) {
-    text-align: right;
-  }
-</style>

@@ -1,13 +1,7 @@
 <script lang="ts">
   import { DateTime } from 'luxon';
-  import Tab, { Label } from '@smui/tab';
-  import TabBar from '@smui/tab-bar';
-  import Button, { Label as ButtonLabel, Icon } from '@smui/button';
   import { userStore } from '$lib/models/user';
   import { page } from '$app/stores';
-  import IconButton from '@smui/icon-button';
-  import Menu from '@smui/menu';
-  import List, { Item } from '@smui/list';
   import { createEventDispatcher } from 'svelte';
 
   /** PlanDates */
@@ -19,7 +13,6 @@
     { name: '設定', icon: 'settings', disabled: false },
     { name: '保存', icon: 'save', disabled: !loggedIn }
   ];
-  let menu: Menu;
 
   userStore.subscribe((cur) => {
     loggedIn = cur.loggedIn;
@@ -35,54 +28,44 @@
 </script>
 
 <nav>
-  <TabBar tabs={planDates} let:tab bind:active class="tabs">
-    <Tab {tab} minWidth>
-      <Label class="tab-label"
-        >{DateTime.fromJSDate(tab)
+  <div role="tablist" class="tabs tabs-lift overflow-x-scroll bg-base-200">
+    {#each planDates as tab}
+      <button role="tab" class={"tab" + ((active.getTime() === tab.getTime()) ? " bg-base-100 tab-active" : " bg-base-300")} on:click={() => active = tab}>
+        {DateTime.fromJSDate(tab)
           .setZone('Asia/Tokyo')
-          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Label
-      >
-    </Tab>
-  </TabBar>
-  <div>
-    <IconButton class="material-icons" on:click={() => menu.setOpen(true)} aria-label="メニュー"
-      >more_vert</IconButton
-    >
-    <Menu bind:this={menu}>
-      <List>
-        <Item>
-          <Button href={`${$page.url.href}/settings`}>
-            <Icon class="material-icons">settings</Icon>
-            <ButtonLabel class="nowrap">出発日時の設定</ButtonLabel>
-          </Button>
-        </Item>
-        <Item>
-          <Button disabled={!loggedIn} on:click={() => saveTouring()}>
-            <Icon class="material-icons">bookmark</Icon>
-            <ButtonLabel class="nowrap">保存と共有</ButtonLabel>
-          </Button>
-        </Item>
-      </List>
-    </Menu>
+          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}
+      </button>
+    {/each}
+  </div>
+  <div class="dropdown dropdown-end grow text-right bg-base-200">
+    <button  aria-label="メニュー">
+      <span class="material-symbols-outlined">more_vert</span>
+    </button>
+    <ul class="menu dropdown-content bg-base-100 rounded-box w-56 shadow-sm">
+      <li>
+        <a href={`${$page.url.href}/settings`} class="text-nowrap">
+          <span class="material-symbols-outlined">settings</span>
+          出発日時の設定
+        </a>
+      </li>
+      <li>
+        <button disabled={!loggedIn} on:click={() => saveTouring()} class="text-nowrap">
+          <span class="material-symbols-outlined">bookmark</span>
+          保存と共有
+        </button>
+      </li>
+    </ul>
   </div>
 </nav>
 
 <style>
   nav {
     position: sticky;
-    background-color: var(--mdc-theme-background);
+    background-color: var(--color-base-200);
     top: 0;
     z-index: 3;
     display: flex;
     flex-direction: row;
-  }
-  nav :global(.tabs) {
-    overflow-x: scroll;
-  }
-  * :global(.tab-label) {
-    color: var(--mdc-theme-on-surface);
-  }
-  * :global(.nowrap) {
-    text-wrap: nowrap;
+    align-items: center;
   }
 </style>

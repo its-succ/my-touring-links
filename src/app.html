@@ -1,13 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja" data-theme="lemonade">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%sveltekit.assets%/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css" />
-    <!-- SMUI Styles -->
-    <link rel="stylesheet" href="/smui.css" media="(prefers-color-scheme: light)" />
-    <link rel="stylesheet" href="/smui-dark.css" media="screen and (prefers-color-scheme: dark)" />
     <!-- Hint where we get fonts from. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,8 +22,8 @@
     ></script>
 
     <link rel="stylesheet" href="https://unpkg.com/mobile-drag-drop/default.css" />
-    <script src="https://unpkg.com/mobile-drag-drop/index.min.js"></script>
-    <script src="https://unpkg.com/mobile-drag-drop/scroll-behaviour.min.js"></script>
+    <script defer src="https://unpkg.com/mobile-drag-drop/index.min.js"></script>
+    <script defer src="https://unpkg.com/mobile-drag-drop/scroll-behaviour.min.js"></script>
     <script>
       const usePolyfill = MobileDragDrop.polyfill({
         dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride

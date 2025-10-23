@@ -1,10 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import Dialog, { Content } from '@smui/dialog';
   import SveltyPicker from 'svelty-picker';
 
-  /** DateTimePicker の表示状態。true で表示する */
-  let isOpen = false;
+  /** DateTimePicker  */
+  let dateTimePicker: HTMLDialogElement;
   /** 初期表示日時 */
   let initialDate: Date;
   /** DateTimePiker のローカライズ */
@@ -43,7 +42,7 @@
    */
   export function open(date: Date) {
     initialDate = date;
-    isOpen = true;
+    dateTimePicker.showModal();
   }
 
   /** イベントディスパッチャー */
@@ -55,7 +54,7 @@
    * @param e - OKボタンイベント
    */
   function selected(e: CustomEvent) {
-    isOpen = false;
+    dateTimePicker.close();
     dispatch('selected', new Date(e.detail));
   }
 
@@ -64,53 +63,51 @@
    * ダイアログを閉じる
    */
   function cancel() {
-    isOpen = false;
+    dateTimePicker.close();
   }
 </script>
 
-<Dialog bind:open={isOpen} noContentPadding sheet aria-describedby="sheet-no-padding-content">
-  <Content id="sheet-no-padding-content">
-    {#if isOpen}
-      <SveltyPicker
-        autocommit={false}
-        pickerOnly={true}
-        mode="datetime"
-        format="yyyy-mm-dd hh:ii"
-        todayBtn={false}
-        clearBtn={false}
-        i18n={jp}
-        {initialDate}
-        on:change={selected}
-        on:cancel={cancel}
-      />
-    {/if}
-  </Content>
-</Dialog>
+<dialog id="datetime-picker" class="modal" aria-describedby="sheet-no-padding-content" bind:this={dateTimePicker}>
+  <div class="modal-box w-auto">
+    <SveltyPicker
+      autocommit={false}
+      pickerOnly={true}
+      mode="datetime"
+      format="yyyy-mm-dd hh:ii"
+      todayBtn={false}
+      clearBtn={false}
+      i18n={jp}
+      {initialDate}
+      on:change={selected}
+      on:cancel={cancel}
+    />
+  </div>
+</dialog>
 
 <style>
   :root {
     /* general */
-    --sdt-bg-main: var(--mdc-theme-background);
+    --sdt-bg-main: var(--color-base-100);
     --sdt-shadow-color: transparent;
-    --sdt-color: var(--mdc-theme-on-surface);
-    --sdt-color-selected: var(--mdc-theme-on-primary);
-    --sdt-header-color: var(--mdc-theme-secondary);
+    --sdt-color: var(--color-base-content);
+    --sdt-color-selected: var(--color-primary-content);
+    --sdt-header-color: var(--color-neutral);
     --sdt-btn-header-bg-hover: #dfdfdf; /** header items hover background color */
-    --sdt-bg-selected: var(--mdc-theme-primary);
+    --sdt-bg-selected: var(--color-primary);
 
     /* action buttons */
-    --sdt-today-bg: var(--mdc-theme-primary);
-    --sdt-today-color: var(--mdc-theme-on-primary);
-    --sdt-clear-color: var(--mdc-theme-primary);
+    --sdt-today-bg: var(--color-primary);
+    --sdt-today-color: var(--color-primary-content);
+    --sdt-clear-color: var(--color-primary);
     --sdt-clear-bg: transparent;
-    --sdt-clear-hover-color: var(--mdc-theme-primary);
+    --sdt-clear-hover-color: var(--color-primary);
     --sdt-clear-hover-bg: transparent;
 
     /* time picker */
-    --sdt-clock-selected-bg: var(--mdc-theme-primary); /** selected time background color */
-    --sdt-clock-bg: var(--mdc-theme-background); /** time picker inner circle background color */
+    --sdt-clock-selected-bg: var(--color-primary); /** selected time background color */
+    --sdt-clock-bg: var(--color-base-100); /** time picker inner circle background color */
     --sdt-clock-color: var(
-      --mdc-theme-on-surface
+      --color-base-content
     ); /** time picker text color (watch "--sdt-color") */
     --sdt-clock-color-hover: var(
       --sdt-color

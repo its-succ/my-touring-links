@@ -5,7 +5,6 @@
   import Tabs from './Tabs.svelte';
   import RouteElement from './Route.svelte';
   import Progress from './Progress.svelte';
-  import Button, { Icon, Label } from '@smui/button';
   import elementResizeDetectorMaker from '@andybeersdev/element-resize-detector';
   import { Touring } from '$lib/models/touring';
   import type { Route } from '$lib/models/route';
@@ -41,7 +40,8 @@
   $: route = active instanceof Date ? touring.findTouringByDepartureDateTime(active) : route;
   /** ルートエレメント */
   let routeElement: RouteElement;
-  /** プログレスダイアログの表示状態 */
+  /** プログレスダイアログ */
+  let progress: Progress;
   let progressOpen: boolean;
   /** 保存ダイアログタグ */
   let saveModal: SaveModal;
@@ -117,7 +117,9 @@
    */
   async function calcRoute() {
     progressOpen = true;
+    progress.show();
     await routeElement.calc(active);
+    progress.close();
     progressOpen = false;
   }
 
@@ -213,50 +215,27 @@
         maxWidth={stepHelpWidth}
         action="prop"
       >
-        <Button
-          variant="outlined"
-          color="primary"
-          class="button-shaped-round"
-          on:click={addPlaceToRoute}
-        >
-          <Icon class="material-icons">add</Icon>
-          <Label>場所を追加</Label>
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          class="button-shaped-round"
-          disabled={routeDisable(route)}
-          on:click={calcRoute}
-        >
-          <Icon class="material-icons">alt_route</Icon>
-          <Label>ルート計算</Label>
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          class="button-shaped-round"
-          disabled={!loggedIn}
-          on:click={saveTouring}
-        >
-          <Icon class="material-icons">bookmark</Icon>
-          <Label>保存</Label>
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          class="button-shaped-round"
-          disabled={shareDisable(loggedIn, entity, touring)}
-          on:click={shareTouring}
-        >
-          <Icon class="material-icons">share</Icon>
-          <Label>共有</Label>
-        </Button>
+        <button class="btn btn-outline btn-primary button-shaped-round" on:click={addPlaceToRoute}>
+          <span class="material-symbols-outlined">add</span>
+         場所を追加
+        </button>
+        <button class="btn btn-outline btn-secondary button-shaped-round" disabled={routeDisable(route)} on:click={calcRoute}>
+          <span class="material-symbols-outlined">alt_route</span>
+         ルート計算
+        </button>
+        <button class="btn btn-outline btn-secondary button-shaped-round" disabled={!loggedIn} on:click={saveTouring}>
+          <span class="material-symbols-outlined">bookmark</span>
+         保存
+        </button>
+        <button class="btn btn-outline btn-secondary button-shaped-round" disabled={shareDisable(loggedIn, entity, touring)} on:click={shareTouring}>
+          <span class="material-symbols-outlined">share</span>
+         共有
+        </button>
       </Tooltip>
     </div>
   </div>
 </gmpx-split-layout>
-<Progress bind:open={progressOpen}></Progress>
+<Progress bind:this={progress}></Progress>
 <SaveModal bind:this={saveModal} on:saved={handleSaved}></SaveModal>
 <ShareModal bind:this={shareModal}></ShareModal>
 

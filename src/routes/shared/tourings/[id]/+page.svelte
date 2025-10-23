@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import type { SharedTouringEntity } from '$lib/models/entity';
-  import Select, { Option } from '@smui/select';
   import { DateTime } from 'luxon';
   import SharedRouteElement from '$lib/components/SharedRoute.svelte';
 
@@ -18,27 +17,29 @@
 </script>
 
 <div class="contents">
-  <h2 class="mdc-typography--headline5">{touring.name}</h2>
-  <p class="mdc-typography--body2 text-right">
+  <h2 class="text-2xl leading-8 font-normal tracking-[normal]">{touring.name}</h2>
+  <p class="text-sm leading-5 font-normal tracking-[0.0178571429em] text-right">
     @{touring.sharedBy} が {DateTime.fromJSDate(updatedAt)
       .setZone('Asia/Tokyo')
       .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })} に共有
   </p>
 
-  <Select bind:value={selectedDepartureDateTime} label="出発日時">
-    {#each departureTimes as departureTime}
-      <Option value={departureTime}
-        >{DateTime.fromISO(departureTime)
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">出発日時</legend>
+    <select class="select" bind:value={selectedDepartureDateTime}>
+      {#each departureTimes as departureTime}
+        <option value={departureTime}>
+          {DateTime.fromISO(departureTime)
           .setZone('Asia/Tokyo')
-          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}</Option
-      >
-    {/each}
-  </Select>
-
+          .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}
+        </option>
+      {/each}
+    </select>
+  </fieldset>
   <SharedRouteElement places={touring.touring[selectedDepartureDateTime].places}
   ></SharedRouteElement>
 
-  <p class="mdc-typography--body2 text-right">
+  <p class="text-sm leading-5 font-normal tracking-[0.0178571429em] text-right">
     ルート計算日時: {DateTime.fromISO(touring.touring[selectedDepartureDateTime].calcedAt)
       .setZone('Asia/Tokyo')
       .toFormat('MM/dd（EEEEE）HH:mm', { locale: 'ja' })}
