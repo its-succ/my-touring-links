@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Touring Links</title>
     <meta name="description" content="複数台の車で旅行するための、制限のない柔軟なルート作成と地図共有を実現。">
-    <link rel="icon" href="favicon.ico">
-    <style>
+    <link rel="icon" href="favicon.ico"> <style>
         /* DAISY UI 'lemonade' テーマを標準CSSで再現 */
         :root {
             /* OKLCH値を近似したHEXカラー */
             --color-primary: #ffd700; /* レモンイエロー (Primary) */
-            --color-secondary: #ffb800; /* オレンジ (Secondary) - セクション背景に利用 */
-            --color-accent: #ff9454; /* コーラル/オレンジピンク (Accent) - CTAボタン */
+            --color-secondary: #ffb800; /* オレンジ (Secondary) */
+            --color-accent: #ff9454; /* コーラル/オレンジピンク (Accent) */
             --color-base-100: #fafaf6; /* メイン背景 (Base-100) */
             --color-base-200: #f0f0e8; /* カード背景などに利用 */
             --color-base-content: #3a3a35; /* 濃いテキスト色 */
@@ -22,8 +21,8 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
             padding: 0;
-            color: var(--color-base-content); /* 濃いテキスト色 */
-            background-color: var(--color-base-100); /* メイン背景色 */
+            color: var(--color-base-content);
+            background-color: var(--color-base-100);
             line-height: 1.6;
             overflow-x: hidden;
         }
@@ -49,7 +48,7 @@
 
         /* ヒーローセクション（ファーストビュー） */
         #hero {
-            background-color: var(--color-base-100); /* Base-100 (明るい背景) */
+            background-color: var(--color-base-100);
             padding: 80px 0;
             text-align: center;
         }
@@ -66,8 +65,6 @@
             margin-bottom: 30px;
         }
         .cta-button {
-            /* アクセントカラー (FF9454) を使用 */
-            display: inline-block;
             background-color: var(--color-accent);
             color: white;
             padding: 12px 30px;
@@ -77,9 +74,10 @@
             font-size: 18px;
             transition: background-color 0.3s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: inline-block;
         }
         .cta-button:hover {
-            background-color: #e37d3d; /* 少し濃いめのアクセント */
+            background-color: #e37d3d;
         }
 
         /* セクション共通 */
@@ -91,17 +89,14 @@
             font-size: 30px;
             margin-bottom: 40px;
             border-bottom: 3px solid var(--color-primary);
-
-            /* === ここに max-width を追加 === */
-            max-width: 800px; /* 見出しの最大幅を設定 */
-            width: 90%; /* スマホ表示でも適切に幅を確保 */
-            /* ============================== */
-
+            max-width: 800px;
+            width: 90%;
             display: inline-block;
             padding-bottom: 5px;
             margin-left: 50%;
             transform: translateX(-50%);
         }
+
         /* 機能・メリット */
         .feature-grid {
             display: grid;
@@ -110,13 +105,13 @@
             margin-top: 30px;
         }
         .feature-card {
-            background-color: var(--color-base-200); /* 少し色味のある背景 */
+            background-color: var(--color-base-200);
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.08);
         }
         .feature-card h3 {
-            color: var(--color-accent); /* 見出し色をアクセントに */
+            color: var(--color-accent);
             font-size: 20px;
             margin-top: 0;
         }
@@ -126,7 +121,7 @@
 
         /* 開発者メッセージ */
         #developer-message {
-            background-color: #f7f7f7; /* ベース200より少し濃い色 */
+            background-color: #f7f7f7;
             text-align: center;
             padding: 40px 0;
             border-top: 1px solid #eee;
@@ -139,24 +134,31 @@
 
         /* クロージングCTAセクション */
         #cta-final {
-            /* プライマリーカラーの薄い色を利用 */
             background-color: #fffae8;
         }
 
         /* フッター */
         footer {
-            background-color: var(--color-base-content); /* 濃いテキスト色をフッター背景に利用 */
+            background-color: var(--color-base-content);
             color: white;
             text-align: center;
             padding: 20px 0;
             font-size: 14px;
         }
+        footer p {
+            margin: 5px 0;
+        }
         footer a {
-            color: var(--color-primary); /* レモンイエローのリンク色 */
+            color: var(--color-primary);
             text-decoration: none;
+            transition: color 0.3s;
+        }
+        footer a:hover {
+            color: #ffd700;
+            text-decoration: underline;
         }
     </style>
-  </head>
+</head>
 <body>
 
     <header>
@@ -179,7 +181,7 @@
             </div>
         </section>
 
-<section id="features">
+        <section id="features">
             <div class="container">
                 <h2>✨ My Touring Linksが約束する「新しい旅のカタチ」</h2>
                 <div class="feature-grid">
@@ -216,7 +218,7 @@
         </section>
 
 
-        <section id="cta-final" style="text-align: center; background-color: #fff8e1; padding: 40px 0;">
+        <section id="cta-final" style="text-align: center; background-color: #fffae8; padding: 40px 0;">
             <div class="container">
                 <h2>さあ、計画の煩わしさから解放された<br>最高のグループツーリングを始めましょう。</h2>
                 <a href="https://my-touring-links-806808118477.asia-northeast1.run.app/" class="cta-button" target="_blank">
@@ -230,7 +232,22 @@
     <footer>
         <div class="container">
             <p>&copy; 2025 My Touring Links. All rights reserved.</p>
-            <p><a href="https://github.com/its-succ/my-touring-links" target="_blank">GitHub Repository</a></p>
+
+            <p style="margin-top: 5px; font-size: 16px; font-weight: bold;">
+                <a href="https://github.com/its-succ/my-touring-links" target="_blank" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="var(--color-primary)" viewBox="0 0 24 24" style="vertical-align: middle;">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.087-.745.084-.729.084-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.837 2.809 1.305 3.493.998.108-.776.417-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.516.111-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.046.138 3.003.404 2.292-1.552 3.3-.921 3.3-.921.645 1.66.233 2.873.111 3.176.769.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.923.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.824.576C20.565 22.257 24 17.756 24 12c0-6.627-5.374-12-12-12z"/>
+                    </svg>
+                    My Touring Links GitHub Repository
+                </a>
+            </p>
+
+            <p style="margin-top: 5px; font-size: 14px;">
+                <span style="color: white; font-weight: bold;">貢献しませんか？</span>
+                <a href="https://github.com/its-succ/my-touring-links/issues" target="_blank" style="margin-left: 15px;">バグ・改善点の報告（Issue）</a>
+                |
+                <a href="https://github.com/its-succ/my-touring-links/pulls" target="_blank">機能の提案・貢献（PR）</a>
+            </p>
         </div>
     </footer>
 
