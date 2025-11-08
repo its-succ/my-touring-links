@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Touring Links</title>
+    <meta name="description" content="複数台の車で旅行するための、制限のない柔軟なルート作成と地図共有を実現。">
+    <link rel="icon" href="favicon.ico">
+    <style>
+        /* DAISY UI 'lemonade' テーマを標準CSSで再現 */
+        :root {
+            /* OKLCH値を近似したHEXカラー */
+            --color-primary: #ffd700; /* レモンイエロー (Primary) */
+            --color-secondary: #ffb800; /* オレンジ (Secondary) - セクション背景に利用 */
+            --color-accent: #ff9454; /* コーラル/オレンジピンク (Accent) - CTAボタン */
+            --color-base-100: #fafaf6; /* メイン背景 (Base-100) */
+            --color-base-200: #f0f0e8; /* カード背景などに利用 */
+            --color-base-content: #3a3a35; /* 濃いテキスト色 */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--color-base-content); /* 濃いテキスト色 */
+            background-color: var(--color-base-100); /* メイン背景色 */
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ヘッダー */
+        header {
+            background-color: var(--color-base-100);
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--color-base-content);
+            text-decoration: none;
+        }
+
+        /* ヒーローセクション（ファーストビュー） */
+        #hero {
+            background-color: var(--color-base-100); /* Base-100 (明るい背景) */
+            padding: 80px 0;
+            text-align: center;
+        }
+        #hero h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--color-base-content);
+        }
+        #hero p.subtitle {
+            font-size: 18px;
+            color: var(--color-base-content);
+            margin-bottom: 30px;
+        }
+        .cta-button {
+            /* アクセントカラー (FF9454) を使用 */
+            display: inline-block;
+            background-color: var(--color-accent);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .cta-button:hover {
+            background-color: #e37d3d; /* 少し濃いめのアクセント */
+        }
+
+        /* セクション共通 */
+        section {
+            padding: 60px 0;
+        }
+        section h2 {
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 40px;
+            border-bottom: 3px solid var(--color-primary);
+
+            /* === ここに max-width を追加 === */
+            max-width: 800px; /* 見出しの最大幅を設定 */
+            width: 90%; /* スマホ表示でも適切に幅を確保 */
+            /* ============================== */
+
+            display: inline-block;
+            padding-bottom: 5px;
+            margin-left: 50%;
+            transform: translateX(-50%);
+        }
+        /* 機能・メリット */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .feature-card {
+            background-color: var(--color-base-200); /* 少し色味のある背景 */
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        .feature-card h3 {
+            color: var(--color-accent); /* 見出し色をアクセントに */
+            font-size: 20px;
+            margin-top: 0;
+        }
+        .feature-card p {
+            font-size: 15px;
+        }
+
+        /* 開発者メッセージ */
+        #developer-message {
+            background-color: #f7f7f7; /* ベース200より少し濃い色 */
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid #eee;
+        }
+        #developer-message p {
+            max-width: 700px;
+            margin: 15px auto;
+            font-style: italic;
+        }
+
+        /* クロージングCTAセクション */
+        #cta-final {
+            /* プライマリーカラーの薄い色を利用 */
+            background-color: #fffae8;
+        }
+
+        /* フッター */
+        footer {
+            background-color: var(--color-base-content); /* 濃いテキスト色をフッター背景に利用 */
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 14px;
+        }
+        footer a {
+            color: var(--color-primary); /* レモンイエローのリンク色 */
+            text-decoration: none;
+        }
+    </style>
+  </head>
+<body>
+
+    <header>
+        <div class="container">
+            <a href="#hero" class="logo">My Touring Links</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container">
+                <h1>複数台での車旅の「ルート共有」が、<br>もっと<strong>自由</strong>で、もっと<strong>快適</strong>に。</h1>
+                <p class="subtitle">グループでの長距離・複数日ツーリングのための、煩わしい制限のない<strong>柔軟なルートプランニング</strong>と<strong>地図共有</strong>を実現するWebサービス。</p>
+                <a href="https://my-touring-links-806808118477.asia-northeast1.run.app/" class="cta-button" target="_blank">
+                    今すぐ無料で計画を始める
+                </a>
+
+                <img src="hero-image.png" alt="ビーナスラインをイメージした高原を走る複数台のオープンカーのイラスト"
+                     style="margin-top: 40px; max-width: 90%; height: auto; border-radius: 10px; box-shadow: 0 8px 15px rgba(0,0,0,0.1); display: block; margin-left: auto; margin-right: auto;">
+            </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2>✨ My Touring Linksが約束する「新しい旅のカタチ」</h2>
+                <div class="feature-grid">
+
+                    <div class="feature-card">
+                        <h3>計画の自由度が桁違い</h3>
+                        <p>Google Mapの制限に縛られず、<strong>何カ所でも</strong>目的地を設定可能。休憩も観光スポットもすべてを1つのルート計画に組み込めます。</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>リアルな旅程管理</h3>
+                        <p><strong>各目的地に「滞在時間」を設定</strong>できます。これにより、より正確で現実的なタイムスケジュールを立てることができ、グループへの情報共有がスムーズになります。</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>迷わない！即座にナビ開始 (NEW!)</h3>
+                        <p>共有された地図上の目的地をタップするだけで、その区間のルートを<strong>Google Mapのナビ画面として瞬時に起動</strong>できます。手動での設定手間が一切不要です。</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>ルートへのこだわりを実現</h3>
+                        <p>自動計算ルートが気に入らなくても、地図上をクリックするだけで<strong>好きな場所に経由地を追加</strong>可能。ツーリング愛好家のこだわりにしっかり応えます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="developer-message">
+            <div class="container">
+                <h2>💬 開発者からのメッセージ</h2>
+                <p>このサービス、略して<strong>「まつり」</strong>は、私自身が複数台でのツーリングで感じた「ルート計画と共有の難しさ」を解決するために生まれました。</p>
+                <p>「My Touring Links」が、あなたのグループ旅行の準備をより快適にし、最高の旅の思い出づくりに貢献できることを願っています。</p>
+            </div>
+        </section>
+
+
+        <section id="cta-final" style="text-align: center; background-color: #fff8e1; padding: 40px 0;">
+            <div class="container">
+                <h2>さあ、計画の煩わしさから解放された<br>最高のグループツーリングを始めましょう。</h2>
+                <a href="https://my-touring-links-806808118477.asia-northeast1.run.app/" class="cta-button" target="_blank">
+                    今すぐ My Touring Links でルートを計画する（無料）
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 My Touring Links. All rights reserved.</p>
+            <p><a href="https://github.com/its-succ/my-touring-links" target="_blank">GitHub Repository</a></p>
+        </div>
+    </footer>
+
+</body>
+</html>
