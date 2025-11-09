@@ -60,7 +60,7 @@
 
 <dialog class="modal"  aria-labelledby="place-editor-title" aria-describedby="place-editor-content" bind:this={editorModal}>
   <h3 id="place-editor-title" class="text-lg font-bold">場所の編集!</h3>
-  <div id="place-editor-content" class="modal-box w-[850px]">
+  <div id="place-editor-content" class="modal-box w-[95%] lg:w-[850px] ">
     <form bind:this={form} on:submit|preventDefault={handleSubmit}>
       <fieldset class="fieldset w-full mb-4 pt-0 pb-4 px-4">
         <legend class="fieldset-legend">表示名</legend>
@@ -96,7 +96,7 @@
           {:else}
             <input type="range" disabled bind:value={stayingTime} class="range range-primary glow ml-2" />
           {/if}
-          <span>
+          <span class="whitespace-nowrap">
             {#if !waypoint}
               ({stayingTime}分)
             {:else}
