@@ -58,12 +58,12 @@
           person
         {/if}
       </button>
-      <ul class="menu dropdown-content bg-base-100 rounded-box w-56 shadow-sm" bind:this={accoutMenu}>
+      <ul class="menu dropdown-content bg-neutral rounded-box w-56 shadow-sm" bind:this={accoutMenu}>
         {#if loggedIn}
-          <li class="menu-title">{user?.name}</li>
+          <li class="menu-title text-neutral-content">{user?.name}</li>
         {/if}
-        <li class={loggedIn ? 'menu-disabled': 'text-neutral'}><button on:click={login} disabled={loggedIn}>Googleアカウントでログイン</button></li>
-        <li class={!loggedIn ? 'menu-disabled': 'text-neutral'}><button on:click={logout} disabled={!loggedIn}>ログアウト</button></li>
+        <li class={loggedIn ? 'text-neutral-500': 'text-neutral-content'}><button on:click={login} disabled={loggedIn}>Googleアカウントでログイン</button></li>
+        <li class={!loggedIn ? 'text-neutral-500': 'text-neutral-content'}><button on:click={logout} disabled={!loggedIn}>ログアウト</button></li>
       </ul>
     </div>
   </div>

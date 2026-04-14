@@ -41,14 +41,14 @@
     <button  aria-label="メニュー">
       <span class="material-symbols-outlined">more_vert</span>
     </button>
-    <ul class="menu dropdown-content bg-base-100 rounded-box w-56 shadow-sm">
-      <li>
+    <ul class="menu dropdown-content bg-neutral rounded-box w-56 shadow-sm">
+      <li class="text-neutral-content">
         <a href={`${$page.url.href}/settings`} class="text-nowrap">
           <span class="material-symbols-outlined">settings</span>
           出発日時の設定
         </a>
       </li>
-      <li>
+      <li class="text-neutral-content">
         <button disabled={!loggedIn} on:click={() => saveTouring()} class="text-nowrap">
           <span class="material-symbols-outlined">bookmark</span>
           保存と共有
