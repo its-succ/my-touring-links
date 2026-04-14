@@ -45,7 +45,12 @@
           .join('|')
       );
     }
-    window.open(url, '_blank', 'noopener,noreferrer');
+    const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isMobile) {
+      location.href = url.toString();
+    } else {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   }
 </script>
 
